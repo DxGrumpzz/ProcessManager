@@ -1,0 +1,4 @@
+[Process]
+C:\WINDOWS\system32\notepad.exe
+[Args]
+C:\Users\yosi1\Desktop\Wrists.txt
