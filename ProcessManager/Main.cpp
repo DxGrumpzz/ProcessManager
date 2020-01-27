@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <string>
 
 std::string GetErrorString(DWORD error)
 {
@@ -38,7 +39,7 @@ struct ProcessModel
         
 
 // Returns a list of ProcessModel which contain name and arguments of a process 
-std::vector<ProcessModel> GetProcessList(const char* filename)
+std::vector<ProcessModel> GetProcessList(const char* filename = "Processes.txt")
 {
     // Stores the list of processes as a ProcessModel struct
     std::vector<ProcessModel> processes;
@@ -58,35 +59,36 @@ std::vector<ProcessModel> GetProcessList(const char* filename)
     // This is absolute aids. 
     // This will improve
 
-    // Iterate through the file by line by line
-    for (std::string line; std::getline(file, line);)
+
+    // Iterate through the file line by line
+    // Store current read line 
+    std::string line;
+    while (std::getline(file, line))
     {
-        // If current line specifies a process name
+        // If current line is the process name
         if (line == "[Process]")
         {
-            // Get the name of the process
-            std::string processName; 
-            file >> processName;
+            // Read process name into current line
+            std::getline(file, line);
 
-            // Add "new" process to the list without arguments
-            processes.emplace_back(processName, "");
+            // Add the process to the list
+            processes.emplace_back(line, "");
         }
-        // If current line specifies a processes args
+        // If current line is the process' arguments
         else if (line == "[Args]")
         {
-            // Get args 
-            std::string processArgs;
-            file >> processArgs;
+            // Read next line
+            std::getline(file, line);
 
             // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
-            processArgs.insert(processArgs.begin(), ' ');
+            line.insert(line.begin(), ' ');
 
-            // Get last process created, And set it's argument
-            auto process= (processes.end() - 1);
-            process->ProcessArgs = processArgs;
+            // Set the process' arguments
+            auto process = (processes.end() - 1);
+            process->ProcessArgs = line;
+        };
         };
 
-    };
 
     return processes;
 };
