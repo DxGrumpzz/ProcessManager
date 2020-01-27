@@ -5,6 +5,10 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <future>
+#include <iostream>
+
+
 
 std::string GetErrorString(DWORD error)
 {
@@ -120,4 +124,81 @@ int main()
         std::string errorString = GetErrorString(GetLastError());
     };
 
+std::vector<PROCESS_INFORMATION*> processHandles;
+
+
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
+{
+    for (const PROCESS_INFORMATION* process : processHandles)
+    {
+        auto result1 = TerminateProcess(processHandles[0]->hProcess, 0);
+    };
+
+     return FALSE;
+};
+
+
+PROCESS_INFORMATION DoProcess()
+{
+    STARTUPINFOA info = { sizeof(info) };
+    PROCESS_INFORMATION processInfo;
+
+    auto processName = "C:\\Users\\yosi1\\Desktop\\TestProcess.exe";
+    LPSTR args = const_cast<char*>(" asdf 1 12 123");
+
+
+    if (!CreateProcessA(processName, args, NULL, NULL, FALSE, /*CREATE_NO_WINDOW |*/ CREATE_NEW_CONSOLE, NULL, NULL, &info, &processInfo))
+    {
+        std::string errorString = GetErrorString(GetLastError());
+
+        return processInfo;
+    };
+
+    return processInfo;
+};
+
+
+
+int main()
+{
+    // Intercept user exit to clear the processes
+    SetConsoleCtrlHandler(CtrlHandler, TRUE);
+    
+    std::cout << "Creating 3 processes" << "\n";
+
+    for (int a = 0; a < 1; a++)
+    {
+        auto result = DoProcess();
+
+        if (result.dwProcessId != 0x0)
+        {
+            processHandles.push_back(&result);
+        };
+    };
+
+
+    std::cin.get();
+
+
+    /*
+    std::vector<ProcessModel> processes = GetProcessList();
+    std::vector<std::future<void>> processThreads;
+
+    std::cout << "Running " << processes.size() << " procceses" << "\n";
+
+
+    for (const ProcessModel& process : processes)
+    {
+        processThreads.push_back(std::async(std::launch::async, RunProcess, process));
+    };
+
+
+    for (const std::future<void>& future : processThreads)
+    {
+        future.wait();
+    };
+
+
+    std::cin.get();
+    */
 };
