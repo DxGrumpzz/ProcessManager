@@ -129,7 +129,7 @@ PROCESS_INFORMATION RunProcess(const ProcessModel& process)
 
     // Try to create the process
     // If process creation failed
-    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
+    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, FALSE, STARTF_USESHOWWINDOW, NULL, NULL, &info, &processInfo))
     {
         // Get error message
         DWORD errorID = GetLastError();
@@ -165,6 +165,7 @@ int main()
 
 
     // For every process request try to run it
+    int counter = 0;
     for (const ProcessModel& process : processes)
     {
         auto result = RunProcess(process);
@@ -172,8 +173,11 @@ int main()
         // If process creation was successful
         if (result.dwProcessId != 0x0)
         {
+            std::cout << process.ProcessName << " created succesfully [" << counter << "]" << "\n";
+         
             // Add process handle to process list
             _processList.push_back(result);
+            counter++;
         };
     };
     
