@@ -132,9 +132,12 @@ std::vector<PROCESS_INFORMATION> processHandles;
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
-    for (const PROCESS_INFORMATION* process : processHandles)
+    for (const PROCESS_INFORMATION& process : processHandles)
     {
-        auto result1 = TerminateProcess(processHandles[0]->hProcess, 0);
+        TerminateProcess(process.hProcess, 0);
+
+        CloseHandle(process.hProcess);
+        CloseHandle(process.hThread);
     };
 
      return FALSE;
@@ -152,7 +155,9 @@ PROCESS_INFORMATION DoProcess()
 
     if (!CreateProcessA(processName, args, NULL, NULL, FALSE, /*CREATE_NO_WINDOW |*/ CREATE_NEW_CONSOLE, NULL, NULL, &info, &processInfo))
     {
-        std::string errorString = GetErrorString(GetLastError());
+        
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
 
         return processInfo;
     };
@@ -175,7 +180,7 @@ int main()
 
         if (result.dwProcessId != 0x0)
         {
-            processHandles.push_back(&result);
+            processHandles.push_back(result);
         };
     };
 
