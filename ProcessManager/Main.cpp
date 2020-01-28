@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include <processthreadsapi.h >
 #include <cstring>
 #include <sstream>
 #include <fstream>
@@ -125,6 +124,10 @@ int main()
     };
 
 std::vector<PROCESS_INFORMATION*> processHandles;
+
+
+
+std::vector<PROCESS_INFORMATION> processHandles;
 
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
