@@ -8,6 +8,7 @@
 #include <iostream>
 
 
+// Takes a DWORD error code and returns its string message 
 std::string GetErrorString(DWORD error)
 {
     // Stores the error message as a string in memory
@@ -23,10 +24,13 @@ std::string GetErrorString(DWORD error)
     return message;
 };
 
-
+// A model class for a process
 struct ProcessModel
 {
+    // The name/path of the process
     std::string ProcessName;
+
+    // The process' arguments
     std::string ProcessArgs;
 
     ProcessModel(std::string _processName, std::string _processArgs) :
@@ -36,7 +40,6 @@ struct ProcessModel
     };
 
 };
-
 
 
 // Returns a list of ProcessModel which contain name and arguments of a process 
@@ -95,35 +98,11 @@ std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Process
 };
 
 
-void RunProcess(const ProcessModel& process)
-{
-    LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
-
-    STARTUPINFOA info = { sizeof(info) };
-    PROCESS_INFORMATION processInfo = { 0 };
-
-
-    if (CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
-    {
-        // Get process exit code after exiting
-        LPDWORD exitCode = { 0 };
-        GetExitCodeProcess(processInfo.hProcess, (LPDWORD)&exitCode);
-
-        // Close/free process handles
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
-    }
-    else
-    {
-        std::string errorString = GetErrorString(GetLastError());
-    };
-};
-
-
-
+// A list of processes which are currently running
 std::vector<PROCESS_INFORMATION> _processList;
 
 
+// Handles console closing 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
     for (const PROCESS_INFORMATION& process : _processList)
@@ -138,26 +117,31 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 };
 
 
-
-
-PROCESS_INFORMATION RunProcess(const char* processName, const char* processArgs)
+// Creates and runs a process
+PROCESS_INFORMATION RunProcess(const ProcessModel& process)
 {
+    // "Converts" the process arguments from the const char* to a char*
+    LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
+    
+    // Process information structs
     STARTUPINFOA info = { sizeof(info) };
     PROCESS_INFORMATION processInfo;
 
-    LPSTR args = const_cast<char*>(processArgs);
-
-
-    if (!CreateProcessA(processName, args, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
+    // Try to create the process
+    // If process creation failed
+    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
     {
+        // Get error message
         DWORD errorID = GetLastError();
-
         std::string errorString = GetErrorString(errorID);
+
+        // display error(s)
         if (errorID == ERROR_FILE_NOT_FOUND)
         {
-            std::cout << "File not found: " << processName << "\n";
+            std::cout << "File not found: " << process.ProcessName << "\n";
         };
 
+        // Clean process junk
         CloseHandle(processInfo.hProcess);
         CloseHandle(processInfo.hThread);
 
@@ -174,17 +158,21 @@ int main()
     // Intercept user exit to clear the processes
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
 
+    // Get processes from file
     std::vector<ProcessModel> processes = GetProcessListFromFile();
 
     std::cout << "Creating " << processes.size() << " procceses" << "\n";
 
 
+    // For every process request try to run it
     for (const ProcessModel& process : processes)
     {
-        auto result = RunProcess(process.ProcessName.c_str(), process.ProcessArgs.c_str());
+        auto result = RunProcess(process);
 
+        // If process creation was successful
         if (result.dwProcessId != 0x0)
         {
+            // Add process handle to process list
             _processList.push_back(result);
         };
     };
