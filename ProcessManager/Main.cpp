@@ -8,7 +8,6 @@
 #include <iostream>
 
 
-
 std::string GetErrorString(DWORD error)
 {
     // Stores the error message as a string in memory
@@ -27,10 +26,8 @@ std::string GetErrorString(DWORD error)
 
 struct ProcessModel
 {
-
     std::string ProcessName;
     std::string ProcessArgs;
-    
 
     ProcessModel(std::string _processName, std::string _processArgs) :
         ProcessName(_processName),
@@ -39,10 +36,11 @@ struct ProcessModel
     };
 
 };
-        
+
+
 
 // Returns a list of ProcessModel which contain name and arguments of a process 
-std::vector<ProcessModel> GetProcessList(const char* filename = "Processes.txt")
+std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Processes.txt")
 {
     // Stores the list of processes as a ProcessModel struct
     std::vector<ProcessModel> processes;
@@ -90,29 +88,26 @@ std::vector<ProcessModel> GetProcessList(const char* filename = "Processes.txt")
             auto process = (processes.end() - 1);
             process->ProcessArgs = line;
         };
-        };
+    };
 
 
     return processes;
 };
-int main()
+
+
+void RunProcess(const ProcessModel& process)
 {
-    const char* path = "C:\\WINDOWS\\system32\\notepad.exe";
-    
-    LPSTR args = const_cast<char*>(" C:\\Users\\yosi1\\Desktop\\Wrists.txt");
+    LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
 
     STARTUPINFOA info = { sizeof(info) };
     PROCESS_INFORMATION processInfo = { 0 };
 
-    
-    if (CreateProcessA(path, args, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo))
-    {
-        // Block current thread until process exists
-        WaitForSingleObject(processInfo.hProcess, INFINITE);
 
+    if (CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
+    {
         // Get process exit code after exiting
         LPDWORD exitCode = { 0 };
-        BOOL s = GetExitCodeProcess(processInfo.hProcess, (LPDWORD)&exitCode);
+        GetExitCodeProcess(processInfo.hProcess, (LPDWORD)&exitCode);
 
         // Close/free process handles
         CloseHandle(processInfo.hProcess);
@@ -122,17 +117,16 @@ int main()
     {
         std::string errorString = GetErrorString(GetLastError());
     };
-
-std::vector<PROCESS_INFORMATION*> processHandles;
-
+};
 
 
-std::vector<PROCESS_INFORMATION> processHandles;
+
+std::vector<PROCESS_INFORMATION> _processList;
 
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
-    for (const PROCESS_INFORMATION& process : processHandles)
+    for (const PROCESS_INFORMATION& process : _processList)
     {
         TerminateProcess(process.hProcess, 0);
 
@@ -140,22 +134,30 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
         CloseHandle(process.hThread);
     };
 
-     return FALSE;
+    return FALSE;
 };
 
 
-PROCESS_INFORMATION DoProcess()
+
+
+PROCESS_INFORMATION RunProcess(const char* processName, const char* processArgs)
 {
     STARTUPINFOA info = { sizeof(info) };
     PROCESS_INFORMATION processInfo;
 
-    auto processName = "C:\\Users\\yosi1\\Desktop\\TestProcess.exe";
-    LPSTR args = const_cast<char*>(" asdf 1 12 123");
+    LPSTR args = const_cast<char*>(processArgs);
 
 
-    if (!CreateProcessA(processName, args, NULL, NULL, FALSE, /*CREATE_NO_WINDOW |*/ CREATE_NEW_CONSOLE, NULL, NULL, &info, &processInfo))
+    if (!CreateProcessA(processName, args, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
     {
-        
+        DWORD errorID = GetLastError();
+
+        std::string errorString = GetErrorString(errorID);
+        if (errorID == ERROR_FILE_NOT_FOUND)
+        {
+            std::cout << "File not found: " << processName << "\n";
+        };
+
         CloseHandle(processInfo.hProcess);
         CloseHandle(processInfo.hThread);
 
@@ -171,42 +173,22 @@ int main()
 {
     // Intercept user exit to clear the processes
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
-    
-    std::cout << "Creating 3 processes" << "\n";
 
-    for (int a = 0; a < 1; a++)
-    {
-        auto result = DoProcess();
+    std::vector<ProcessModel> processes = GetProcessListFromFile();
 
-        if (result.dwProcessId != 0x0)
-        {
-            processHandles.push_back(result);
-        };
-    };
-
-
-    std::cin.get();
-
-
-    /*
-    std::vector<ProcessModel> processes = GetProcessList();
-    std::vector<std::future<void>> processThreads;
-
-    std::cout << "Running " << processes.size() << " procceses" << "\n";
+    std::cout << "Creating " << processes.size() << " procceses" << "\n";
 
 
     for (const ProcessModel& process : processes)
     {
-        processThreads.push_back(std::async(std::launch::async, RunProcess, process));
+        auto result = RunProcess(process.ProcessName.c_str(), process.ProcessArgs.c_str());
+
+        if (result.dwProcessId != 0x0)
+        {
+            _processList.push_back(result);
+        };
     };
-
-
-    for (const std::future<void>& future : processThreads)
-    {
-        future.wait();
-    };
-
+    
 
     std::cin.get();
-    */
 };
