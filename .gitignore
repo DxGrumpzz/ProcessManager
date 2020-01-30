@@ -13,6 +13,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# User defined process list to run
+ProcessManager/Processes.txt
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -338,3 +341,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+
