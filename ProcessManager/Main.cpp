@@ -192,5 +192,49 @@ int main()
     };
     
 
+    std::string command;
+    std::vector<std::string> splitComamnd;
+
+    while (1)
+    {
+        std::getline(std::cin, command);
+        splitComamnd = SplitString(command, ' ');
+
+        if (splitComamnd[0] == "kill")
+        {
+            if (splitComamnd[1] == "all")
+            {
+                for (const PROCESS_INFORMATION& process : _processList)
+                {
+                    TerminateProcess(process.hProcess, 0);
+                  
+                    CloseHandle(process.hProcess);
+                    CloseHandle(process.hThread);
+                };
+            }
+            else
+            {
+                try
+                {
+                    int processIndex = std::stoi(splitComamnd[1]);
+
+                    TerminateProcess(_processList[processIndex].hProcess, 0);
+
+                    CloseHandle(_processList[processIndex].hProcess);
+                    CloseHandle(_processList[processIndex].hThread);
+
+                    std::cout << "Succesfully terminated" << "\n";
+                }
+                catch (const std::invalid_argument & exception)
+                {
+                    std::cout << "Invalid argument: " << splitComamnd[1] << "\n";
+                    continue;
+                };
+            };
+        };
+
+    };
+
+
     std::cin.get();
 };
