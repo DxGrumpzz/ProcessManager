@@ -1,11 +1,9 @@
 #include <Windows.h>
-#include <cstring>
-#include <sstream>
 #include <fstream>
 #include <vector>
 #include <string>
-#include <future>
 #include <iostream>
+
 
 
 // Takes a DWORD error code and returns its string message 
@@ -54,10 +52,10 @@ std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Process
     // If file is invalid
     if (!file)
     {
-        std::string error = "File error ";
+        std::string error = "File error. \nCould not open: ";
         error.append(filename);
 
-        throw new std::runtime_error(error);
+        throw std::exception(error.c_str());
     };
 
     // This is absolute aids. 
@@ -100,21 +98,6 @@ std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Process
 
 // A list of processes which are currently running
 std::vector<PROCESS_INFORMATION> _processList;
-
-
-// Handles console closing 
-BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
-{
-    for (const PROCESS_INFORMATION& process : _processList)
-    {
-        TerminateProcess(process.hProcess, 0);
-
-        CloseHandle(process.hProcess);
-        CloseHandle(process.hThread);
-    };
-
-    return FALSE;
-};
 
 
 // Creates and runs a process
