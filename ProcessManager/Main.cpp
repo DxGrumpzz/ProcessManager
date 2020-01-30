@@ -135,17 +135,44 @@ PROCESS_INFORMATION RunProcess(const ProcessModel& process)
 };
 
 
+// Takes a string and spilts it into several other strings
+std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
+{
+    // Store the split strings
+    std::vector<std::string> strings;
+
+    // The previous index where the delimiter was located
+    int previousSpaceIndex = 0;
+
+    for (int a = 0; a < stringToSplit.size(); a++)
+{
+        const char& currentChar = stringToSplit[a];
+
+        // If the currenct character matches the delimiter
+        if (currentChar == delimiter)
+        {
+            // Use substring function to take the string in between the previous index and the current index - previous
+            strings.emplace_back(stringToSplit.substr(previousSpaceIndex, a - previousSpaceIndex));
+
+            previousSpaceIndex = a + 1;
+        };
+    };
+
+    // Add last string
+    strings.emplace_back(stringToSplit.substr(previousSpaceIndex, stringToSplit.size() - 1));
+
+    return strings;
+};
+
+
+
 
 int main()
 {
-    // Intercept user exit to clear the processes
-    SetConsoleCtrlHandler(CtrlHandler, TRUE);
-
     // Get processes from file
     std::vector<ProcessModel> processes = GetProcessListFromFile();
 
     std::cout << "Creating " << processes.size() << " procceses" << "\n";
-
 
     // For every process request try to run it
     int counter = 0;
