@@ -105,14 +105,18 @@ PROCESS_INFORMATION RunProcess(const ProcessModel& process)
 {
     // "Converts" the process arguments from the const char* to a char*
     LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
-    
+
     // Process information structs
-    STARTUPINFOA info = { sizeof(info) };
-    PROCESS_INFORMATION processInfo;
+    STARTUPINFOA info = { 0 };
+    info.wShowWindow = FALSE;
+    info.cb = sizeof(STARTUPINFO);
+
+    PROCESS_INFORMATION processInfo = { 0 };
+
 
     // Try to create the process
     // If process creation failed
-    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, FALSE, STARTF_USESHOWWINDOW, NULL, NULL, &info, &processInfo))
+    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
     {
         // Get error message
         DWORD errorID = GetLastError();
@@ -125,8 +129,8 @@ PROCESS_INFORMATION RunProcess(const ProcessModel& process)
         };
 
         // Clean process junk
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
+         CloseHandle(processInfo.hProcess);
+         CloseHandle(processInfo.hThread);
 
         return processInfo;
     };
@@ -145,7 +149,7 @@ std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
     int previousSpaceIndex = 0;
 
     for (int a = 0; a < stringToSplit.size(); a++)
-{
+    {
         const char& currentChar = stringToSplit[a];
 
         // If the currenct character matches the delimiter
@@ -166,14 +170,13 @@ std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
 
 
 
-
 int main()
 {
     // Get processes from file
     std::vector<ProcessModel> processes = GetProcessListFromFile();
 
     std::cout << "Creating " << processes.size() << " procceses" << "\n";
-
+    
     // For every process request try to run it
     int counter = 0;
     for (const ProcessModel& process : processes)
@@ -181,16 +184,16 @@ int main()
         auto result = RunProcess(process);
 
         // If process creation was successful
-        if (result.dwProcessId != 0x0)
+        if (result.dwProcessId)
         {
             std::cout << process.ProcessName << " created succesfully [" << counter << "]" << "\n";
-         
+
             // Add process handle to process list
             _processList.push_back(result);
             counter++;
         };
     };
-    
+
 
     std::string command;
     std::vector<std::string> splitComamnd;
