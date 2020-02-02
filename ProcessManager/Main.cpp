@@ -148,7 +148,7 @@ std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
     // The previous index where the delimiter was located
     int previousSpaceIndex = 0;
 
-    for (int a = 0; a < stringToSplit.size(); a++)
+    for (size_t a = 0; a < stringToSplit.size(); a++)
     {
         const char& currentChar = stringToSplit[a];
 
@@ -169,9 +169,134 @@ std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
 };
 
 
+PROCESS_INFORMATION RunProcess2(const ProcessModel& process)
+{
+    // "Converts" the process arguments from the const char* to a char*
+    LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
+
+    // Process information structs
+    STARTUPINFOA info = { 0 };
+    info.wShowWindow = FALSE;
+    info.cb = sizeof(STARTUPINFO);
+
+    PROCESS_INFORMATION processInfo = { 0 };
+
+
+
+    return processInfo;
+};
+
+
+
+void GetAllWindowsFromProcessID(DWORD dwProcessID, std::vector <HWND>& vhWnds)
+{
+    HWND hCurWnd = NULL;
+
+    do
+    {
+        hCurWnd = FindWindowExW(NULL, hCurWnd, NULL, NULL);
+        
+        DWORD _dwProcessID = 0;
+        GetWindowThreadProcessId(hCurWnd, &_dwProcessID);
+
+
+        if (_dwProcessID == dwProcessID)
+        {
+            std::cout << "found " << hCurWnd << "\n";
+
+            vhWnds.push_back(hCurWnd);  
+        };
+
+    } 
+    while (hCurWnd != NULL);
+}
+
+
+
+//HWND g_HWND = NULL;
+std::vector<HWND> handles;
+BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
+{
+    DWORD lpdwProcessId;
+    GetWindowThreadProcessId(hwnd, &lpdwProcessId);
+
+    if (lpdwProcessId == lParam)
+    {
+        handles.push_back(hwnd);
+        //return FALSE;
+    };
+
+    return TRUE;
+}
+
+
 
 int main()
 {
+
+    //SHELLEXECUTEINFO ShExecInfo;
+    //ShExecInfo.nShow = false;
+    //HWND consoleHandle = GetConsoleWindow();
+    
+    //HINSTANCE result = ShellExecuteW(consoleHandle, L"open", L"cmd", L"start C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, SW_HIDE);
+
+    //SHELLEXECUTEINFO ShExecInfo;
+    //ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+    //ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    //ShExecInfo.hwnd = GetConsoleWindow();
+    //ShExecInfo.lpParameters = L"/c";
+    //ShExecInfo.lpVerb = L"open";
+    //ShExecInfo.lpFile = L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe";
+    //ShExecInfo.lpDirectory = NULL;
+    //ShExecInfo.nShow = 1;
+
+    //BOOL result = ShellExecuteEx(&ShExecInfo);
+    //
+    //BOOL result2 = ShowWindow((HWND)ShExecInfo.hProcess,SW_HIDE);
+    //
+    //std::string errorString = GetErrorString(GetLastError());
+
+    //TerminateProcess(ShExecInfo.hProcess, 0);
+    //CloseHandle(ShExecInfo.hProcess);
+
+    //std::string errorString2 = GetErrorString(GetLastError());
+    
+    STARTUPINFOW info = { 0 };
+    info.wShowWindow = FALSE;
+    info.cb = sizeof(STARTUPINFOW);
+    info.dwFlags = STARTF_USESHOWWINDOW;
+    info.wShowWindow = SW_HIDE;
+
+    PROCESS_INFORMATION processInfo = { 0 };
+
+    BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, TRUE, NULL, NULL, NULL, &info, &processInfo);
+    
+
+    if (!result)
+    {
+        DWORD errorID = GetLastError();
+        std::string errorString = GetErrorString(errorID);
+    };
+
+    EnumWindows(EnumWindowsCallback, processInfo.dwProcessId);
+   
+    WINDOWINFO windowInfo = { 0 };
+    GetWindowInfo(handles[0], &windowInfo);
+
+    for (const HWND& handle : handles)
+    {
+        SetFocus(handle);
+        ShowWindow(handle, SW_HIDE);
+    };
+
+    TerminateProcess(processInfo.hProcess, 0);
+    CloseHandle(processInfo.hProcess);
+    CloseHandle(processInfo.hThread);
+
+
+    return 0;
+
+
     // Get processes from file
     std::vector<ProcessModel> processes = GetProcessListFromFile();
 
@@ -197,7 +322,7 @@ int main()
 
     std::string command;
     std::vector<std::string> splitComamnd;
-
+    
     while (1)
     {
         std::getline(std::cin, command);
@@ -210,7 +335,7 @@ int main()
                 for (const PROCESS_INFORMATION& process : _processList)
                 {
                     TerminateProcess(process.hProcess, 0);
-                  
+
                     CloseHandle(process.hProcess);
                     CloseHandle(process.hThread);
                 };
@@ -228,14 +353,17 @@ int main()
 
                     std::cout << "Succesfully terminated" << "\n";
                 }
-                catch (const std::invalid_argument & exception)
+                catch (std::invalid_argument)
                 {
                     std::cout << "Invalid argument: " << splitComamnd[1] << "\n";
                     continue;
                 };
             };
+        }
+        else
+        {
+            std::cout << "Uknown command " << command << "\n";
         };
-
     };
 
 
