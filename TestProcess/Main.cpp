@@ -1,5 +1,17 @@
 #include <windows.h>
 #include <string>
+#include <vector>
+#include <tlhelp32.h>
+#include <wbemcli.h>
+#include <msinkaut.h>
+
+#define _WIN32_DCOM
+#include <iostream>
+using namespace std;
+#include <comdef.h>
+#include <Wbemidl.h>
+
+#pragma comment(lib, "wbemuuid.lib")
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
@@ -29,6 +41,47 @@ std::wstring GetErrorStringW(DWORD error)
 const wchar_t* windowTitle = L"Window title";
 const wchar_t* windowClassName = L"DesktopApp";
 
+
+
+std::vector<HWND> handles;
+PROCESS_INFORMATION processInfo = { 0 };
+
+
+BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
+{
+    DWORD lpdwProcessId;
+    GetWindowThreadProcessId(hwnd, &lpdwProcessId);
+
+    if (lpdwProcessId == lParam)
+    {
+        handles.push_back(hwnd);
+    };
+
+    return TRUE;
+}
+
+
+void GetHwnds(DWORD processID)
+{
+
+    int previousHandleSize = 0;
+
+    do
+    {
+        previousHandleSize = handles.size();
+        EnumWindows(EnumWindowsCallback, processID);
+    }
+    while (previousHandleSize < 1);
+
+}
+
+
+
+void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
+{
+    ShowWindowAsync(hwnd, SW_HIDE);
+    handles.push_back(hwnd);
+};
 
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -66,29 +119,70 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             if (HIWORD(wParam) == BN_CLICKED)
             {
                 WORD buttonId = LOWORD(wParam);
-                
+
                 switch (buttonId)
                 {
                     // Create process button
                     case 0:
                     {
-                        int s = 9;
+                        STARTUPINFOW info = { 0 };
+                        info.cb = sizeof(STARTUPINFOW);
+                        info.dwFlags = STARTF_USESHOWWINDOW;
+                        info.wShowWindow = SW_HIDE;
+
+                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        
+                        HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+                       
+
+                        if (!ResumeThread(processInfo.hThread))
+                        {
+                            TerminateProcess(processInfo.hProcess, 0);
+
+                            CloseHandle(processInfo.hProcess);
+                            CloseHandle(processInfo.hThread);
+
+                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
+                        };
+
+
+                        if (!hook)
+                        {
+                            TerminateProcess(processInfo.hProcess, 0);
+
+                            CloseHandle(processInfo.hProcess);
+                            CloseHandle(processInfo.hThread);
+
+                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
+                        };
+
+
+                        //for (const HWND& hwnd : handles)
+                        //{
+                        //    Sleep(100);
+                        //    ShowWindow(hwnd, SW_HIDE);
+                        //};
+
+
                         break;
                     };
 
                     // Abort process button
                     case 1:
                     {
-                        int s = 9;
+                        TerminateProcess(processInfo.hProcess, 0);
+
+                        CloseHandle(processInfo.hProcess);
+                        CloseHandle(processInfo.hThread);
+
                         break;
                     };
                 };
             };
         };
 
-
     };
-    
+
     return DefWindowProcW(hWnd, message, wParam, lParam);
 };
 
@@ -129,10 +223,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                                       windowTitle,
                                       WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
                                       0, 0,
-                                      500, 350, 
-                                      NULL, 
-                                      NULL, 
-                                      hInstance, 
+                                      500, 350,
+                                      NULL,
+                                      NULL,
+                                      hInstance,
                                       NULL);
 
 
@@ -161,17 +255,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 
     HWND button2 = CreateWindowExW(NULL,
-                                  L"BUTTON",
-                                  L"Stop process",
-                                  WS_BORDER | WS_CHILD,
-                                  10,
-                                  45,
-                                  120,
-                                  30,
-                                  windowHWND,
-                                  (HMENU)1,
-                                  hInstance,
-                                  NULL);
+                                   L"BUTTON",
+                                   L"Stop process",
+                                   WS_BORDER | WS_CHILD,
+                                   10,
+                                   45,
+                                   120,
+                                   30,
+                                   windowHWND,
+                                   (HMENU)1,
+                                   hInstance,
+                                   NULL);
 
 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
