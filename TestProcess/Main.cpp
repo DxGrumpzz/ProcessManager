@@ -76,13 +76,18 @@ void GetHwnds(DWORD processID)
 }
 
 
-
+bool _doEvent = false;
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
     ShowWindowAsync(hwnd, SW_HIDE);
+    _doEvent = true;
     handles.push_back(hwnd);
 };
 
+
+
+HWND button;
+HWND button2;
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -91,31 +96,18 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         case WM_CLOSE:
         {
             PostQuitMessage(0);
-            break;
-        };
 
-        case WM_KEYDOWN:
-        {
-            if (wParam == VK_SPACE)
-            {
-                SetWindowTextW(hWnd, L"Changed title");
-            };
+            TerminateProcess(processInfo.hProcess, 0);
 
-            break;
-        };
+            CloseHandle(processInfo.hProcess);
+            CloseHandle(processInfo.hThread);
 
-        case WM_KEYUP:
-        {
-            if (wParam == VK_SPACE)
-            {
-                SetWindowTextW(hWnd, windowTitle);
-            };
-
-            break;
+            return TRUE;
         };
 
         case  WM_COMMAND:
         {
+
             if (HIWORD(wParam) == BN_CLICKED)
             {
                 WORD buttonId = LOWORD(wParam);
@@ -125,15 +117,18 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Create process button
                     case 0:
                     {
+
                         STARTUPINFOW info = { 0 };
                         info.cb = sizeof(STARTUPINFOW);
                         info.dwFlags = STARTF_USESHOWWINDOW;
                         info.wShowWindow = SW_HIDE;
 
-                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-                        
+                        //BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        //BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+
                         HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-                       
+
 
                         if (!ResumeThread(processInfo.hThread))
                         {
@@ -157,14 +152,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                         };
 
 
-                        //for (const HWND& hwnd : handles)
-                        //{
-                        //    Sleep(100);
-                        //    ShowWindow(hwnd, SW_HIDE);
-                        //};
-
-
-                        break;
+                        return TRUE;
                     };
 
                     // Abort process button
@@ -175,17 +163,47 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                         CloseHandle(processInfo.hProcess);
                         CloseHandle(processInfo.hThread);
 
-                        break;
+
+                        return TRUE;
                     };
                 };
             };
         };
 
+
+        case WM_SIZE:
+        {
+            int width = LOWORD(lParam);
+            int height = HIWORD(lParam);
+
+            SetWindowPos(button, HWND_BOTTOM,
+                         (width - 120) / 2, (height - 30) / 2 - 22.5,
+                         120, 30,
+                         NULL);
+
+            SetWindowPos(button2, HWND_BOTTOM,
+                        (width - 120) / 2, (height - 30) / 2 + 22.5,
+                         120, 30,
+                         NULL);
+
+            return TRUE;
+        };
+
+
+        case WM_DESTROY:
+        {
+            TerminateProcess(processInfo.hProcess, 0);
+
+            CloseHandle(processInfo.hProcess);
+            CloseHandle(processInfo.hThread);
+
+            return TRUE;
+        };
+
+        default:
+            return DefWindowProcW(hWnd, message, wParam, lParam);
     };
-
-    return DefWindowProcW(hWnd, message, wParam, lParam);
 };
-
 
 
 
@@ -240,32 +258,32 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         return 1;
     };
 
-    HWND button = CreateWindowExW(NULL,
-                                  L"BUTTON",
-                                  L"Create process",
-                                  WS_BORDER | WS_CHILD,
-                                  10,
-                                  10,
-                                  120,
-                                  30,
-                                  windowHWND,
-                                  (HMENU)0,
-                                  hInstance,
-                                  NULL);
+    button = CreateWindowExW(NULL,
+                             L"BUTTON",
+                             L"Create process",
+                             WS_BORDER | WS_CHILD,
+                             10,
+                             10,
+                             120,
+                             30,
+                             windowHWND,
+                             (HMENU)0,
+                             hInstance,
+                             NULL);
 
 
-    HWND button2 = CreateWindowExW(NULL,
-                                   L"BUTTON",
-                                   L"Stop process",
-                                   WS_BORDER | WS_CHILD,
-                                   10,
-                                   45,
-                                   120,
-                                   30,
-                                   windowHWND,
-                                   (HMENU)1,
-                                   hInstance,
-                                   NULL);
+    button2 = CreateWindowExW(NULL,
+                              L"BUTTON",
+                              L"Stop process",
+                              WS_BORDER | WS_CHILD,
+                              10,
+                              45,
+                              120,
+                              30,
+                              windowHWND,
+                              (HMENU)1,
+                              hInstance,
+                              NULL);
 
 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
@@ -283,6 +301,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     while (GetMessageW(&message, NULL, 0, 0) > 0)
     {
+        if (_doEvent == true)
+        {
+            _doEvent = false;
+
+            for (const HWND& hwnd : handles)
+            {
+                ShowWindow(hwnd, SW_HIDE);
+            };
+        };
+
         TranslateMessage(&message);
         DispatchMessageW(&message);
     };
