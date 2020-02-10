@@ -276,11 +276,36 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
+    const int  CHAR_MULTIPLIER = 8;
+    std::wstring processName = L"Process1";
+
+    int TEXT_HEIGHT = (int)(std::count(processName.begin(), processName.end(), L'\n') + 1) * 15;
+
+    const int TEXT_WIDTH = processName.size() * CHAR_MULTIPLIER;
+    
+    const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
+
+
+    HWND textBlock = CreateWindowExW(NULL,
+                                     L"STATIC",
+                                     processName.c_str(),
+                                     WS_CHILD,
+                                     TEXT_X_POSITION, 0,
+                                     TEXT_WIDTH, TEXT_HEIGHT,
+                                     windowHWND,
+                                     NULL,
+                                     hInstance,
+                                     NULL);
+
+
     ShowWindow(windowHWND, nShowCmd);
     UpdateWindow(windowHWND);
 
     ShowWindow(button, SW_SHOW);
     ShowWindow(button2, SW_SHOW);
+    ShowWindow(textBlock, SW_SHOW);
+    
+
 
     MSG message;
     while (GetMessageW(&message, NULL, 0, 0) > 0)
