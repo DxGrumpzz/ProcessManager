@@ -36,23 +36,57 @@ const wchar_t* windowClassName = L"DesktopApp";
 
 
 std::vector<HWND> handles;
-PROCESS_INFORMATION processInfo = { 0 };
+PROCESS_INFORMATION _processInfo = { 0 };
 
 
 
 bool _doEvent = false;
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
+{
     _doEvent = true;
-        handles.push_back(hwnd);
+    handles.push_back(hwnd);
+};
+
+
+BOOL CloseProcess(PROCESS_INFORMATION process)
+{
+    if (!TerminateProcess(process.hProcess, 0))
+        return FALSE;
+
+    if(!CloseHandle(process.hProcess))
+        return FALSE;
+
+    if(!CloseHandle(process.hThread))
+        return FALSE;
+    
+    return TRUE;
+}
+
+PROCESS_INFORMATION RunProcess(const wchar_t* processName)
+{
+    PROCESS_INFORMATION processInfo = { 0 };
+
+    STARTUPINFOW info = { 0 };
+    info.cb = sizeof(STARTUPINFOW);
+    info.dwFlags = STARTF_USESHOWWINDOW;
+    info.wShowWindow = SW_HIDE;
+
+    BOOL result = CreateProcessW(processName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+
+    HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, _processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+
+
+    if (!ResumeThread(_processInfo.hThread))
+    {
+        CloseProcess(processInfo);
     };
 
+    if (!hook)
+    {
+        CloseProcess(processInfo);
+    };
 
-void GetHwnds(DWORD processID)
-{
-
-    BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-
+    return processInfo;
 }
 
 
@@ -67,10 +101,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         {
             PostQuitMessage(0);
 
-            TerminateProcess(processInfo.hProcess, 0);
-
-            CloseHandle(processInfo.hProcess);
-            CloseHandle(processInfo.hThread);
+            CloseProcess(_processInfo);
 
             return TRUE;
         };
@@ -88,25 +119,25 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Create process button
                     case 0:
                     {
-
+                        /*
                         STARTUPINFOW info = { 0 };
                         info.cb = sizeof(STARTUPINFOW);
                         info.dwFlags = STARTF_USESHOWWINDOW;
                         info.wShowWindow = SW_HIDE;
 
-                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &_processInfo);
                         //BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
                         //BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
 
-                        HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+                        HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, _processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
 
-                        if (!ResumeThread(processInfo.hThread))
+                        if (!ResumeThread(_processInfo.hThread))
                         {
-                            TerminateProcess(processInfo.hProcess, 0);
+                            TerminateProcess(_processInfo.hProcess, 0);
 
-                            CloseHandle(processInfo.hProcess);
-                            CloseHandle(processInfo.hThread);
+                            CloseHandle(_processInfo.hProcess);
+                            CloseHandle(_processInfo.hThread);
 
                             MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
                         };
@@ -114,14 +145,16 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
                         if (!hook)
                         {
-                            TerminateProcess(processInfo.hProcess, 0);
+                            TerminateProcess(_processInfo.hProcess, 0);
 
-                            CloseHandle(processInfo.hProcess);
-                            CloseHandle(processInfo.hThread);
+                            CloseHandle(_processInfo.hProcess);
+                            CloseHandle(_processInfo.hThread);
 
                             MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
                         };
+                        */
 
+                        _processInfo = RunProcess(L"C:\\Software\\IL Spy\\ILSpy.exe");
 
                         return TRUE;
                     };
@@ -129,11 +162,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Abort process button
                     case 1:
                     {
-                        TerminateProcess(processInfo.hProcess, 0);
-
-                        CloseHandle(processInfo.hProcess);
-                        CloseHandle(processInfo.hThread);
-
+                        CloseProcess(_processInfo);
 
                         return TRUE;
                     };
@@ -150,10 +179,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         case WM_DESTROY:
         {
-            TerminateProcess(processInfo.hProcess, 0);
-
-            CloseHandle(processInfo.hProcess);
-            CloseHandle(processInfo.hThread);
+            CloseProcess(_processInfo);
 
             return TRUE;
         };
