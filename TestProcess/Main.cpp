@@ -276,26 +276,48 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
+    std::wstring processes[] =
+    {
+        L"Process1",
+        L"Process2",
+        L"Process3",
+        L"Process4",
+    };
+
+    HWND hwnds[sizeof(processes) / sizeof(processes[0])];
+    
     const int  CHAR_MULTIPLIER = 8;
-    std::wstring processName = L"Process1";
 
+
+    int index = 0;
+    for (const std::wstring& processName : processes)
+    {
     int TEXT_HEIGHT = (int)(std::count(processName.begin(), processName.end(), L'\n') + 1) * 15;
-
     const int TEXT_WIDTH = processName.size() * CHAR_MULTIPLIER;
     
     const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
+        const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
 
 
     HWND textBlock = CreateWindowExW(NULL,
                                      L"STATIC",
                                      processName.c_str(),
                                      WS_CHILD,
-                                     TEXT_X_POSITION, 0,
+                                         TEXT_X_POSITION, TEXT_Y_POSITION,
                                      TEXT_WIDTH, TEXT_HEIGHT,
                                      windowHWND,
                                      NULL,
                                      hInstance,
                                      NULL);
+
+        hwnds[index] = textBlock;
+
+        index++;
+    };
+
+
+
+
 
 
     ShowWindow(windowHWND, nShowCmd);
@@ -303,7 +325,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     ShowWindow(button, SW_SHOW);
     ShowWindow(button2, SW_SHOW);
-    ShowWindow(textBlock, SW_SHOW);
+    
+
+    for (const HWND& hwnd : hwnds)
+    {
+        ShowWindow(hwnd, SW_SHOW);
+    };
     
 
 
