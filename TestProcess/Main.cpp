@@ -39,43 +39,21 @@ std::vector<HWND> handles;
 PROCESS_INFORMATION processInfo = { 0 };
 
 
-BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
-{
-    DWORD lpdwProcessId;
-    GetWindowThreadProcessId(hwnd, &lpdwProcessId);
 
-    if (lpdwProcessId == lParam)
+bool _doEvent = false;
+void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
     {
+    _doEvent = true;
         handles.push_back(hwnd);
     };
-
-    return TRUE;
-}
 
 
 void GetHwnds(DWORD processID)
 {
 
-    int previousHandleSize = 0;
-
-    do
-    {
-        previousHandleSize = handles.size();
-        EnumWindows(EnumWindowsCallback, processID);
-    }
-    while (previousHandleSize < 1);
+    BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
 
 }
-
-
-bool _doEvent = false;
-void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-{
-    //ShowWindowAsync(hwnd, SW_HIDE);
-    _doEvent = true;
-    handles.push_back(hwnd);
-};
-
 
 
 HWND button;
@@ -116,9 +94,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                         info.dwFlags = STARTF_USESHOWWINDOW;
                         info.wShowWindow = SW_HIDE;
 
-                        //BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
                         //BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-                        BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
+                        //BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
 
                         HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
