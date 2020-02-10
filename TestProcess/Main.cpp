@@ -276,6 +276,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
+
     std::wstring processes[] =
     {
         L"Process1",
@@ -286,14 +287,23 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     HWND hwnds[sizeof(processes) / sizeof(processes[0])];
     
+    int longestProcessName = processes[0].size();
+
+    for (const std::wstring& string : processes)
+    {
+        if (string.size() > longestProcessName)
+            longestProcessName = string.size();
+    };
+
     const int  CHAR_MULTIPLIER = 8;
+
+    const int TEXT_WIDTH = longestProcessName * CHAR_MULTIPLIER;
 
 
     int index = 0;
     for (const std::wstring& processName : processes)
     {
-    int TEXT_HEIGHT = (int)(std::count(processName.begin(), processName.end(), L'\n') + 1) * 15;
-    const int TEXT_WIDTH = processName.size() * CHAR_MULTIPLIER;
+        int TEXT_HEIGHT = (int)(std::count(processName.begin(), processName.end(), L'\n') + 1) * 20;
     
     const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
         const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
@@ -302,15 +312,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     HWND textBlock = CreateWindowExW(NULL,
                                      L"STATIC",
                                      processName.c_str(),
-                                     WS_CHILD,
-                                         TEXT_X_POSITION, TEXT_Y_POSITION,
+                                         WS_CHILD | SS_CENTER | SS_NOTIFY,
+                                         TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
                                      TEXT_WIDTH, TEXT_HEIGHT,
                                      windowHWND,
-                                     NULL,
+                                         (HMENU)(index + 3),
                                      hInstance,
                                      NULL);
 
+        SetClassLongPtrW(textBlock, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
+
         hwnds[index] = textBlock;
+
+        ShowWindow(textBlock, SW_SHOW);
 
         index++;
     };
