@@ -5,14 +5,6 @@
 #include <wbemcli.h>
 #include <msinkaut.h>
 
-#define _WIN32_DCOM
-#include <iostream>
-using namespace std;
-#include <comdef.h>
-#include <Wbemidl.h>
-
-#pragma comment(lib, "wbemuuid.lib")
-
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
 
@@ -79,7 +71,7 @@ void GetHwnds(DWORD processID)
 bool _doEvent = false;
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
-    ShowWindowAsync(hwnd, SW_HIDE);
+    //ShowWindowAsync(hwnd, SW_HIDE);
     _doEvent = true;
     handles.push_back(hwnd);
 };
@@ -104,6 +96,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
             return TRUE;
         };
+
 
         case  WM_COMMAND:
         {
@@ -166,25 +159,12 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
                         return TRUE;
                     };
+
+
+                    default:
+                        return DefWindowProcW(hWnd, message, wParam, lParam);
                 };
             };
-        };
-
-
-        case WM_SIZE:
-        {
-            int width = LOWORD(lParam);
-            int height = HIWORD(lParam);
-
-            SetWindowPos(button, HWND_BOTTOM,
-                         (width - 120) / 2, (height - 30) / 2 - 22.5,
-                         120, 30,
-                         NULL);
-
-            SetWindowPos(button2, HWND_BOTTOM,
-                        (width - 120) / 2, (height - 30) / 2 + 22.5,
-                         120, 30,
-                         NULL);
 
             return TRUE;
         };
@@ -286,6 +266,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                               NULL);
 
 
+
+
+    // Set button cursor
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
@@ -295,10 +278,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     ShowWindow(button, SW_SHOW);
     ShowWindow(button2, SW_SHOW);
 
-
-
     MSG message;
-
     while (GetMessageW(&message, NULL, 0, 0) > 0)
     {
         if (_doEvent == true)
