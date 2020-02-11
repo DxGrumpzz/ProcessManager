@@ -1,9 +1,6 @@
 #include <windows.h>
 #include <string>
 #include <vector>
-#include <tlhelp32.h>
-#include <wbemcli.h>
-#include <msinkaut.h>
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
@@ -34,13 +31,18 @@ const wchar_t* windowTitle = L"Window title";
 const wchar_t* windowClassName = L"DesktopApp";
 
 
-
 std::vector<HWND> handles;
 PROCESS_INFORMATION _processInfo = { 0 };
 
-
+std::vector<PROCESS_INFORMATION> processList;
+HWINEVENTHOOK _hook;
 
 bool _doEvent = false;
+
+
+HWND button;
+HWND button2;
+
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
     _doEvent = true;
@@ -48,19 +50,85 @@ void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWN
 };
 
 
+struct ProcessModel
+{
+
+public:
+    wchar_t* ProcessName;
+    wchar_t* ProcessArgs;
+
+    PROCESS_INFORMATION ProcessInfo;
+    STARTUPINFOW info;
+
+    std::vector<HWND> handles;
+
+
+public:
+    ProcessModel()
+    {
+        info.cb = sizeof(STARTUPINFOW);
+        info.dwFlags = STARTF_USESHOWWINDOW;
+        info.wShowWindow = SW_HIDE;
+    };
+
+
+public:
+  
+    BOOL RunProcess()
+    {
+        if (!CreateProcessW(ProcessName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
+        {
+            CloseHandle(ProcessInfo.hProcess);
+            CloseHandle(ProcessInfo.hThread);
+
+            return FALSE;
+        };
+
+        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+
+
+        if (!ResumeThread(ProcessInfo.hThread))
+        {
+            CloseHandle(ProcessInfo.hProcess);
+            CloseHandle(ProcessInfo.hThread);
+
+            return FALSE;
+        };
+
+        return TRUE;
+    };
+
+    BOOL CloseProcess()
+    {
+        TerminateProcess(ProcessInfo.hProcess, 0);
+
+        if (!CloseHandle(ProcessInfo.hProcess))
+            return FALSE;
+
+        if (!CloseHandle(ProcessInfo.hThread))
+            return FALSE;
+
+        return TRUE;
+    }
+
+};
+
+
+
+
 BOOL CloseProcess(PROCESS_INFORMATION process)
 {
-    if (!TerminateProcess(process.hProcess, 0))
+    TerminateProcess(process.hProcess, 0);
+
+    if (!CloseHandle(process.hProcess))
         return FALSE;
 
-    if(!CloseHandle(process.hProcess))
-        return FALSE;
-
-    if(!CloseHandle(process.hThread))
+    if (!CloseHandle(process.hThread))
         return FALSE;
     
     return TRUE;
 }
+
 
 PROCESS_INFORMATION RunProcess(const wchar_t* processName)
 {
@@ -71,27 +139,26 @@ PROCESS_INFORMATION RunProcess(const wchar_t* processName)
     info.dwFlags = STARTF_USESHOWWINDOW;
     info.wShowWindow = SW_HIDE;
 
-    BOOL result = CreateProcessW(processName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-
-    HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, _processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-
-    if (!ResumeThread(_processInfo.hThread))
+    if (!CreateProcessW(processName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
     {
-        CloseProcess(processInfo);
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+
+        return { 0 };
     };
 
-    if (!hook)
+    _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+
+
+    if (!ResumeThread(processInfo.hThread))
     {
         CloseProcess(processInfo);
+
+        return { 0 };
     };
 
     return processInfo;
 }
-
-
-HWND button;
-HWND button2;
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
