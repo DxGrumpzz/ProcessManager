@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
@@ -54,17 +55,19 @@ struct ProcessModel
 {
 
 public:
-    wchar_t* ProcessName;
-    wchar_t* ProcessArgs;
+    std::wstring ProcessName;
+    std::wstring ProcessArgs;
 
-    PROCESS_INFORMATION ProcessInfo;
-    STARTUPINFOW info;
+    PROCESS_INFORMATION ProcessInfo = { 0 };
+    STARTUPINFOW info = { 0 };
 
     std::vector<HWND> handles;
 
 
 public:
-    ProcessModel()
+    ProcessModel(std::wstring processName, std::wstring processArgs) :
+        ProcessName(processName),
+        ProcessArgs(processArgs)
     {
         info.cb = sizeof(STARTUPINFOW);
         info.dwFlags = STARTF_USESHOWWINDOW;
@@ -76,7 +79,7 @@ public:
   
     BOOL RunProcess()
     {
-        if (!CreateProcessW(ProcessName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
+        if (!CreateProcessW(ProcessName.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
         {
             CloseHandle(ProcessInfo.hProcess);
             CloseHandle(ProcessInfo.hThread);
@@ -254,6 +257,74 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         default:
             return DefWindowProcW(hWnd, message, wParam, lParam);
     };
+};
+
+
+
+// Returns a list of ProcessModel which contain name and arguments of a process 
+std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
+{
+    // Stores the list of processes as a ProcessModel struct
+    std::vector<ProcessModel> processes;
+
+    // The processes file
+    std::wifstream file(filename);
+
+    // If file is invalid
+    if (!file)
+    {
+        std::wstring error = L"File error. \nCould not open: ";
+        error.append(filename); 
+
+        size_t outputSize = error.size() + 1; 
+
+        char* outputString = new char[outputSize];
+        
+        size_t charsConverted = 0;
+        
+        const wchar_t* inputW = error.c_str();
+        
+        wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
+
+        throw std::exception(outputString);
+        delete[] outputString;
+    };
+
+
+    // This is absolute aids. 
+    // This will improve
+
+
+    // Iterate through the file line by line
+    // Store current read line 
+    std::wstring line;
+    while (std::getline(file, line))
+    {
+        // If current line is the process name
+        if (line == L"[Process]")
+        {
+            // Read process name into current line
+            std::getline(file, line);
+
+            // Add the process to the list
+            processes.emplace_back(line, L"");
+        }
+        // If current line is the process' arguments
+        else if (line == L"[Args]")
+        {
+            // Read next line
+            std::getline(file, line);
+
+            // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
+            line.insert(line.begin(), ' ');
+
+            // Set the process' arguments
+            auto process = (processes.end() - 1);
+            process->ProcessArgs = line;
+        };
+    };
+
+    return processes;
 };
 
 
