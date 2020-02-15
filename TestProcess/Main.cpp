@@ -44,6 +44,10 @@ bool _doEvent = false;
 HWND button;
 HWND button2;
 
+
+std::vector<HWND> ProcessesLabels;
+
+
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
     _doEvent = true;
@@ -246,6 +250,29 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             return TRUE;
         };
 
+        case WM_SIZE:
+        {
+            const int newWidth = LOWORD(lParam);
+
+            int counter = 0;
+            for (const HWND& _hwnd: ProcessesLabels)
+            {
+                const RECT windowRect;
+                GetWindowRect(_hwnd, &windowRect);
+
+                const int windowWidth = windowRect.right - windowRect.left;
+                const int windowHeight = windowRect.bottom - windowRect.top;
+
+                SetWindowPos(_hwnd, NULL, 
+                             newWidth - windowWidth, (windowHeight + 4) * counter,
+                             0, 0, 
+                             SWP_NOSIZE | SWP_NOZORDER);
+
+                counter++;
+            };
+            
+            return TRUE;
+        }
 
         case WM_DESTROY:
         {
