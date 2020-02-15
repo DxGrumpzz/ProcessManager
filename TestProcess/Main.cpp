@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 
+
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
 
@@ -32,7 +33,7 @@ const wchar_t* windowTitle = L"Window title";
 const wchar_t* windowClassName = L"DesktopApp";
 
 
-std::vector<HWND> handles;
+std::vector<HWND> _handles;
 PROCESS_INFORMATION _processInfo = { 0 };
 
 std::vector<PROCESS_INFORMATION> processList;
@@ -51,11 +52,14 @@ std::vector<HWND> ProcessesLabels;
 void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
     _doEvent = true;
-    handles.push_back(hwnd);
+    _handles.push_back(hwnd);
 };
+    
 
+void* _currentInitializingProcess;
+bool _creating = false;
 
-struct ProcessModel
+class ProcessModel
 {
 
 public:
@@ -68,6 +72,17 @@ public:
     std::vector<HWND> handles;
 
 
+    static void CALLBACK WinEventHookCallback2(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
+    {
+        if (_currentInitializingProcess == nullptr)
+            return;
+
+        _doEvent = true;
+        ((ProcessModel*)_currentInitializingProcess)->handles.push_back(hwnd);
+        _creating = false;
+    };
+    
+
 public:
     ProcessModel(std::wstring processName, std::wstring processArgs) :
         ProcessName(processName),
@@ -77,6 +92,9 @@ public:
         info.dwFlags = STARTF_USESHOWWINDOW;
         info.wShowWindow = SW_HIDE;
     };
+
+private:
+    ProcessModel() { }
 
 
 public:
@@ -91,8 +109,9 @@ public:
             return FALSE;
         };
 
-        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
+        _creating = true;
+        _currentInitializingProcess = this;
+        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback2, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
         if (!ResumeThread(ProcessInfo.hThread))
         {
@@ -123,6 +142,8 @@ public:
 
 
 
+
+
 BOOL CloseProcess(PROCESS_INFORMATION process)
 {
     TerminateProcess(process.hProcess, 0);
@@ -132,7 +153,7 @@ BOOL CloseProcess(PROCESS_INFORMATION process)
 
     if (!CloseHandle(process.hThread))
         return FALSE;
-    
+
     return TRUE;
 }
 
@@ -175,7 +196,11 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         {
             PostQuitMessage(0);
 
-            CloseProcess(_processInfo);
+            DWORD exitCode;
+            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
+
+            if (exitCode == STILL_ACTIVE)
+                CloseProcess(_processInfo);
 
             return TRUE;
         };
@@ -183,15 +208,15 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         case  WM_COMMAND:
         {
-
+            
             if (HIWORD(wParam) == BN_CLICKED)
             {
-                WORD buttonId = LOWORD(wParam);
+                WORD controlID = LOWORD(wParam);
 
-                switch (buttonId)
+                switch (controlID)
                 {
                     // Create process button
-                    case 0:
+                    case 1:
                     {
                         /*
                         STARTUPINFOW info = { 0 };
@@ -234,9 +259,13 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     };
 
                     // Abort process button
-                    case 1:
+                    case 2:
                     {
-                        CloseProcess(_processInfo);
+                        DWORD exitCode;
+                        GetExitCodeProcess(_processInfo.hProcess, &exitCode);
+
+                        if (exitCode == STILL_ACTIVE)
+                            CloseProcess(_processInfo);
 
                         return TRUE;
                     };
@@ -257,7 +286,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             int counter = 0;
             for (const HWND& _hwnd: ProcessesLabels)
             {
-                const RECT windowRect;
+                RECT windowRect;
                 GetWindowRect(_hwnd, &windowRect);
 
                 const int windowWidth = windowRect.right - windowRect.left;
@@ -276,10 +305,15 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         case WM_DESTROY:
         {
-            CloseProcess(_processInfo);
+            DWORD exitCode;
+            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
+
+            if (exitCode == STILL_ACTIVE)
+                CloseProcess(_processInfo);
 
             return TRUE;
         };
+
 
         default:
             return DefWindowProcW(hWnd, message, wParam, lParam);
@@ -359,7 +393,6 @@ std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Pro
 // _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
-
     WNDCLASSEXW windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEXW);
     windowClass.style = CS_HREDRAW | CS_VREDRAW;
@@ -390,7 +423,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                                       windowTitle,
                                       WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
                                       0, 0,
-                                      500, 350,
+                                      800, 350,
                                       NULL,
                                       NULL,
                                       hInstance,
@@ -409,55 +442,46 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     button = CreateWindowExW(NULL,
                              L"BUTTON",
-                             L"Create process",
+                             L"Run processes",
                              WS_BORDER | WS_CHILD,
                              10,
                              10,
                              120,
                              30,
                              windowHWND,
-                             (HMENU)0,
+                             (HMENU)1,
                              hInstance,
                              NULL);
 
 
     button2 = CreateWindowExW(NULL,
                               L"BUTTON",
-                              L"Stop process",
+                              L"Stop processes",
                               WS_BORDER | WS_CHILD,
                               10,
                               45,
                               120,
                               30,
                               windowHWND,
-                              (HMENU)1,
+                              (HMENU)2,
                               hInstance,
                               NULL);
-
-
-
 
     // Set button cursor
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
+    auto processList = GetProcessListFromFile();
 
-    std::wstring processes[] =
+    processList[0].RunProcess();
+
+    /*
+    int longestProcessName = processList[0].ProcessName.size();
+
+    for (const ProcessModel& process : processList)
     {
-        L"Process1",
-        L"Process2",
-        L"Process3",
-        L"Process4",
-    };
-
-    HWND hwnds[sizeof(processes) / sizeof(processes[0])];
-    
-    int longestProcessName = processes[0].size();
-
-    for (const std::wstring& string : processes)
-    {
-        if (string.size() > longestProcessName)
-            longestProcessName = string.size();
+        if (process.ProcessName.size() > longestProcessName)
+            longestProcessName = process.ProcessName.size();
     };
 
     const int  CHAR_MULTIPLIER = 8;
@@ -466,51 +490,41 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 
     int index = 0;
-    for (const std::wstring& processName : processes)
+    for (const ProcessModel& process : processList)
     {
-        int TEXT_HEIGHT = (int)(std::count(processName.begin(), processName.end(), L'\n') + 1) * 20;
-    
-    const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
+        int TEXT_HEIGHT = (int)(std::count(process.ProcessName.begin(), process.ProcessName.end(), L'\n') + 1) * 20;
+
+        const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
         const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
 
 
-    HWND textBlock = CreateWindowExW(NULL,
-                                     L"STATIC",
-                                     processName.c_str(),
+        HWND textBlock = CreateWindowExW(NULL,
+                                         L"STATIC",
+                                         process.ProcessName.c_str(),
                                          WS_CHILD | SS_CENTER | SS_NOTIFY,
                                          TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
-                                     TEXT_WIDTH, TEXT_HEIGHT,
-                                     windowHWND,
-                                         (HMENU)(index + 3),
-                                     hInstance,
-                                     NULL);
+                                         TEXT_WIDTH, TEXT_HEIGHT,
+                                         windowHWND,
+                                         (HMENU)index + 3,
+                                         hInstance,
+                                         NULL);
+
+        ProcessesLabels.push_back(textBlock);
 
         SetClassLongPtrW(textBlock, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
-
-        hwnds[index] = textBlock;
 
         ShowWindow(textBlock, SW_SHOW);
 
         index++;
     };
 
-
-
-
-
+    */
 
     ShowWindow(windowHWND, nShowCmd);
     UpdateWindow(windowHWND);
 
     ShowWindow(button, SW_SHOW);
     ShowWindow(button2, SW_SHOW);
-    
-
-    for (const HWND& hwnd : hwnds)
-    {
-        ShowWindow(hwnd, SW_SHOW);
-    };
-    
 
 
     MSG message;
@@ -520,10 +534,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         {
             _doEvent = false;
 
-            for (const HWND& hwnd : handles)
+            for (const HWND& hwnd : ((ProcessModel*)_currentInitializingProcess)->handles)
             {
-                ShowWindow(hwnd, SW_HIDE);
+                ShowWindowAsync(hwnd, SW_HIDE);
             };
+        }
+        else
+        {
+            if(_creating == false)
+                _currentInitializingProcess = nullptr;
         };
 
         TranslateMessage(&message);
