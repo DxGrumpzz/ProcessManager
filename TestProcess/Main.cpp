@@ -54,20 +54,25 @@ void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWN
     _doEvent = true;
     _handles.push_back(hwnd);
 };
-    
 
-struct Test
-{
-    void* CurrentInitializingProcess;
-    bool _creating = false;
-};
+//
+//struct Test
+//{
+//    void* CurrentInitializingProcess;
+//    bool _creating = false;
+//};
 
 
-std::vector<Test> _processInitializers;
+//std::vector<Test> _processInitializers;
 
 void* _currentInitializingProcess;
 bool _creating = false;
 int ProcessCounter = 0;
+
+
+class ProcessModel;
+
+std::vector<ProcessModel> _processList;
 
 class ProcessModel
 {
@@ -92,19 +97,18 @@ public:
         DWORD processId;
         GetWindowThreadProcessId(hwnd, &processId);
 
-        for (const Test& process : _processInitializers)
+        for (ProcessModel& process : _processList)
         {
-            ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
+            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
 
-            if (_process->ProcessInfo.dwProcessId == processId)
+            if (process.ProcessInfo.dwProcessId == processId)
             {
-                _process->Creating = true;
-                _process->handles.push_back(hwnd);
-    };
+                process.Creating = true;
+                process.handles.push_back(hwnd);
+            };
         };
-    
-    };
 
+    };
 
 public:
 
@@ -119,7 +123,7 @@ public:
 
 
 public:
-  
+
     BOOL RunProcess()
     {
         if (!CreateProcessW(ProcessName.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
@@ -140,11 +144,11 @@ public:
             return FALSE;
         };
 
-        _processInitializers.push_back(Test(
-        {
-            this,
-            true,
-        }));
+        //_processInitializers.push_back(Test(
+        //{
+        //    this,
+        //    true,
+        //}));
 
         return TRUE;
     };
@@ -233,7 +237,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         case  WM_COMMAND:
         {
-            
+
             if (HIWORD(wParam) == BN_CLICKED)
             {
                 WORD controlID = LOWORD(wParam);
@@ -309,7 +313,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             const int newWidth = LOWORD(lParam);
 
             int counter = 0;
-            for (const HWND& _hwnd: ProcessesLabels)
+            for (const HWND& _hwnd : ProcessesLabels)
             {
                 RECT windowRect;
                 GetWindowRect(_hwnd, &windowRect);
@@ -317,14 +321,14 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                 const int windowWidth = windowRect.right - windowRect.left;
                 const int windowHeight = windowRect.bottom - windowRect.top;
 
-                SetWindowPos(_hwnd, NULL, 
+                SetWindowPos(_hwnd, NULL,
                              newWidth - windowWidth, (windowHeight + 4) * counter,
-                             0, 0, 
+                             0, 0,
                              SWP_NOSIZE | SWP_NOZORDER);
 
                 counter++;
             };
-            
+
             return TRUE;
         }
 
@@ -360,16 +364,16 @@ std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Pro
     if (!file)
     {
         std::wstring error = L"File error. \nCould not open: ";
-        error.append(filename); 
+        error.append(filename);
 
-        size_t outputSize = error.size() + 1; 
+        size_t outputSize = error.size() + 1;
 
         char* outputString = new char[outputSize];
-        
+
         size_t charsConverted = 0;
-        
+
         const wchar_t* inputW = error.c_str();
-        
+
         wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
 
         throw std::exception(outputString);
@@ -496,10 +500,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
 
-    auto processList = GetProcessListFromFile();
+    _processList = GetProcessListFromFile();
 
-    processList[0].RunProcess();
-    processList[1].RunProcess();
+    _processList[0].RunProcess();
+    _processList[1].RunProcess();
 
     /*
     int longestProcessName = processList[0].ProcessName.size();
@@ -557,13 +561,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     while (GetMessageW(&message, NULL, 0, 0) > 0)
     {
 
-        for (const Test& process : _processInitializers)
+        for (const ProcessModel& process : _processList)
         {
-            ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
+            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
 
-            if (_process->Creating == true)
+            if (process.Creating == true)
             {
-                for (const HWND& hwnd : _process->handles)
+                for (const HWND& hwnd : process.handles)
                 {
                     ShowWindowAsync(hwnd, SW_HIDE);
                 };
