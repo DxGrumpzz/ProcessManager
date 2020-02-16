@@ -56,12 +56,21 @@ void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWN
 };
     
 
+struct Test
+{
+    void* CurrentInitializingProcess;
+    bool _creating = false;
+};
+
+
+std::vector<Test> _processInitializers;
+
 void* _currentInitializingProcess;
 bool _creating = false;
+int ProcessCounter = 0;
 
 class ProcessModel
 {
-
 public:
     std::wstring ProcessName;
     std::wstring ProcessArgs;
@@ -71,19 +80,34 @@ public:
 
     std::vector<HWND> handles;
 
+    bool Creating = false;
+
 
     static void CALLBACK WinEventHookCallback2(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
     {
-        if (_currentInitializingProcess == nullptr)
-            return;
+        /* if (_currentInitializingProcess == nullptr)
+             return;*/
+             // _doEvent = true;
 
-        _doEvent = true;
-        ((ProcessModel*)_currentInitializingProcess)->handles.push_back(hwnd);
-        _creating = false;
+        DWORD processId;
+        GetWindowThreadProcessId(hwnd, &processId);
+
+        for (const Test& process : _processInitializers)
+        {
+            ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
+
+            if (_process->ProcessInfo.dwProcessId == processId)
+            {
+                _process->Creating = true;
+                _process->handles.push_back(hwnd);
     };
+        };
     
+    };
+
 
 public:
+
     ProcessModel(std::wstring processName, std::wstring processArgs) :
         ProcessName(processName),
         ProcessArgs(processArgs)
@@ -92,9 +116,6 @@ public:
         info.dwFlags = STARTF_USESHOWWINDOW;
         info.wShowWindow = SW_HIDE;
     };
-
-private:
-    ProcessModel() { }
 
 
 public:
@@ -109,8 +130,6 @@ public:
             return FALSE;
         };
 
-        _creating = true;
-        _currentInitializingProcess = this;
         _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback2, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
         if (!ResumeThread(ProcessInfo.hThread))
@@ -120,6 +139,12 @@ public:
 
             return FALSE;
         };
+
+        _processInitializers.push_back(Test(
+        {
+            this,
+            true,
+        }));
 
         return TRUE;
     };
@@ -474,6 +499,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     auto processList = GetProcessListFromFile();
 
     processList[0].RunProcess();
+    processList[1].RunProcess();
 
     /*
     int longestProcessName = processList[0].ProcessName.size();
@@ -530,6 +556,21 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     MSG message;
     while (GetMessageW(&message, NULL, 0, 0) > 0)
     {
+
+        for (const Test& process : _processInitializers)
+        {
+            ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
+
+            if (_process->Creating == true)
+            {
+                for (const HWND& hwnd : _process->handles)
+                {
+                    ShowWindowAsync(hwnd, SW_HIDE);
+                };
+            };
+        };
+
+        /*
         if (_doEvent == true)
         {
             _doEvent = false;
@@ -541,9 +582,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         }
         else
         {
-            if(_creating == false)
+            if (_creating == false)
                 _currentInitializingProcess = nullptr;
         };
+        */
 
         TranslateMessage(&message);
         DispatchMessageW(&message);
