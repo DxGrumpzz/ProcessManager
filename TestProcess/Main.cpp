@@ -476,6 +476,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                 {
                     ShowWindowAsync(hwnd, SW_HIDE);
                 };
+
+                process.Creating = false;
             };
         };
 
