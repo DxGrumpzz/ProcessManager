@@ -28,18 +28,10 @@ std::wstring GetErrorStringW(DWORD error)
 };
 
 
-
 const wchar_t* windowTitle = L"Window title";
 const wchar_t* windowClassName = L"DesktopApp";
 
-
-std::vector<HWND> _handles;
-PROCESS_INFORMATION _processInfo = { 0 };
-
-std::vector<PROCESS_INFORMATION> processList;
 HWINEVENTHOOK _hook;
-
-bool _doEvent = false;
 
 
 HWND button;
@@ -49,30 +41,12 @@ HWND button2;
 std::vector<HWND> ProcessesLabels;
 
 
-void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-{
-    _doEvent = true;
-    _handles.push_back(hwnd);
-};
-
-//
-//struct Test
-//{
-//    void* CurrentInitializingProcess;
-//    bool _creating = false;
-//};
-
-
-//std::vector<Test> _processInitializers;
-
-void* _currentInitializingProcess;
-bool _creating = false;
-int ProcessCounter = 0;
-
-
 class ProcessModel;
 
 std::vector<ProcessModel> _processList;
+
+void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime);
+
 
 class ProcessModel
 {
@@ -87,28 +61,6 @@ public:
 
     bool Creating = false;
 
-
-    static void CALLBACK WinEventHookCallback2(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
-        /* if (_currentInitializingProcess == nullptr)
-             return;*/
-             // _doEvent = true;
-
-        DWORD processId;
-        GetWindowThreadProcessId(hwnd, &processId);
-
-        for (ProcessModel& process : _processList)
-        {
-            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
-
-            if (process.ProcessInfo.dwProcessId == processId)
-            {
-                process.Creating = true;
-                process.handles.push_back(hwnd);
-            };
-        };
-
-    };
 
 public:
 
@@ -134,7 +86,7 @@ public:
             return FALSE;
         };
 
-        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback2, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
         if (!ResumeThread(ProcessInfo.hThread))
         {
@@ -144,24 +96,24 @@ public:
             return FALSE;
         };
 
-        //_processInitializers.push_back(Test(
-        //{
-        //    this,
-        //    true,
-        //}));
-
         return TRUE;
     };
 
     BOOL CloseProcess()
     {
-        TerminateProcess(ProcessInfo.hProcess, 0);
+        DWORD exitCode;
+        GetExitCodeProcess(ProcessInfo.hProcess, &exitCode);
 
-        if (!CloseHandle(ProcessInfo.hProcess))
-            return FALSE;
+        if (exitCode == STILL_ACTIVE)
+        {
+            TerminateProcess(ProcessInfo.hProcess, 0);
 
-        if (!CloseHandle(ProcessInfo.hThread))
-            return FALSE;
+            if (!CloseHandle(ProcessInfo.hProcess))
+                return FALSE;
+
+            if (!CloseHandle(ProcessInfo.hThread))
+                return FALSE;
+        }
 
         return TRUE;
     }
@@ -169,53 +121,23 @@ public:
 };
 
 
-
-
-
-
-BOOL CloseProcess(PROCESS_INFORMATION process)
+void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
-    TerminateProcess(process.hProcess, 0);
+    DWORD processId;
+    GetWindowThreadProcessId(hwnd, &processId);
 
-    if (!CloseHandle(process.hProcess))
-        return FALSE;
-
-    if (!CloseHandle(process.hThread))
-        return FALSE;
-
-    return TRUE;
-}
-
-
-PROCESS_INFORMATION RunProcess(const wchar_t* processName)
-{
-    PROCESS_INFORMATION processInfo = { 0 };
-
-    STARTUPINFOW info = { 0 };
-    info.cb = sizeof(STARTUPINFOW);
-    info.dwFlags = STARTF_USESHOWWINDOW;
-    info.wShowWindow = SW_HIDE;
-
-    if (!CreateProcessW(processName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
+    for (ProcessModel& process : _processList)
     {
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
-
-        return { 0 };
+        if (process.ProcessInfo.dwProcessId == processId)
+        {
+            process.Creating = true;
+            process.handles.push_back(hwnd);
+        };
     };
+};
 
-    _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
 
-    if (!ResumeThread(processInfo.hThread))
-    {
-        CloseProcess(processInfo);
-
-        return { 0 };
-    };
-
-    return processInfo;
-}
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -226,10 +148,10 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             PostQuitMessage(0);
 
             DWORD exitCode;
-            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-            if (exitCode == STILL_ACTIVE)
-                CloseProcess(_processInfo);
+            for (ProcessModel& process : _processList)
+            {
+                process.CloseProcess();
+            };
 
             return TRUE;
         };
@@ -247,42 +169,10 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Create process button
                     case 1:
                     {
-                        /*
-                        STARTUPINFOW info = { 0 };
-                        info.cb = sizeof(STARTUPINFOW);
-                        info.dwFlags = STARTF_USESHOWWINDOW;
-                        info.wShowWindow = SW_HIDE;
-
-                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &_processInfo);
-                        //BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-                        //BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-
-                        HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, _processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-
-                        if (!ResumeThread(_processInfo.hThread))
+                        for (ProcessModel& process : _processList)
                         {
-                            TerminateProcess(_processInfo.hProcess, 0);
-
-                            CloseHandle(_processInfo.hProcess);
-                            CloseHandle(_processInfo.hThread);
-
-                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
+                            process.RunProcess();
                         };
-
-
-                        if (!hook)
-                        {
-                            TerminateProcess(_processInfo.hProcess, 0);
-
-                            CloseHandle(_processInfo.hProcess);
-                            CloseHandle(_processInfo.hThread);
-
-                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
-                        };
-                        */
-
-                        _processInfo = RunProcess(L"C:\\Software\\IL Spy\\ILSpy.exe");
 
                         return TRUE;
                     };
@@ -290,11 +180,16 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Abort process button
                     case 2:
                     {
-                        DWORD exitCode;
+                        for (ProcessModel& process : _processList)
+                        {
+                            process.CloseProcess();
+                        };
+
+                        /*DWORD exitCode;
                         GetExitCodeProcess(_processInfo.hProcess, &exitCode);
 
                         if (exitCode == STILL_ACTIVE)
-                            CloseProcess(_processInfo);
+                            CloseProcess(_processInfo);*/
 
                         return TRUE;
                     };
@@ -334,11 +229,10 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         case WM_DESTROY:
         {
-            DWORD exitCode;
-            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-            if (exitCode == STILL_ACTIVE)
-                CloseProcess(_processInfo);
+            for (ProcessModel& process : _processList)
+            {
+                process.CloseProcess();
+            };
 
             return TRUE;
         };
@@ -502,9 +396,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     _processList = GetProcessListFromFile();
 
-    _processList[0].RunProcess();
-    _processList[1].RunProcess();
-
     /*
     int longestProcessName = processList[0].ProcessName.size();
 
@@ -560,11 +451,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     MSG message;
     while (GetMessageW(&message, NULL, 0, 0) > 0)
     {
-
         for (const ProcessModel& process : _processList)
         {
-            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
-
             if (process.Creating == true)
             {
                 for (const HWND& hwnd : process.handles)
@@ -573,23 +461,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                 };
             };
         };
-
-        /*
-        if (_doEvent == true)
-        {
-            _doEvent = false;
-
-            for (const HWND& hwnd : ((ProcessModel*)_currentInitializingProcess)->handles)
-            {
-                ShowWindowAsync(hwnd, SW_HIDE);
-            };
-        }
-        else
-        {
-            if (_creating == false)
-                _currentInitializingProcess = nullptr;
-        };
-        */
 
         TranslateMessage(&message);
         DispatchMessageW(&message);
