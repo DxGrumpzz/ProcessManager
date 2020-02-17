@@ -313,6 +313,9 @@ std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Pro
 // _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
+
+HWND CreateMainWindow(const HINSTANCE& hInstance)
+{
     WNDCLASSEXW windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEXW);
     windowClass.style = CS_HREDRAW | CS_VREDRAW;
@@ -332,9 +335,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         MessageBoxW(NULL, error.c_str(), NULL, NULL);
 
-        return 1;
+        return NULL;
     };
-
 
 
 
@@ -349,17 +351,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                                       hInstance,
                                       NULL);
 
+    return windowHWND;
+}
 
-    if (windowHWND == 0)
+void CreateButtons(const HWND& windowHWND, const HINSTANCE& hInstance)
     {
-        std::wstring error = GetErrorStringW(GetLastError());
-        error.insert(0, L"An error occured while creating window.\n");
-
-        MessageBoxW(NULL, error.c_str(), NULL, NULL);
-
-        return 1;
-    };
-
     button = CreateWindowExW(NULL,
                              L"BUTTON",
                              L"Run processes",
@@ -373,6 +369,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                              hInstance,
                              NULL);
 
+    // Set button cursor
+    SetClassLongPtrW(button, GCLP_HCURSOR, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
     button2 = CreateWindowExW(NULL,
                               L"BUTTON",
@@ -387,12 +385,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                               hInstance,
                               NULL);
 
-    // Set button cursor
-    SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
+}
 
-
-    _processList = GetProcessListFromFile();
-
+void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
+{
     int longestProcessName = 0;
 
     for (const ProcessModel& process : _processList)
@@ -413,7 +409,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
         const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
-
+        const HMENU id = (HMENU)(index + 3);
 
         HWND textBlock = CreateWindowExW(NULL,
                                          L"STATIC",
@@ -422,9 +418,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
                                          TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
                                          TEXT_WIDTH, TEXT_HEIGHT,
                                          windowHWND,
-                                         (HMENU)index + 3,
+                                         id,
                                          hInstance,
                                          NULL);
+
+        CreateToolTip((int)id, textBlock, const_cast<wchar_t*>(process.ProcessArgs.c_str()));
 
         ProcessesLabels.push_back(textBlock);
 
@@ -434,7 +432,31 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         index++;
     };
+}
 
+
+// _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
+{
+    
+    HWND windowHWND = CreateMainWindow(hInstance);
+
+    if (windowHWND == 0)
+    {
+        std::wstring error = GetErrorStringW(GetLastError());
+        error.insert(0, L"An error occured while creating window.\n");
+
+        MessageBoxW(NULL, error.c_str(), NULL, NULL);
+
+        return 1;
+    };
+
+
+    CreateButtons(windowHWND, hInstance);
+
+    _processList = GetProcessListFromFile();
+
+    CreateProcessLabels(windowHWND, hInstance);
 
     ShowWindow(windowHWND, nShowCmd);
     UpdateWindow(windowHWND);
