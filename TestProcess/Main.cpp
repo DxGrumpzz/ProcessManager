@@ -156,7 +156,6 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             return TRUE;
         };
 
-
         case  WM_COMMAND:
         {
 
@@ -185,12 +184,6 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                             process.CloseProcess();
                         };
 
-                        /*DWORD exitCode;
-                        GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-                        if (exitCode == STILL_ACTIVE)
-                            CloseProcess(_processInfo);*/
-
                         return TRUE;
                     };
 
@@ -216,8 +209,12 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                 const int windowWidth = windowRect.right - windowRect.left;
                 const int windowHeight = windowRect.bottom - windowRect.top;
 
+                const int newX = (newWidth - windowWidth) - 10;
+                const int newY = ((windowHeight + 4) * counter) + 10;
+
+
                 SetWindowPos(_hwnd, NULL,
-                             newWidth - windowWidth, (windowHeight + 4) * counter,
+                             newX, newY,
                              0, 0,
                              SWP_NOSIZE | SWP_NOZORDER);
 
@@ -396,10 +393,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     _processList = GetProcessListFromFile();
 
-    /*
-    int longestProcessName = processList[0].ProcessName.size();
+    int longestProcessName = 0;
 
-    for (const ProcessModel& process : processList)
+    for (const ProcessModel& process : _processList)
     {
         if (process.ProcessName.size() > longestProcessName)
             longestProcessName = process.ProcessName.size();
@@ -411,7 +407,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 
     int index = 0;
-    for (const ProcessModel& process : processList)
+    for (const ProcessModel& process : _processList)
     {
         int TEXT_HEIGHT = (int)(std::count(process.ProcessName.begin(), process.ProcessName.end(), L'\n') + 1) * 20;
 
@@ -439,7 +435,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         index++;
     };
 
-    */
 
     ShowWindow(windowHWND, nShowCmd);
     UpdateWindow(windowHWND);
