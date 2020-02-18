@@ -29,7 +29,7 @@ std::wstring GetErrorStringW(DWORD error)
 };
 
 
-const wchar_t* windowTitle = L"Process ";
+const wchar_t* windowTitle = L"Process manager";
 const wchar_t* windowClassName = L"DesktopApp";
 
 HINSTANCE hInstance;
@@ -490,8 +490,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         {
             TranslateMessage(&message);
             DispatchMessageW(&message);
-            
-            Sleep(1);
         };
 
         for (ProcessModel& process : _processList)
