@@ -461,14 +461,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     ShowWindow(windowHWND, nShowCmd);
     UpdateWindow(windowHWND);
 
-    ShowWindow(button, SW_SHOW);
-    ShowWindow(button2, SW_SHOW);
-
-
     MSG message;
-    while (GetMessageW(&message, NULL, 0, 0) > 0)
+
+    while (1)
     {
-        for (const ProcessModel& process : _processList)
+        while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&message);
+            DispatchMessageW(&message);
+
+            Sleep(1);
+        };
+
+        for (ProcessModel& process : _processList)
         {
             if (process.Creating == true)
             {
@@ -481,9 +486,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
             };
         };
 
-        TranslateMessage(&message);
-        DispatchMessageW(&message);
+        if (message.message == WM_QUIT)
+            break;
+       
+        Sleep(1);
     };
+
 
     return (int)message.wParam;
 };
