@@ -11,7 +11,6 @@
 // Takes a DWORD error code and returns its string message 
 std::wstring GetErrorStringW(DWORD error)
 {
-
     // Stores the error message as a string in memory
     LPWSTR buffer = nullptr;
 
@@ -34,10 +33,8 @@ const wchar_t* windowClassName = L"DesktopApp";
 
 HINSTANCE hInstance;
 
-
 HWND button;
 HWND button2;
-
 
 std::vector<HWND> _processesLabels;
 
@@ -148,7 +145,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
             {
                 process.CloseProcess();
             };
-      
+
             PostQuitMessage(0);
             return 0;
         };
@@ -507,7 +504,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         if (message.message == WM_QUIT)
             break;
-       
+
         Sleep(1);
     };
 

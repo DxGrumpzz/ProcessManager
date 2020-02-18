@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5B0B5F91-93D9-4153-A550-63A6EC372E1E}</ProjectGuid>
-    <RootNamespace>TestProcess</RootNamespace>
+    <RootNamespace>ProcessManager</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>ProcessManager</ProjectName>
   </PropertyGroup>
