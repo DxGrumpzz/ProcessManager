@@ -1,76 +1,264 @@
-#include <Windows.h>
-#include <fstream>
-#include <vector>
+#include <windows.h>
 #include <string>
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <set>
-#include <psapi.h>
+#include <vector>
+#include <fstream>
+#include <CommCtrl.h>
+
+
+#define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
+
 
 // Takes a DWORD error code and returns its string message 
-std::string GetErrorString(DWORD error)
+std::wstring GetErrorStringW(DWORD error)
 {
+
     // Stores the error message as a string in memory
-    LPSTR buffer = nullptr;
+    LPWSTR buffer = nullptr;
 
     // Format DWORD error ID to a string 
-    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, NULL);
+    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL,
+                   error,
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   (LPWSTR)&buffer, 0, NULL);
 
     // Create std string from buffer
-    std::string message(buffer);
+    std::wstring message(buffer);
 
     return message;
 };
 
-std::string GetLastErrorString()
-{
-    return GetErrorString(GetLastError());
-};
 
-// A model class for a process
-struct ProcessModel
+const wchar_t* windowTitle = L"Process ";
+const wchar_t* windowClassName = L"DesktopApp";
+
+HINSTANCE hInstance;
+
+
+HWND button;
+HWND button2;
+
+
+std::vector<HWND> _processesLabels;
+
+
+class ProcessModel;
+
+std::vector<ProcessModel> _processList;
+
+
+class ProcessModel
 {
 public:
-    // The name/path of the process
-    std::string ProcessName;
-
-    // The process' arguments
-    std::string ProcessArgs;
+    std::wstring ProcessName;
+    std::wstring ProcessArgs;
 
     PROCESS_INFORMATION ProcessInfo = { 0 };
+    STARTUPINFOW info = { 0 };
 
-    std::vector<HWND> Handles;
+    std::vector<HWND> handles;
+
+    bool Creating = false;
+
+    HWINEVENTHOOK Hook;
+
+
+public:
+    static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
+    {
+        DWORD processId;
+        GetWindowThreadProcessId(hwnd, &processId);
+
+        for (ProcessModel& process : _processList)
+        {
+            if (process.ProcessInfo.dwProcessId == processId)
+            {
+                process.Creating = true;
+                process.handles.push_back(hwnd);
+            };
+        };
+    };
+
+public:
+
+    ProcessModel(std::wstring processName, std::wstring processArgs) :
+        ProcessName(processName),
+        ProcessArgs(processArgs)
+    {
+        info.cb = sizeof(STARTUPINFOW);
+        info.dwFlags = STARTF_USESHOWWINDOW;
+        info.wShowWindow = SW_HIDE;
+    };
 
 
 public:
 
-    ProcessModel(std::string _processName, std::string _processArgs) :
-        ProcessName(_processName),
-        ProcessArgs(_processArgs)
+    BOOL RunProcess()
     {
+        if (!CreateProcessW(ProcessName.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
+        {
+            CloseHandle(ProcessInfo.hProcess);
+            CloseHandle(ProcessInfo.hThread);
+
+            return FALSE;
+        };
+
+        Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+
+        if (!ResumeThread(ProcessInfo.hThread))
+        {
+            CloseHandle(ProcessInfo.hProcess);
+            CloseHandle(ProcessInfo.hThread);
+
+            return FALSE;
+        };
+
+        return TRUE;
+    };
+
+    BOOL CloseProcess()
+    {
+        DWORD exitCode;
+        GetExitCodeProcess(ProcessInfo.hProcess, &exitCode);
+
+        if (exitCode == STILL_ACTIVE)
+        {
+            TerminateProcess(ProcessInfo.hProcess, 0);
+
+            if (!CloseHandle(ProcessInfo.hProcess))
+                return FALSE;
+
+            if (!CloseHandle(ProcessInfo.hThread))
+                return FALSE;
+        }
+
+        return TRUE;
+    }
+
+};
+
+
+LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        case WM_CLOSE:
+        {
+            for (ProcessModel& process : _processList)
+            {
+                process.CloseProcess();
+            };
+      
+            PostQuitMessage(0);
+            return 0;
+        };
+
+
+        case  WM_COMMAND:
+        {
+            if (HIWORD(wParam) == BN_CLICKED)
+            {
+                WORD controlID = LOWORD(wParam);
+
+                switch (controlID)
+                {
+                    // Create process button
+                    case 1:
+                    {
+                        for (ProcessModel& process : _processList)
+                        {
+                            process.RunProcess();
+                        };
+
+                        return TRUE;
+                    };
+
+                    // Abort process button
+                    case 2:
+                    {
+                        for (ProcessModel& process : _processList)
+                        {
+                            process.CloseProcess();
+                        };
+
+                        return TRUE;
+                    };
+
+
+                    default:
+                        return DefWindowProcW(hWnd, message, wParam, lParam);
+                };
+            };
+
+            return 0;
+        };
+
+
+        case WM_SIZE:
+        {
+            const int newWidth = LOWORD(lParam);
+
+            int counter = 0;
+            for (const HWND& _hwnd : _processesLabels)
+            {
+                RECT windowRect;
+                GetWindowRect(_hwnd, &windowRect);
+
+                const int windowWidth = windowRect.right - windowRect.left;
+                const int windowHeight = windowRect.bottom - windowRect.top;
+
+                const int newX = (newWidth - windowWidth) - 10;
+                const int newY = ((windowHeight + 4) * counter) + 10;
+
+
+                SetWindowPos(_hwnd, NULL,
+                             newX, newY,
+                             0, 0,
+                             SWP_NOSIZE | SWP_NOZORDER);
+
+                counter++;
+            };
+
+            return 1;
+        }
+
+
+        default:
+            return DefWindowProcW(hWnd, message, wParam, lParam);
     };
 };
 
 
+
 // Returns a list of ProcessModel which contain name and arguments of a process 
-std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Processes.txt")
+std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
 {
     // Stores the list of processes as a ProcessModel struct
     std::vector<ProcessModel> processes;
 
     // The processes file
-    std::ifstream file(filename);
+    std::wifstream file(filename);
 
     // If file is invalid
     if (!file)
     {
-        std::string error = "File error. \nCould not open: ";
+        std::wstring error = L"File error. \nCould not open: ";
         error.append(filename);
 
-        throw std::exception(error.c_str());
+        size_t outputSize = error.size() + 1;
+
+        char* outputString = new char[outputSize];
+
+        size_t charsConverted = 0;
+
+        const wchar_t* inputW = error.c_str();
+
+        wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
+
+        throw std::exception(outputString);
+        delete[] outputString;
     };
+
 
     // This is absolute aids. 
     // This will improve
@@ -78,20 +266,20 @@ std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Process
 
     // Iterate through the file line by line
     // Store current read line 
-    std::string line;
+    std::wstring line;
     while (std::getline(file, line))
     {
         // If current line is the process name
-        if (line == "[Process]")
+        if (line == L"[Process]")
         {
             // Read process name into current line
             std::getline(file, line);
 
             // Add the process to the list
-            processes.emplace_back(line, "");
+            processes.emplace_back(line, L"");
         }
         // If current line is the process' arguments
-        else if (line == "[Args]")
+        else if (line == L"[Args]")
         {
             // Read next line
             std::getline(file, line);
@@ -105,419 +293,226 @@ std::vector<ProcessModel> GetProcessListFromFile(const char* filename = "Process
         };
     };
 
-
     return processes;
 };
 
 
-// A list of processes which are currently running
-std::vector<PROCESS_INFORMATION> _processList;
 
-
-// Creates and runs a process
-PROCESS_INFORMATION RunProcess(const ProcessModel& process)
+HWND CreateToolTip(HWND hwndTool, wchar_t* text)
 {
-    // "Converts" the process arguments from the const char* to a char*
-    LPSTR args = const_cast<char*>(process.ProcessArgs.c_str());
-
-    // Process information structs
-    STARTUPINFOA info = { 0 };
-    info.wShowWindow = FALSE;
-    info.cb = sizeof(STARTUPINFO);
-
-    PROCESS_INFORMATION processInfo = { 0 };
-
-
-    // Try to create the process
-    // If process creation failed
-    if (!CreateProcessA(process.ProcessName.c_str(), args, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
+    HWND hwndTip = CreateWindowExW(NULL,
+                                   TOOLTIPS_CLASS,
+                                   NULL,
+                                   WS_POPUP | TTS_ALWAYSTIP,
+                                   CW_USEDEFAULT, CW_USEDEFAULT,
+                                   CW_USEDEFAULT, CW_USEDEFAULT,
+                                   GetParent(hwndTool),
+                                   NULL,
+                                   NULL,
+                                   NULL);
+    if (!hwndTool || !hwndTip)
     {
-        // Get error message
-        DWORD errorID = GetLastError();
-        std::string errorString = GetErrorString(errorID);
+        return NULL;
+    }
 
-        // display error(s)
-        if (errorID == ERROR_FILE_NOT_FOUND)
-        {
-            std::cout << "File not found: " << process.ProcessName << "\n";
-        };
+    TOOLINFO toolInfo = { 0 };
+    toolInfo.cbSize = TTTOOLINFOA_V1_SIZE;
+    toolInfo.hwnd = GetParent(hwndTool);
+    toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+    toolInfo.uId = (UINT_PTR)hwndTool;
+    toolInfo.lpszText = text;
 
-        // Clean process junk
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
+    SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
 
-        return processInfo;
-    };
-
-    // Wait for process to initialize
-    WaitForInputIdle(processInfo.hProcess, INFINITE);
-
-    return processInfo;
-};
-
-
-// Takes a string and spilts it into several other strings
-std::vector<std::string> SplitString(std::string stringToSplit, char delimiter)
-{
-    // Store the split strings
-    std::vector<std::string> strings;
-
-    // The previous index where the delimiter was located
-    int previousSpaceIndex = 0;
-
-    for (size_t a = 0; a < stringToSplit.size(); a++)
-    {
-        const char& currentChar = stringToSplit[a];
-
-        // If the currenct character matches the delimiter
-        if (currentChar == delimiter)
-        {
-            // Use substring function to take the string in between the previous index and the current index - previous
-            strings.emplace_back(stringToSplit.substr(previousSpaceIndex, a - previousSpaceIndex));
-
-            previousSpaceIndex = a + 1;
-        };
-    };
-
-    // Add last string
-    strings.emplace_back(stringToSplit.substr(previousSpaceIndex, stringToSplit.size() - 1));
-
-    return strings;
-};
-
-
-
-std::vector<HWND> handles;
-
-BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
-{
-    DWORD lpdwProcessId;
-    GetWindowThreadProcessId(hwnd, &lpdwProcessId);
-
-    if (lpdwProcessId == lParam)
-    {
-        handles.push_back(hwnd);
-    };
-
-    return TRUE;
+    return hwndTip;
 }
 
 
-void GetHwnds(DWORD processID)
+
+HWND CreateMainWindow(const HINSTANCE& hInstance)
 {
+    WNDCLASSEXW windowClass = { 0 };
+    windowClass.cbSize = sizeof(WNDCLASSEXW);
+    windowClass.style = CS_HREDRAW | CS_VREDRAW;
+    windowClass.hInstance = hInstance;
+    windowClass.lpszClassName = windowClassName;
+    windowClass.lpfnWndProc = WindowProcedure;
+    windowClass.hbrBackground = CreateSolidBrush(RBG_UNIFORM(0xE1));
+    windowClass.hCursor = LoadCursorW(NULL, IDC_ARROW);
 
-    int previousHandleSize = 0;
 
-    do
+    ATOM registerClassResult = RegisterClassExW(&windowClass);
+
+    if (registerClassResult == 0)
     {
-        previousHandleSize = handles.size();
-        EnumWindows(EnumWindowsCallback, processID);
-    }
-    while (previousHandleSize < 1);
+        std::wstring error = GetErrorStringW(GetLastError());
+        error.insert(0, L"An error occured while creating window.\n");
 
+        MessageBoxW(NULL, error.c_str(), NULL, NULL);
+
+        return NULL;
+    };
+
+
+
+    HWND windowHWND = CreateWindowExW(NULL,
+                                      windowClassName,
+                                      windowTitle,
+                                      WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
+                                      0, 0,
+                                      800, 350,
+                                      NULL,
+                                      NULL,
+                                      hInstance,
+                                      NULL);
+
+
+
+    return windowHWND;
 }
 
-int main()
+void CreateButtons(const HWND& windowHWND, const HINSTANCE& hInstance)
 {
-    STARTUPINFOW info = { 0 };
-    info.cb = sizeof(STARTUPINFOW);
-    
-    PROCESS_INFORMATION processInfo = { 0 };
+    button = CreateWindowExW(NULL,
+                             L"BUTTON",
+                             L"Run processes",
+                             WS_BORDER | WS_CHILD,
+                             10,
+                             10,
+                             120,
+                             30,
+                             windowHWND,
+                             (HMENU)1,
+                             hInstance,
+                             NULL);
 
-    std::cout << "Initializing process\n";
-    
-    BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &info, &processInfo);
+    // Set button cursor
+    SetClassLongPtrW(button, GCLP_HCURSOR, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
-    std::cout << "Getting process data\n";
-    
+    button2 = CreateWindowExW(NULL,
+                              L"BUTTON",
+                              L"Stop processes",
+                              WS_BORDER | WS_CHILD,
+                              10,
+                              45,
+                              120,
+                              30,
+                              windowHWND,
+                              (HMENU)2,
+                              hInstance,
+                              NULL);
 
-    DWORD exitCode = { 0 };
-    ResumeThread(processInfo.hThread);
-    
-    
 
+    ShowWindow(button, SW_SHOW);
+    ShowWindow(button2, SW_SHOW);
+}
 
-    do
+void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
+{
+    int longestProcessName = 0;
+
+    for (const ProcessModel& process : _processList)
     {
-        GetExitCodeProcess(processInfo.hProcess, &exitCode);
-    }
-    while (exitCode == 0);
+        if (process.ProcessName.size() > longestProcessName)
+            longestProcessName = process.ProcessName.size();
+    };
+
+    const int  CHAR_MULTIPLIER = 8;
+
+    const int TEXT_WIDTH = longestProcessName * CHAR_MULTIPLIER;
 
 
-    GetHwnds(processInfo.dwProcessId);
-
-    // Validate HWNDS
     int index = 0;
-    int size = handles.size();
-
-    for (; index < size; index++)
+    for (const ProcessModel& process : _processList)
     {
-        HWND hwnd = handles[0];
-        BOOL result = IsWindow(hwnd);
+        int TEXT_HEIGHT = (int)(std::count(process.ProcessName.begin(), process.ProcessName.end(), L'\n') + 1) * 20;
 
-        if (result <= 0)
+        const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
+        const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
+        const HMENU id = (HMENU)(index + 3);
+
+        HWND textBlock = CreateWindowExW(NULL,
+                                         L"STATIC",
+                                         process.ProcessName.c_str(),
+                                         WS_CHILD | SS_CENTER | SS_NOTIFY,
+                                         TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
+                                         TEXT_WIDTH, TEXT_HEIGHT,
+                                         windowHWND,
+                                         id,
+                                         hInstance,
+                                         NULL);
+
+
+        _processesLabels.push_back(textBlock);
+
+        SetClassLongPtrW(textBlock, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
+
+        ShowWindow(textBlock, SW_SHOW);
+
+        index++;
+    };
+}
+
+
+
+// _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
+{
+
+    HWND windowHWND = CreateMainWindow(hInstance);
+
+    if (windowHWND == 0)
+    {
+        std::wstring error = GetErrorStringW(GetLastError());
+        error.insert(0, L"An error occured while creating window.\n");
+
+        MessageBoxW(NULL, error.c_str(), NULL, NULL);
+
+        return 1;
+    };
+
+
+    CreateButtons(windowHWND, hInstance);
+
+    _processList = GetProcessListFromFile();
+
+    CreateProcessLabels(windowHWND, hInstance);
+
+
+    ShowWindow(windowHWND, nShowCmd);
+    UpdateWindow(windowHWND);
+
+    MSG message;
+
+    while (1)
+    {
+        while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
         {
-            index = 0;
-
-            GetHwnds(processInfo.dwProcessId);
-                
-            size = handles.size();
-        };
-    };
-
-
-
-    std::cout << "Found " << handles.size() << " handles\n";
-
-    for (const HWND& hwnd : handles)
-    {
-        ShowWindowAsync(hwnd, SW_HIDE);
-        ShowWindowAsync(hwnd, SW_HIDE);
-    };
-    
-
-    std::cout << "Press enter key to terminate process...";
-    std::cin.get();
-
-    TerminateProcess(processInfo.hProcess, 0);
-
-    CloseHandle(processInfo.hProcess);
-    CloseHandle(processInfo.hThread);
-
-
-    /*
-    STARTUPINFOW info = { 0 };
-    info.wShowWindow = FALSE;
-    info.cb = sizeof(STARTUPINFOW);
-    info.dwFlags = STARTF_USESHOWWINDOW;
-    info.wShowWindow = SW_HIDE;
-
-    PROCESS_INFORMATION processInfo = { 0 };
-
-    BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &info, &processInfo);
-
-    HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, Wineventproc, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-    ResumeThread(processInfo.hThread);
-
-
-    MSG msg;
-    BOOL result1 = GetMessageW(&msg, NULL, 0, 0);
-
-    while (result1 > 0)
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    };
-
-    for (const HWND& handle : handles)
-    {
-        ShowWindow(handle, SW_HIDE);
-    };
-
-    TerminateProcess(processInfo.hProcess, 0);
-    CloseHandle(processInfo.hProcess);
-    CloseHandle(processInfo.hThread);
-    */
-
-
-    /*
-    STARTUPINFOW info = { 0 };
-    info.wShowWindow = FALSE;
-    info.cb = sizeof(STARTUPINFOW);
-    info.dwFlags = STARTF_USESHOWWINDOW;
-    info.wShowWindow = SW_HIDE;
-
-    PROCESS_INFORMATION processInfo = { 0 };
-
-    // BOOL result = CreateProcessW(L"C:\\WINDOWS\\system32\\notepad.exe", const_cast<wchar_t*>(L" C:\\Users\\yosi1\\Desktop\\Wrists.txt"), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-    // BOOL result = CreateProcessW(L"C:\\Development\\Projects\\ProcessManager\\Debug\\TestProcess.exe", NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &info, &processInfo);
-    // BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &info, &processInfo);
-    // BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &info, &processInfo);
-
-    BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-
-
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-    // Wait for process to initialize
-    WaitForInputIdle(processInfo.hProcess, INFINITE);
-
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(end - begin);
-
-    std::cout << "waiting for " << seconds.count() << " seconds" << "\n";
-
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(5s);
-
-    if (!result)
-    {
-        DWORD errorID = GetLastError();
-        std::string errorString = GetErrorString(errorID);
-    };
-
-    EnumWindows(EnumWindowsCallback, processInfo.dwProcessId);
-
-    std::cout << "handles: " << handles.size() << "\n";
-
-    for (const HWND& handle : handles)
-    {
-        SetFocus(handle);
-        ShowWindow(handle, SW_HIDE);
-    };
-
-    TerminateProcess(processInfo.hProcess, 0);
-    CloseHandle(processInfo.hProcess);
-    CloseHandle(processInfo.hThread);
-    */
-
-
-    /*
-    // Get processes from file
-    std::vector<ProcessModel> processes = GetProcessListFromFile();
-
-    std::cout << "Creating " << processes.size() << " procceses" << "\n";
-
-    // For every process request try to run it
-    int counter = 0;
-    for (ProcessModel& process : processes)
-    {
-        auto result = RunProcess(process);
-
-        // If process creation was successful
-        if (result.dwProcessId)
-        {
-            std::cout << process.ProcessName << " created succesfully [" << counter << "]" << "\n";
-
-            process.ProcessInfo = result;
-
-            counter++;
-        };
-    };
-
-
-    // Get process HWNDs
-    for (ProcessModel& process : processes)
-    {
-        EnumWindows(EnumWindowsCallback, process.ProcessInfo.dwProcessId);
-
-        for(const auto& hwnd : handles)
-        {
-            process.Handles.push_back(hwnd);
+            TranslateMessage(&message);
+            DispatchMessageW(&message);
+            
+            Sleep(1);
         };
 
-        handles.empty();
-    };
-
-
-    // Hide process
-    for (const ProcessModel& process : processes)
-    {
-        for (size_t a = 0; a < sizeof(process.Handles) / sizeof(process.Handles[0]); a++)
+        for (ProcessModel& process : _processList)
         {
-            SetFocus(process.Handles[a]);
-            ShowWindow(process.Handles[a], SW_HIDE);
+            if (process.Creating == true)
+            {
+                for (const HWND& hwnd : process.handles)
+                {
+                    ShowWindowAsync(hwnd, SW_HIDE);
+                };
+
+                process.Creating = false;
+            };
         };
+
+        if (message.message == WM_QUIT)
+            break;
+       
+        Sleep(1);
     };
 
-    // Close processes
-    for (const ProcessModel& process : processes)
-    {
-        TerminateProcess(process.ProcessInfo.hProcess, 0);
-        CloseHandle(process.ProcessInfo.hProcess);
-        CloseHandle(process.ProcessInfo.hThread);
-    }
 
-    //EnumWindows(EnumWindowsCallback, processInfo.dwProcessId);
-
-
-    //for (const HWND& handle : handles)
-    //{
-    //    SetFocus(handle);
-    //    ShowWindow(handle, SW_HIDE);
-    //};
-
-    //TerminateProcess(processInfo.hProcess, 0);
-    //CloseHandle(processInfo.hProcess);
-    //CloseHandle(processInfo.hThread);
-
-    return 0;
-
-
-    */
-
-
-    //// Get processes from file
-    //std::vector<ProcessModel> processes = GetProcessListFromFile();
-
-    //std::cout << "Creating " << processes.size() << " procceses" << "\n";
-    //
-    //// For every process request try to run it
-    //int counter = 0;
-    //for (const ProcessModel& process : processes)
-    //{
-    //    auto result = RunProcess(process);
-
-    //    // If process creation was successful
-    //    if (result.dwProcessId)
-    //    {
-    //        std::cout << process.ProcessName << " created succesfully [" << counter << "]" << "\n";
-
-    //        // Add process handle to process list
-    //        _processList.push_back(result);
-    //        counter++;
-    //    };
-    //};
-
-
-    //std::string command;
-    //std::vector<std::string> splitComamnd;
-    //
-    //while (1)
-    //{
-    //    std::getline(std::cin, command);
-    //    splitComamnd = SplitString(command, ' ');
-
-    //    if (splitComamnd[0] == "kill")
-    //    {
-    //        if (splitComamnd[1] == "all")
-    //        {
-    //            for (const PROCESS_INFORMATION& process : _processList)
-    //            {
-    //                TerminateProcess(process.hProcess, 0);
-
-    //                CloseHandle(process.hProcess);
-    //                CloseHandle(process.hThread);
-    //            };
-    //        }
-    //        else
-    //        {
-    //            try
-    //            {
-    //                int processIndex = std::stoi(splitComamnd[1]);
-
-    // TerminateProcess(_processList[processIndex].hProcess, 0);
-
-    //                CloseHandle(_processList[processIndex].hProcess);
-    //                CloseHandle(_processList[processIndex].hThread);
-
-    //                std::cout << "Succesfully terminated" << "\n";
-    //            }
-    //            catch (std::invalid_argument)
-    //            {
-    //                std::cout << "Invalid argument: " << splitComamnd[1] << "\n";
-    //                continue;
-    //            };
-    //        };
-    //    }
-    //    else
-    //    {
-    //        std::cout << "Uknown command " << command << "\n";
-    //    };
-    //};
-
-
-    std::cin.get();
+    return (int)message.wParam;
 };
