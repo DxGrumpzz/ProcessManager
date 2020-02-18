@@ -132,6 +132,16 @@ public:
         return TRUE;
     }
 
+private:
+
+    void NormalizeArgs()
+    {
+        if (ProcessArgs[0] != L' ')
+        {
+            ProcessArgs.insert(0, L" ");
+        };
+    }
+
 };
 
 
