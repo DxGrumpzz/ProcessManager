@@ -92,7 +92,9 @@ public:
 
     BOOL RunProcess()
     {
-        if (!CreateProcessW(ProcessName.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
+        NormalizeArgs();
+
+        if (!CreateProcessW(ProcessName.c_str(), const_cast<wchar_t*>(ProcessArgs.c_str()), NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
         {
             CloseHandle(ProcessInfo.hProcess);
             CloseHandle(ProcessInfo.hThread);
