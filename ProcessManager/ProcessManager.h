@@ -5,8 +5,6 @@
 #include "ProcessModel.h"
 
 
-//class ProcessModel;
-
 class ProcessManager
 {
 
@@ -35,7 +33,7 @@ public:
 
 public:
 
-    BOOL RunProcess(ProcessModel& process)
+    static BOOL RunProcess(ProcessModel& process)
     {
         NormalizeArgs(process);
 
@@ -60,7 +58,7 @@ public:
         return TRUE;
     };
 
-    BOOL CloseProcess(ProcessModel& process)
+    static  BOOL CloseProcess(ProcessModel& process)
     {
         DWORD exitCode;
         GetExitCodeProcess(process.ProcessInfo.hProcess, &exitCode);
@@ -81,15 +79,20 @@ public:
         return TRUE;
     }
 
+    static void CreateProcessModel(std::wstring processName, std::wstring processArgs)
+    {
+        ProcessManager::ProcessList.emplace_back(processName, processArgs);
+    };
+
+
 private:
 
-    void NormalizeArgs(ProcessModel& process)
+    static void NormalizeArgs(ProcessModel& process)
     {
         if (process.ProcessArgs[0] != L' ')
         {
             process.ProcessArgs.insert(0, L" ");
         };
     }
-
 
 };
