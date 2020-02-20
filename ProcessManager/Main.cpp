@@ -4,6 +4,8 @@
 #include <fstream>
 #include <CommCtrl.h>
 
+#include "ProcessManager.h"
+
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
 
@@ -39,112 +41,7 @@ HWND button2;
 std::vector<HWND> _processesLabels;
 
 
-class ProcessModel;
 
-std::vector<ProcessModel> _processList;
-
-
-class ProcessModel
-{
-public:
-    std::wstring ProcessName;
-    std::wstring ProcessArgs;
-
-    PROCESS_INFORMATION ProcessInfo = { 0 };
-    STARTUPINFOW info = { 0 };
-
-    std::vector<HWND> handles;
-
-    bool Creating = false;
-
-    HWINEVENTHOOK Hook;
-
-
-public:
-    static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
-        DWORD processId;
-        GetWindowThreadProcessId(hwnd, &processId);
-
-        for (ProcessModel& process : _processList)
-        {
-            if (process.ProcessInfo.dwProcessId == processId)
-            {
-                process.Creating = true;
-                process.handles.push_back(hwnd);
-            };
-        };
-    };
-
-public:
-
-    ProcessModel(std::wstring processName, std::wstring processArgs) :
-        ProcessName(processName),
-        ProcessArgs(processArgs)
-    {
-        info.cb = sizeof(STARTUPINFOW);
-        info.dwFlags = STARTF_USESHOWWINDOW;
-        info.wShowWindow = SW_HIDE;
-    };
-
-
-public:
-
-    BOOL RunProcess()
-    {
-        NormalizeArgs();
-
-        if (!CreateProcessW(ProcessName.c_str(), const_cast<wchar_t*>(ProcessArgs.c_str()), NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
-        {
-            CloseHandle(ProcessInfo.hProcess);
-            CloseHandle(ProcessInfo.hThread);
-
-            return FALSE;
-        };
-
-        Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-        if (!ResumeThread(ProcessInfo.hThread))
-        {
-            CloseHandle(ProcessInfo.hProcess);
-            CloseHandle(ProcessInfo.hThread);
-
-            return FALSE;
-        };
-
-        return TRUE;
-    };
-
-    BOOL CloseProcess()
-    {
-        DWORD exitCode;
-        GetExitCodeProcess(ProcessInfo.hProcess, &exitCode);
-
-        if (exitCode == STILL_ACTIVE)
-        {
-            TerminateProcess(ProcessInfo.hProcess, 0);
-
-            if (!CloseHandle(ProcessInfo.hProcess))
-                return FALSE;
-
-            if (!CloseHandle(ProcessInfo.hThread))
-                return FALSE;
-        }
-
-        return TRUE;
-    }
-
-private:
-
-    void NormalizeArgs()
-    {
-        if (ProcessArgs[0] != L' ')
-        {
-            ProcessArgs.insert(0, L" ");
-        };
-    }
-
-};
 
 
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -153,9 +50,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     {
         case WM_CLOSE:
         {
-            for (ProcessModel& process : _processList)
+            for (ProcessModel& process : ProcessManager::ProcessList)
             {
-                process.CloseProcess();
+                ProcessManager::CloseProcess(process);
             };
 
             PostQuitMessage(0);
@@ -174,9 +71,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Create process button
                     case 1:
                     {
-                        for (ProcessModel& process : _processList)
+                        for (ProcessModel& process : ProcessManager::ProcessList)
                         {
-                            process.RunProcess();
+                            ProcessManager::RunProcess(process);
                         };
 
                         return TRUE;
@@ -185,9 +82,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     // Abort process button
                     case 2:
                     {
-                        for (ProcessModel& process : _processList)
+                        for (ProcessModel& process : ProcessManager::ProcessList)
                         {
-                            process.CloseProcess();
+                            ProcessManager::CloseProcess(process);
                         };
 
                         return TRUE;
@@ -420,7 +317,7 @@ void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
 {
     int longestProcessName = 0;
 
-    for (const ProcessModel& process : _processList)
+    for (const ProcessModel& process : ProcessManager::ProcessList)
     {
         if (process.ProcessName.size() > longestProcessName)
             longestProcessName = process.ProcessName.size();
@@ -432,7 +329,7 @@ void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
 
 
     int index = 0;
-    for (const ProcessModel& process : _processList)
+    for (const ProcessModel& process : ProcessManager::ProcessList)
     {
         int TEXT_HEIGHT = (int)(std::count(process.ProcessName.begin(), process.ProcessName.end(), L'\n') + 1) * 20;
 
@@ -483,7 +380,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     CreateButtons(windowHWND, hInstance);
 
-    _processList = GetProcessListFromFile();
+    ProcessManager::ProcessList = GetProcessListFromFile();
 
     CreateProcessLabels(windowHWND, hInstance);
 
@@ -501,7 +398,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
             DispatchMessageW(&message);
         };
 
-        for (ProcessModel& process : _processList)
+        for (ProcessModel& process : ProcessManager::ProcessList)
         {
             if (process.Creating == true)
             {
