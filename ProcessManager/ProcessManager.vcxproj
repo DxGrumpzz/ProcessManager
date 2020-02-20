@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ProcessManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProcessManager.h" />
