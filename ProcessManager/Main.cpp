@@ -50,12 +50,11 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     {
         case WM_CLOSE:
         {
+            PostQuitMessage(0);
             for (ProcessModel& process : ProcessManager::ProcessList)
             {
                 ProcessManager::CloseProcess(process);
             };
-
-            PostQuitMessage(0);
             return 0;
         };
 
