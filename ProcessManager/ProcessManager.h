@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <msxml.h>
+#include <fstream>
 
 #include "ProcessModel.h"
 
@@ -96,6 +97,68 @@ public:
     static void CreateProcessModel(std::wstring processName, std::wstring processArgs)
     {
         ProcessManager::ProcessList.emplace_back(processName, processArgs);
+    };
+
+
+    // Returns a list of ProcessModel which contain name and arguments of a process 
+    static void GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
+    {
+        // The processes file
+        std::wifstream file(filename);
+
+        // If file is invalid
+        if (!file)
+        {
+            std::wstring error = L"File error. \nCould not open: ";
+            error.append(filename);
+
+            size_t outputSize = error.size() + 1;
+
+            char* outputString = new char[outputSize];
+
+            size_t charsConverted = 0;
+
+            const wchar_t* inputW = error.c_str();
+
+            wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
+
+            throw std::exception(outputString);
+            delete[] outputString;
+        };
+
+
+        // This is absolute aids. 
+        // This will improve
+
+
+        // Iterate through the file line by line
+        // Store current read line 
+        std::wstring line;
+        while (std::getline(file, line))
+        {
+            // If current line is the process name
+            if (line == L"[Process]")
+            {
+                // Read process name into current line
+                std::getline(file, line);
+
+                // Add the process to the list
+                ProcessManager::ProcessList.emplace_back(line, L"");
+            }
+            // If current line is the process' arguments
+            else if (line == L"[Args]")
+            {
+                // Read next line
+                std::getline(file, line);
+
+                // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
+                line.insert(line.begin(), ' ');
+
+                // Set the process' arguments
+                auto process = (ProcessManager::ProcessList.end() - 1);
+                process->ProcessArgs = line;
+            };
+        };
     };
 
 

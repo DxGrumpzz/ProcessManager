@@ -380,7 +380,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     CreateButtons(windowHWND, hInstance);
 
-    ProcessManager::ProcessList = GetProcessListFromFile();
+    ProcessManager::GetProcessListFromFile();
 
     CreateProcessLabels(windowHWND, hInstance);
 
@@ -397,6 +397,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
             TranslateMessage(&message);
             DispatchMessageW(&message);
         };
+
+        if (message.message == WM_QUIT)
+            break;
 
         for (ProcessModel& process : ProcessManager::ProcessList)
         {
