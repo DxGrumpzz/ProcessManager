@@ -93,6 +93,7 @@ public:
             for (const HWND& hwnd : process.handles)
             {
                 ShowWindowAsync(hwnd, SW_HIDE);
+                PostMessageW(hwnd, WM_KILLFOCUS, NULL, NULL);
             };
 
             process.Creating = false;
