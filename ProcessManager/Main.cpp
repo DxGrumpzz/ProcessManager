@@ -42,8 +42,6 @@ std::vector<HWND> _processesLabels;
 
 
 
-
-
 LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -219,7 +217,7 @@ void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
     for (const ProcessModel& process : ProcessManager::ProcessList)
     {
         if (process.ProcessName.size() > longestProcessName)
-            longestProcessName = process.ProcessName.size();
+            longestProcessName = (int)process.ProcessName.size();
     };
 
     const int  CHAR_MULTIPLIER = 8;
@@ -234,7 +232,7 @@ void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
 
         const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
         const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
-        const HMENU id = (HMENU)(index + 3);
+        const long long id = (long long)index + 3L;
 
         HWND textBlock = CreateWindowExW(NULL,
                                          L"STATIC",
@@ -243,14 +241,12 @@ void CreateProcessLabels(const HWND& windowHWND, const HINSTANCE& hInstance)
                                          TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
                                          TEXT_WIDTH, TEXT_HEIGHT,
                                          windowHWND,
-                                         id,
+                                         (HMENU)id,
                                          hInstance,
                                          NULL);
 
 
         _processesLabels.push_back(textBlock);
-
-        SetClassLongPtrW(textBlock, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
 
         ShowWindow(textBlock, SW_SHOW);
 
@@ -288,7 +284,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     UpdateWindow(windowHWND);
 
     MSG message;
-
     while (1)
     {
         while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
@@ -304,9 +299,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         {
             ProcessManager::HideProcess(process, windowHWND);
         };
-
-        if (message.message == WM_QUIT)
-            break;
 
         Sleep(1);
     };
