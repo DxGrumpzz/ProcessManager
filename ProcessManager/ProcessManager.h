@@ -68,14 +68,19 @@ public:
 
         if (exitCode == STILL_ACTIVE)
         {
-            TerminateProcess(process.ProcessInfo.hProcess, 0);
-
-            if (!CloseHandle(process.ProcessInfo.hProcess))
+            if(!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
 
-            if (!CloseHandle(process.ProcessInfo.hThread))
+            if (!CloseHandle(process.ProcessInfo.hProcess) &&
+                !CloseHandle(process.ProcessInfo.hThread))
                 return FALSE;
+
+            UnhookWinEvent(process.Hook);
         }
+        else
+        {
+                return FALSE;
+        };
 
         return TRUE;
     }
