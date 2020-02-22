@@ -400,15 +400,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         for (ProcessModel& process : ProcessManager::ProcessList)
         {
-            if (process.Creating == true)
-            {
-                for (const HWND& hwnd : process.handles)
-                {
-                    ShowWindowAsync(hwnd, SW_HIDE);
-                };
-
-                process.Creating = false;
-            };
+            ProcessManager::HideProcess(process, windowHWND);
         };
 
         if (message.message == WM_QUIT)

@@ -13,7 +13,7 @@ public:
     static std::vector<ProcessModel> ProcessList;
 
 
-public:
+private:
 
     static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
     {
@@ -29,6 +29,7 @@ public:
             };
         };
     };
+
 
 
 public:
@@ -58,7 +59,8 @@ public:
         return TRUE;
     };
 
-    static  BOOL CloseProcess(ProcessModel& process)
+
+    static BOOL CloseProcess(ProcessModel& process)
     {
         DWORD exitCode;
         GetExitCodeProcess(process.ProcessInfo.hProcess, &exitCode);
@@ -74,10 +76,22 @@ public:
                 return FALSE;
         }
 
-        //Unhook
-
         return TRUE;
     }
+
+
+    static void HideProcess(ProcessModel& process, HWND mainWindow)
+    {
+        if (process.Creating == true)
+        {
+            for (const HWND& hwnd : process.handles)
+            {
+                ShowWindowAsync(hwnd, SW_HIDE);
+            };
+
+            process.Creating = false;
+        };
+    };
 
     static void CreateProcessModel(std::wstring processName, std::wstring processArgs)
     {
