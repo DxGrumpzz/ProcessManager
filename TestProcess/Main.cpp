@@ -1,599 +1,94 @@
-#include <windows.h>
 #include <string>
-#include <vector>
 #include <fstream>
+#include <thread>
+#include <iostream>
+#include <algorithm>
+#include <filesystem>
 
-
-#define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
-
-
-// Takes a DWORD error code and returns its string message 
-std::wstring GetErrorStringW(DWORD error)
+/* Check if a file exists
+@param name The file to check
+*/
+bool FileExists(const std::string& name)
 {
+    bool result = std::filesystem::exists(name);
 
-    // Stores the error message as a string in memory
-    LPWSTR buffer = nullptr;
-
-    // Format DWORD error ID to a string 
-    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL,
-                   error,
-                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPWSTR)&buffer, 0, NULL);
-
-    // Create std string from buffer
-    std::wstring message(buffer);
-
-    return message;
-};
-
-
-
-const wchar_t* windowTitle = L"Window title";
-const wchar_t* windowClassName = L"DesktopApp";
-
-
-std::vector<HWND> _handles;
-PROCESS_INFORMATION _processInfo = { 0 };
-
-std::vector<PROCESS_INFORMATION> processList;
-HWINEVENTHOOK _hook;
-
-bool _doEvent = false;
-
-
-HWND button;
-HWND button2;
-
-
-std::vector<HWND> ProcessesLabels;
-
-
-void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-{
-    _doEvent = true;
-    _handles.push_back(hwnd);
-};
-
-//
-//struct Test
-//{
-//    void* CurrentInitializingProcess;
-//    bool _creating = false;
-//};
-
-
-//std::vector<Test> _processInitializers;
-
-void* _currentInitializingProcess;
-bool _creating = false;
-int ProcessCounter = 0;
-
-
-class ProcessModel;
-
-std::vector<ProcessModel> _processList;
-
-class ProcessModel
-{
-public:
-    std::wstring ProcessName;
-    std::wstring ProcessArgs;
-
-    PROCESS_INFORMATION ProcessInfo = { 0 };
-    STARTUPINFOW info = { 0 };
-
-    std::vector<HWND> handles;
-
-    bool Creating = false;
-
-
-    static void CALLBACK WinEventHookCallback2(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
-        /* if (_currentInitializingProcess == nullptr)
-             return;*/
-             // _doEvent = true;
-
-        DWORD processId;
-        GetWindowThreadProcessId(hwnd, &processId);
-
-        for (ProcessModel& process : _processList)
-        {
-            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
-
-            if (process.ProcessInfo.dwProcessId == processId)
-            {
-                process.Creating = true;
-                process.handles.push_back(hwnd);
-            };
-        };
-
-    };
-
-public:
-
-    ProcessModel(std::wstring processName, std::wstring processArgs) :
-        ProcessName(processName),
-        ProcessArgs(processArgs)
-    {
-        info.cb = sizeof(STARTUPINFOW);
-        info.dwFlags = STARTF_USESHOWWINDOW;
-        info.wShowWindow = SW_HIDE;
-    };
-
-
-public:
-
-    BOOL RunProcess()
-    {
-        if (!CreateProcessW(ProcessName.c_str(), NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &ProcessInfo))
-        {
-            CloseHandle(ProcessInfo.hProcess);
-            CloseHandle(ProcessInfo.hThread);
-
-            return FALSE;
-        };
-
-        _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback2, ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-        if (!ResumeThread(ProcessInfo.hThread))
-        {
-            CloseHandle(ProcessInfo.hProcess);
-            CloseHandle(ProcessInfo.hThread);
-
-            return FALSE;
-        };
-
-        //_processInitializers.push_back(Test(
-        //{
-        //    this,
-        //    true,
-        //}));
-
-        return TRUE;
-    };
-
-    BOOL CloseProcess()
-    {
-        TerminateProcess(ProcessInfo.hProcess, 0);
-
-        if (!CloseHandle(ProcessInfo.hProcess))
-            return FALSE;
-
-        if (!CloseHandle(ProcessInfo.hThread))
-            return FALSE;
-
-        return TRUE;
-    }
-
-};
-
-
-
-
-
-
-BOOL CloseProcess(PROCESS_INFORMATION process)
-{
-    TerminateProcess(process.hProcess, 0);
-
-    if (!CloseHandle(process.hProcess))
-        return FALSE;
-
-    if (!CloseHandle(process.hThread))
-        return FALSE;
-
-    return TRUE;
+    return result;
 }
 
-
-PROCESS_INFORMATION RunProcess(const wchar_t* processName)
+char asciitolower(const char& in)
 {
-    PROCESS_INFORMATION processInfo = { 0 };
-
-    STARTUPINFOW info = { 0 };
-    info.cb = sizeof(STARTUPINFOW);
-    info.dwFlags = STARTF_USESHOWWINDOW;
-    info.wShowWindow = SW_HIDE;
-
-    if (!CreateProcessW(processName, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo))
-    {
-        CloseHandle(processInfo.hProcess);
-        CloseHandle(processInfo.hThread);
-
-        return { 0 };
-    };
-
-    _hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-
-    if (!ResumeThread(processInfo.hThread))
-    {
-        CloseProcess(processInfo);
-
-        return { 0 };
-    };
-
-    return processInfo;
+    if (in <= 'Z' && in >= 'A')
+        return in - ('Z' - 'z');
+    return in;
 }
 
-LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+// A "simple" process that takes a file as an argument and continuously re-creates it if it's deleted or renamed
+
+int main(int argc, char* argv[])
 {
-    switch (message)
+    // Check if file path arg exists
+    if (argc < 2)
     {
-        case WM_CLOSE:
-        {
-            PostQuitMessage(0);
-
-            DWORD exitCode;
-            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-            if (exitCode == STILL_ACTIVE)
-                CloseProcess(_processInfo);
-
-            return TRUE;
-        };
-
-
-        case  WM_COMMAND:
-        {
-
-            if (HIWORD(wParam) == BN_CLICKED)
-            {
-                WORD controlID = LOWORD(wParam);
-
-                switch (controlID)
-                {
-                    // Create process button
-                    case 1:
-                    {
-                        /*
-                        STARTUPINFOW info = { 0 };
-                        info.cb = sizeof(STARTUPINFOW);
-                        info.dwFlags = STARTF_USESHOWWINDOW;
-                        info.wShowWindow = SW_HIDE;
-
-                        BOOL result = CreateProcessW(L"C:\\Software\\IL Spy\\ILSpy.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &_processInfo);
-                        //BOOL result = CreateProcessW(L"C:\\Users\\yosi1\\Desktop\\AnyDesk.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-                        //BOOL result = CreateProcessW(L"C:\\Software\\Microsoft VS Code\\Code.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, NULL, &info, &processInfo);
-
-                        HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, _processInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-
-                        if (!ResumeThread(_processInfo.hThread))
-                        {
-                            TerminateProcess(_processInfo.hProcess, 0);
-
-                            CloseHandle(_processInfo.hProcess);
-                            CloseHandle(_processInfo.hThread);
-
-                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
-                        };
-
-
-                        if (!hook)
-                        {
-                            TerminateProcess(_processInfo.hProcess, 0);
-
-                            CloseHandle(_processInfo.hProcess);
-                            CloseHandle(_processInfo.hThread);
-
-                            MessageBoxW(hWnd, GetErrorStringW(GetLastError()).insert(0, L"An error occured\n").c_str(), L"error", 0);
-                        };
-                        */
-
-                        _processInfo = RunProcess(L"C:\\Software\\IL Spy\\ILSpy.exe");
-
-                        return TRUE;
-                    };
-
-                    // Abort process button
-                    case 2:
-                    {
-                        DWORD exitCode;
-                        GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-                        if (exitCode == STILL_ACTIVE)
-                            CloseProcess(_processInfo);
-
-                        return TRUE;
-                    };
-
-
-                    default:
-                        return DefWindowProcW(hWnd, message, wParam, lParam);
-                };
-            };
-
-            return TRUE;
-        };
-
-        case WM_SIZE:
-        {
-            const int newWidth = LOWORD(lParam);
-
-            int counter = 0;
-            for (const HWND& _hwnd : ProcessesLabels)
-            {
-                RECT windowRect;
-                GetWindowRect(_hwnd, &windowRect);
-
-                const int windowWidth = windowRect.right - windowRect.left;
-                const int windowHeight = windowRect.bottom - windowRect.top;
-
-                SetWindowPos(_hwnd, NULL,
-                             newWidth - windowWidth, (windowHeight + 4) * counter,
-                             0, 0,
-                             SWP_NOSIZE | SWP_NOZORDER);
-
-                counter++;
-            };
-
-            return TRUE;
-        }
-
-        case WM_DESTROY:
-        {
-            DWORD exitCode;
-            GetExitCodeProcess(_processInfo.hProcess, &exitCode);
-
-            if (exitCode == STILL_ACTIVE)
-                CloseProcess(_processInfo);
-
-            return TRUE;
-        };
-
-
-        default:
-            return DefWindowProcW(hWnd, message, wParam, lParam);
-    };
-};
-
-
-
-// Returns a list of ProcessModel which contain name and arguments of a process 
-std::vector<ProcessModel> GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
-{
-    // Stores the list of processes as a ProcessModel struct
-    std::vector<ProcessModel> processes;
-
-    // The processes file
-    std::wifstream file(filename);
-
-    // If file is invalid
-    if (!file)
-    {
-        std::wstring error = L"File error. \nCould not open: ";
-        error.append(filename);
-
-        size_t outputSize = error.size() + 1;
-
-        char* outputString = new char[outputSize];
-
-        size_t charsConverted = 0;
-
-        const wchar_t* inputW = error.c_str();
-
-        wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
-
-        throw std::exception(outputString);
-        delete[] outputString;
-    };
-
-
-    // This is absolute aids. 
-    // This will improve
-
-
-    // Iterate through the file line by line
-    // Store current read line 
-    std::wstring line;
-    while (std::getline(file, line))
-    {
-        // If current line is the process name
-        if (line == L"[Process]")
-        {
-            // Read process name into current line
-            std::getline(file, line);
-
-            // Add the process to the list
-            processes.emplace_back(line, L"");
-        }
-        // If current line is the process' arguments
-        else if (line == L"[Args]")
-        {
-            // Read next line
-            std::getline(file, line);
-
-            // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
-            line.insert(line.begin(), ' ');
-
-            // Set the process' arguments
-            auto process = (processes.end() - 1);
-            process->ProcessArgs = line;
-        };
-    };
-
-    return processes;
-};
-
-
-
-// _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
-{
-    WNDCLASSEXW windowClass = { 0 };
-    windowClass.cbSize = sizeof(WNDCLASSEXW);
-    windowClass.style = CS_HREDRAW | CS_VREDRAW;
-    windowClass.hInstance = hInstance;
-    windowClass.lpszClassName = windowClassName;
-    windowClass.lpfnWndProc = WindowProcedure;
-    windowClass.hbrBackground = CreateSolidBrush(RBG_UNIFORM(0xE1));
-    windowClass.hCursor = LoadCursorW(NULL, IDC_ARROW);
-
-
-    ATOM registerClassResult = RegisterClassExW(&windowClass);
-
-    if (registerClassResult == 0)
-    {
-        std::wstring error = GetErrorStringW(GetLastError());
-        error.insert(0, L"An error occured while creating window.\n");
-
-        MessageBoxW(NULL, error.c_str(), NULL, NULL);
-
+        std::cout << "Error: Missing file arg";
+        std::cin.get();
         return 1;
     };
 
-
-
-
-    HWND windowHWND = CreateWindowExW(NULL,
-                                      windowClassName,
-                                      windowTitle,
-                                      WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
-                                      0, 0,
-                                      800, 350,
-                                      NULL,
-                                      NULL,
-                                      hInstance,
-                                      NULL);
-
-
-    if (windowHWND == 0)
+    // Attach a debugger if requested
+    if (argc > 2)
     {
-        std::wstring error = GetErrorStringW(GetLastError());
-        error.insert(0, L"An error occured while creating window.\n");
+        // "normalize" the string to lower case
+        std::string s(argv[2]);
+        std::transform(s.begin(), s.end(), s.begin(), asciitolower);
 
-        MessageBoxW(NULL, error.c_str(), NULL, NULL);
-
-        return 1;
-    };
-
-    button = CreateWindowExW(NULL,
-                             L"BUTTON",
-                             L"Run processes",
-                             WS_BORDER | WS_CHILD,
-                             10,
-                             10,
-                             120,
-                             30,
-                             windowHWND,
-                             (HMENU)1,
-                             hInstance,
-                             NULL);
-
-
-    button2 = CreateWindowExW(NULL,
-                              L"BUTTON",
-                              L"Stop processes",
-                              WS_BORDER | WS_CHILD,
-                              10,
-                              45,
-                              120,
-                              30,
-                              windowHWND,
-                              (HMENU)2,
-                              hInstance,
-                              NULL);
-
-    // Set button cursor
-    SetClassLongPtrW(button, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
-
-
-    _processList = GetProcessListFromFile();
-
-    _processList[0].RunProcess();
-    _processList[1].RunProcess();
-
-    /*
-    int longestProcessName = processList[0].ProcessName.size();
-
-    for (const ProcessModel& process : processList)
-    {
-        if (process.ProcessName.size() > longestProcessName)
-            longestProcessName = process.ProcessName.size();
-    };
-
-    const int  CHAR_MULTIPLIER = 8;
-
-    const int TEXT_WIDTH = longestProcessName * CHAR_MULTIPLIER;
-
-
-    int index = 0;
-    for (const ProcessModel& process : processList)
-    {
-        int TEXT_HEIGHT = (int)(std::count(process.ProcessName.begin(), process.ProcessName.end(), L'\n') + 1) * 20;
-
-        const int TEXT_X_POSITION = abs(500 - TEXT_WIDTH) - 15;
-        const int TEXT_Y_POSITION = TEXT_HEIGHT * index;
-
-
-        HWND textBlock = CreateWindowExW(NULL,
-                                         L"STATIC",
-                                         process.ProcessName.c_str(),
-                                         WS_CHILD | SS_CENTER | SS_NOTIFY,
-                                         TEXT_X_POSITION, TEXT_Y_POSITION + (index * 4),
-                                         TEXT_WIDTH, TEXT_HEIGHT,
-                                         windowHWND,
-                                         (HMENU)index + 3,
-                                         hInstance,
-                                         NULL);
-
-        ProcessesLabels.push_back(textBlock);
-
-        SetClassLongPtrW(textBlock, -12, (LONG_PTR)LoadCursorW(NULL, IDC_HAND));
-
-        ShowWindow(textBlock, SW_SHOW);
-
-        index++;
-    };
-
-    */
-
-    ShowWindow(windowHWND, nShowCmd);
-    UpdateWindow(windowHWND);
-
-    ShowWindow(button, SW_SHOW);
-    ShowWindow(button2, SW_SHOW);
-
-
-    MSG message;
-    while (GetMessageW(&message, NULL, 0, 0) > 0)
-    {
-
-        for (const ProcessModel& process : _processList)
+        if (s == "true")
         {
-            //ProcessModel* _process = (ProcessModel*)process.CurrentInitializingProcess;
-
-            if (process.Creating == true)
-            {
-                for (const HWND& hwnd : process.handles)
-                {
-                    ShowWindowAsync(hwnd, SW_HIDE);
-                };
-            };
+            std::cout << "Attach debugger and press enter to continue\n";
+            std::cin.get();
         };
+    };
 
-        /*
-        if (_doEvent == true)
+    // Setup file path
+    std::string filePath(argv[1]);
+
+
+    int counter = 0;
+    while (1)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        // Check if file exists
+        if (FileExists(filePath))
         {
-            _doEvent = false;
-
-            for (const HWND& hwnd : ((ProcessModel*)_currentInitializingProcess)->handles)
-            {
-                ShowWindowAsync(hwnd, SW_HIDE);
-            };
+            std::cout << counter << " File exist \n";
         }
+        // If file was removed or renamed
         else
         {
-            if (_creating == false)
-                _currentInitializingProcess = nullptr;
+            std::cout << counter << " Creating file...\n";
+
+            // Create file 
+            std::ofstream file;
+
+            file.open(filePath);
+
+            if (file.fail())
+            {
+                const size_t size = 256;
+                char errmsg[size];
+
+                strerror_s(errmsg, size, errno);
+                
+                std::cout << "Error: " << errmsg << "\n";
+                std::cout << "File: " << filePath << "\n";
+
+                std::cin.get();
+                return 1;
+            };
+            
+            file.close();
         };
-        */
 
-        TranslateMessage(&message);
-        DispatchMessageW(&message);
+        counter++;
     };
-
-    return (int)message.wParam;
 };
