@@ -60,7 +60,6 @@ public:
         return TRUE;
     };
 
-
     static BOOL CloseProcess(ProcessModel& process)
     {
         DWORD exitCode;
@@ -68,7 +67,7 @@ public:
 
         if (exitCode == STILL_ACTIVE)
         {
-            if(!TerminateProcess(process.ProcessInfo.hProcess, 0))
+            if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
 
             if (!CloseHandle(process.ProcessInfo.hProcess) &&
@@ -79,21 +78,40 @@ public:
         }
         else
         {
-                return FALSE;
+            return FALSE;
         };
 
         return TRUE;
     }
 
 
-    static void HideProcess(ProcessModel& process, HWND mainWindow)
+
+    static void RunEveryProcess()
+    {
+        for (ProcessModel& process : ProcessManager::ProcessList)
+        {
+            ProcessManager::RunProcess(process);
+        };
+    };
+
+
+    static void CloseEveryProcess()
+    {
+        for (ProcessModel& process : ProcessManager::ProcessList)
+        {
+            ProcessManager::CloseProcess(process);
+        };
+    };
+
+
+
+    static void HideProcess(ProcessModel& process)
     {
         if (process.Creating == true)
         {
             for (const HWND& hwnd : process.handles)
             {
                 ShowWindowAsync(hwnd, SW_HIDE);
-                PostMessageW(hwnd, WM_KILLFOCUS, NULL, NULL);
             };
 
             process.Creating = false;
