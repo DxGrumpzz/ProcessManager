@@ -77,6 +77,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                         // Run the processes
                         ProcessManager::RunEveryProcess();
 
+                        EnableWindow(_createProcessesButton, FALSE);
+                        EnableWindow(_closeProcessesButton, TRUE);
+
                         return TRUE;
                     };
 
@@ -85,6 +88,9 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
                     {
                         // Close every process
                         ProcessManager::CloseEveryProcess();
+
+                        EnableWindow(_createProcessesButton, TRUE);
+                        EnableWindow(_closeProcessesButton, FALSE);
 
                         return TRUE;
                     };
@@ -299,6 +305,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     // Show the main window
     ShowWindow(windowHWND, nShowCmd);
+    EnableWindow(_closeProcessesButton, FALSE);
 
 
     // Windows message loop
@@ -307,8 +314,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     // Continuously try and get message
     while (1)
     {
-        // Peek message returns 1 if there is a message(s), 
-        // If there are no messages it will return 0.
+        // Peek message returns 1 if there a message is available, 
+        // If there are none it will return 0.
         // So we continually loop as long as there are messages in queue
         while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
         {
