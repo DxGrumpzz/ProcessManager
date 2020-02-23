@@ -72,6 +72,7 @@ public:
         };
         
         // Setup the hook function so it will only call the function when the process has finished initialization
+        // The hook function will ONLY be called when the app's main window receives and dispatches a message
         process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
         // After hooking the process resume normal execution
@@ -143,7 +144,7 @@ public:
             // Go through every handle, and run ShowWindow with SW_HIDE
             for (const HWND& hwnd : process.handles)
             {
-                ShowWindow(hwnd, SW_HIDE);
+                ShowWindowAsync(hwnd, SW_HIDE);
             };
 
             // Set creating flag
