@@ -28,6 +28,7 @@
         <StackPanel x:Name="ProcessList" 
                     HorizontalAlignment="Right">
             
+           
         </StackPanel>
 
     </Grid>

@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Windows;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Controls;
 
     /// <summary>
@@ -11,7 +11,6 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-
         private class ProcessModel
         {
             public string ProcessName { get; set; }
@@ -76,6 +75,7 @@
             ProcessList.Children.Add(new TextBlock()
             { 
                 Text = process.ProcessName,
+                TextAlignment = TextAlignment.Center,
             });
         }
 
