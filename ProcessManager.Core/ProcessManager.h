@@ -53,7 +53,7 @@ public:
             // Because the argument string will be appended to the default path argument 
             // a const cast must be used to convert the LPCWSTR to a LPWSTR
             const_cast<wchar_t*>(process.ProcessArgs.c_str()), 
-            NULL,NULL, 
+            NULL, NULL,
             FALSE,
             // Create a suspended process, A process that will start paused until ResumeThread is called
             // Run the process without a window, Only works on Console app for some reason 
@@ -86,6 +86,22 @@ public:
         return TRUE;
     };
 
+    // Runs a single process
+    static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+    {
+        ProcessModel process(processName, processArgs);
+        BOOL result = ProcessManager::RunProcess(process);
+
+        if (result == FALSE)
+            return 0;
+        else
+        {
+            ProcessManager::ProcessList.push_back(process);
+
+            return process.ProcessInfo.dwProcessId;
+        };
+    };
+
     // Closes a single process
     static BOOL CloseProcess(ProcessModel& process)
     {
@@ -103,7 +119,7 @@ public:
             if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
 
-            if(!CleanupProcessHandles(process))
+            if (!CleanupProcessHandles(process))
                 return FALSE;
         }
         // Don't do anything if the process is closed
