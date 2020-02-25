@@ -6,11 +6,13 @@
 #include <thread>
 
 #include "ProcessManager.h"
+#include "ProcessModel.h"
 
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
 
 #define DLL_CALL extern "C" __declspec(dllexport) 
+
 
 // Takes a DWORD error code and returns its string message 
 std::wstring GetErrorStringW(DWORD error)
@@ -57,7 +59,6 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             return DefWindowProcW(hwnd, message, wParam, lParam);
     };
 };
-
 
 
 // Create the app's main window
@@ -120,8 +121,19 @@ struct sProcessModel
 };
 
 
-DLL_CALL void Initialize()
+DLL_CALL void Initialize(sProcessModel processes[], int size)
 {
+    for (int a = 0; a < size; a++)
+    {
+        const ProcessModel process(processes[a].ProcessName,
+                                   processes[a].ProcessArgs == nullptr ?
+                                   L"" :
+                                   processes[a].ProcessArgs);
+
+        ProcessManager::ProcessList.push_back(process);
+    };
+
+
     std::thread([]()
     {
         HINSTANCE hInstance = GetModuleHandleW(NULL);
@@ -180,58 +192,8 @@ DLL_CALL void Initialize()
 };
 
 
-struct sStruct
-{
-    const wchar_t* Word;
-    const wchar_t* Word2;
-};
-
-
-DLL_CALL void Test(sProcessModel s[], int size)//sProcessModel processes[], int size)
-{
-    //std::wstring s;
-
-    //for (int a = 0; a < size; a++)
-    //{
-    //    const sProcessModel& process = processes[a];
-    //    
-    //    s += process.ProcessName;
-    //    s += L"\n";
-    //};
-    
-    for (int a = 0; a < size; a++)
-    {
-        const sProcessModel& ss = s[a];
-
-        MessageBoxW(NULL, ss.ProcessArgs, ss.ProcessName, NULL);
-    };
-
-    //const ProcessModel process(processes[1].ProcessName, processes[1].ProcessArgs);
-
-
-    //for (int a = 0; a < size; a++)
-    //{
-    //    const ProcessModel process(processes[a].ProcessName, processes[a].ProcessArgs);
-    //    MessageBoxW(NULL, L"Flag1", L"Test()", NULL);
-
-    //    ProcessManager::ProcessList.push_back(process);
-    //};
-
-};
-
-
 DLL_CALL void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
 {
-   /* std::wstring processNameW(processName); 
-    std::wstring processArgsW;
-    
-    if (processArgs == nullptr)
-        processArgsW = L"";
-    else
-        processArgsW = processArgs;
-
-    ProcessManager::ProcessList.emplace_back(processNameW, processArgsW);*/
-
     ProcessManager::RunProcess(ProcessManager::ProcessList[0]);
 }
 

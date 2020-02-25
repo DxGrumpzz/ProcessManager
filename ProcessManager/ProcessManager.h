@@ -103,7 +103,7 @@ public:
             if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
 
-            if(!CleanupProcessHandles(process));
+            if(!CleanupProcessHandles(process))
                 return FALSE;
         }
         // Don't do anything if the process is closed
@@ -236,6 +236,8 @@ private:
         if (!CloseHandle(process.ProcessInfo.hProcess) &&
             !CloseHandle(process.ProcessInfo.hThread))
             return FALSE;
+
+        return TRUE;
     }
 
 };
