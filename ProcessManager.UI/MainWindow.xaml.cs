@@ -81,7 +81,13 @@
 
         List<ProcessModel> _processList;
 
-        Process _process;
+
+        [DllImport("ProcessManager.Core.dll")]
+        private static extern void Initialize();
+
+
+        [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
+        private static extern void RunProcess(string processName, string processArgs);
 
         public MainWindow()
         {
@@ -93,26 +99,14 @@
             // Display processes
             _processList.ForEach(process => AddProcessToList(process));
 
-                
-            _process = Process.Start(new ProcessStartInfo()
-            { 
-                FileName = "ProcessManager.Core.exe",
-                //CreateNoWindow = true,
-                //WindowStyle = ProcessWindowStyle.Hidden,
-            });
+            Initialize();
 
         }
 
 
         private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
-            // "Convert" the string to an unmanaged string in memory
-            IntPtr handle  = Marshal.StringToHGlobalUni(_processList[1].ProcessName);
-
-            IntPtr hwndMessageWasSentTo = IntPtr.Zero;
-
-            // Send a message (500) to the created process with LPARAM as the handle to the string
-            _process.SendMessage(out hwndMessageWasSentTo, 0x500, IntPtr.Zero, handle);
+           RunProcess(_processList[0].ProcessName, _processList[0].ProcessArgs);
         }
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
