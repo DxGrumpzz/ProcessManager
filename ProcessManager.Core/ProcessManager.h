@@ -52,15 +52,15 @@ public:
         if (!CreateProcessW(process.ProcessName.c_str(),
             // Because the argument string will be appended to the default path argument 
             // a const cast must be used to convert the LPCWSTR to a LPWSTR
-            const_cast<wchar_t*>(process.ProcessArgs.c_str()), 
+            const_cast<wchar_t*>(process.ProcessArgs.c_str()),
             NULL, NULL,
             FALSE,
             // Create a suspended process, A process that will start paused until ResumeThread is called
             // Run the process without a window, Only works on Console app for some reason 
-            CREATE_SUSPENDED | CREATE_NO_WINDOW, 
+            CREATE_SUSPENDED | CREATE_NO_WINDOW,
             NULL,
-            NULL, 
-            &process.info, 
+            NULL,
+            &process.info,
             &process.ProcessInfo))
         {
             // If process creation failed.
@@ -70,7 +70,7 @@ public:
 
             return FALSE;
         };
-        
+
         // Setup the hook function so it will only call the function when the process has finished initialization
         // The hook function will ONLY be called when the app's main window receives and dispatches a message
         process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
@@ -102,6 +102,7 @@ public:
         };
     };
 
+
     // Closes a single process
     static BOOL CloseProcess(ProcessModel& process)
     {
@@ -114,7 +115,7 @@ public:
         {
             // Unhook the WinEvent from the process
             UnhookWinEvent(process.Hook);
-           
+
             // Close the process
             if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
