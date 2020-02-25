@@ -10,6 +10,7 @@
 
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
 
+#define DLL_CALL extern "C" __declspec(dllexport) 
 
 // Takes a DWORD error code and returns its string message 
 std::wstring GetErrorStringW(DWORD error)
@@ -112,8 +113,14 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
 };
 
 
+struct sProcessModel
+{
+    const wchar_t* ProcessName;
+    const wchar_t* ProcessArgs;
+};
 
-extern "C" __declspec(dllexport) void Initialize()
+
+DLL_CALL void Initialize()
 {
     std::thread([]()
     {
@@ -173,10 +180,49 @@ extern "C" __declspec(dllexport) void Initialize()
 };
 
 
-extern "C" 
-__declspec(dllexport) void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+struct sStruct
 {
-    std::wstring processNameW(processName); 
+    const wchar_t* Word;
+    const wchar_t* Word2;
+};
+
+
+DLL_CALL void Test(sProcessModel s[], int size)//sProcessModel processes[], int size)
+{
+    //std::wstring s;
+
+    //for (int a = 0; a < size; a++)
+    //{
+    //    const sProcessModel& process = processes[a];
+    //    
+    //    s += process.ProcessName;
+    //    s += L"\n";
+    //};
+    
+    for (int a = 0; a < size; a++)
+    {
+        const sProcessModel& ss = s[a];
+
+        MessageBoxW(NULL, ss.ProcessArgs, ss.ProcessName, NULL);
+    };
+
+    //const ProcessModel process(processes[1].ProcessName, processes[1].ProcessArgs);
+
+
+    //for (int a = 0; a < size; a++)
+    //{
+    //    const ProcessModel process(processes[a].ProcessName, processes[a].ProcessArgs);
+    //    MessageBoxW(NULL, L"Flag1", L"Test()", NULL);
+
+    //    ProcessManager::ProcessList.push_back(process);
+    //};
+
+};
+
+
+DLL_CALL void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+{
+   /* std::wstring processNameW(processName); 
     std::wstring processArgsW;
     
     if (processArgs == nullptr)
@@ -184,14 +230,13 @@ __declspec(dllexport) void RunProcess(const wchar_t* processName, const wchar_t*
     else
         processArgsW = processArgs;
 
-    ProcessManager::ProcessList.emplace_back(processNameW, processArgsW);
+    ProcessManager::ProcessList.emplace_back(processNameW, processArgsW);*/
 
     ProcessManager::RunProcess(ProcessManager::ProcessList[0]);
 }
 
 
-extern "C" 
-__declspec(dllexport) void CloseProcess(const wchar_t* processName)
+DLL_CALL void CloseProcess(const wchar_t* processName)
 {
     std::wstring processNameW(processName);
     

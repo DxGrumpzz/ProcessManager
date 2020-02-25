@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ProcessManager.UI": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

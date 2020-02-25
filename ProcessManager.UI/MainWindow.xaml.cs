@@ -14,7 +14,16 @@
     {
 
         private const string DLL = "ProcessManager.Core.dll";
+
         private class ProcessModel
+        {
+            public string ProcessName { get; set; }
+            public string ProcessArgs { get; set; }
+        }
+
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct sProcessModel
         {
             public string ProcessName { get; set; }
             public string ProcessArgs { get; set; }
@@ -37,6 +46,25 @@
 
 
 
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct sStruct
+        {
+            public string Word { get; set; }
+            public string Word2 { get; set; }
+
+            //public sStruct(string word, string word2)
+            //{
+            //    Word = word;
+            //    Word2 = word2;
+            //}
+        };
+
+
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        private static extern void Test(sStruct[] s, int size);//sProcessModel[] processes, int arrayLength);
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -48,12 +76,44 @@
             _processList.ForEach(process => AddProcessToList(process));
 
             Initialize();
+
+
         }
 
 
         private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
-           RunProcess(_processList[1].ProcessName, _processList[1].ProcessArgs);
+            sStruct[] s = new sStruct[]
+            {
+                new sStruct()
+                {
+                    Word = "b",
+                    Word2 = "fdsa",
+                },
+                new sStruct()
+                {
+                    Word = "f",
+                    Word2 = "fdsa",
+                },
+                new sStruct()
+                {
+                    Word = "r",
+                    Word2 = "asdf",
+                },
+            };
+
+            Test(s, s.Length);
+
+            //var s = _processList.Select(process =>
+            //new sProcessModel()
+            //{
+            //    ProcessName = process.ProcessName,
+            //    ProcessArgs = process.ProcessArgs,
+            //})
+            //.ToArray();
+
+            //Test(s, s.Length);
+            //RunProcess(_processList[1].ProcessName, _processList[1].ProcessArgs);
         }
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
