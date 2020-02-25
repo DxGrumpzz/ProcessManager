@@ -121,8 +121,7 @@ struct sProcessModel
 };
 
 
-
-DLL_CALL void Initialize(sProcessModel processes[], int size, int* processIds)
+DLL_CALL void Initialize()
 {
     std::thread([]()
     {
