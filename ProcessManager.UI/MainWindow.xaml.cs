@@ -23,13 +23,6 @@
         }
 
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct sProcessModel
-        {
-            public string ProcessName { get; set; }
-            public string ProcessArgs { get; set; }
-        }
-
         private const string DLL = "ProcessManager.Core.dll";
 
         List<ProcessModel> _processList;
@@ -56,6 +49,7 @@
             // Display processes
             _processList.ForEach(process => AddProcessToList(process));
 
+
             Initialize();
         }
 
@@ -63,15 +57,21 @@
 
         private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
-            var processID = RunProcess(_processList[0].ProcessName, _processList[0].ProcessArgs);
+            _processList.ForEach(process =>
+            {
+                var processID = RunProcess(process.ProcessName, process.ProcessArgs);
+                process.ProcessID = processID;
+            });
 
-            _processList[0].ProcessID = processID;
         }
 
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
         {
-            CloseProcess(_processList[0].ProcessID);
+            _processList.ForEach(process =>
+            {
+                CloseProcess(process.ProcessID);
+            });
         }
 
 
@@ -110,6 +110,5 @@
                 TextAlignment = TextAlignment.Center,
             });
         }
-
     };
 };
