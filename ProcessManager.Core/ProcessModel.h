@@ -46,7 +46,10 @@ public:
     };
 
     ProcessModel(const wchar_t* processName, const wchar_t* processArgs) :
-        ProcessModel(std::wstring(processName), std::wstring(processArgs))
+        ProcessModel(std::wstring(processName), 
+                     std::wstring(processArgs == nullptr ?
+                     L"" :
+                     processArgs))
     {
     };
 

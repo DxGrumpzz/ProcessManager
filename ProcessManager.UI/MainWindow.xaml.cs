@@ -13,12 +13,12 @@
     public partial class MainWindow : Window
     {
 
-        private const string DLL = "ProcessManager.Core.dll";
-
         private class ProcessModel
         {
             public string ProcessName { get; set; }
             public string ProcessArgs { get; set; }
+
+            public ulong ProcessID { get; set; }
         }
 
 
@@ -29,6 +29,7 @@
             public string ProcessArgs { get; set; }
         }
 
+        private const string DLL = "ProcessManager.Core.dll";
 
         List<ProcessModel> _processList;
 
@@ -36,14 +37,11 @@
         [DllImport(DLL)]
         private static extern void Initialize(sProcessModel[] processes, int size);
 
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        private static extern ulong RunProcess(string processName, string processArgs);
 
         [DllImport(DLL, CharSet = CharSet.Unicode)]
-        private static extern void RunProcess(string processName, string processArgs);
-
-
-        [DllImport(DLL, CharSet = CharSet.Unicode)]
-        private static extern void CloseProcess(string processName);
-
+        private static extern void CloseProcess(ulong processID);
 
 
 
@@ -70,15 +68,19 @@
         }
 
 
+
         private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
-            RunProcess(_processList[1].ProcessName, _processList[1].ProcessArgs);
+            var processID = RunProcess(_processList[0].ProcessName, _processList[0].ProcessArgs);
+
+            _processList[0].ProcessID = processID;
         }
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
         {
-            CloseProcess(_processList[1].ProcessName);
+            CloseProcess(_processList[0].ProcessID);
         }
+
 
         private List<ProcessModel> GetProcessesFromFile(string filePath = "Processes.txt")
         {

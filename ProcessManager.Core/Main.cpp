@@ -121,19 +121,9 @@ struct sProcessModel
 };
 
 
-DLL_CALL void Initialize(sProcessModel processes[], int size)
+
+DLL_CALL void Initialize(sProcessModel processes[], int size, int* processIds)
 {
-    for (int a = 0; a < size; a++)
-    {
-        const ProcessModel process(processes[a].ProcessName,
-                                   processes[a].ProcessArgs == nullptr ?
-                                   L"" :
-                                   processes[a].ProcessArgs);
-
-        ProcessManager::ProcessList.push_back(process);
-    };
-
-
     std::thread([]()
     {
         HINSTANCE hInstance = GetModuleHandleW(NULL);
@@ -188,7 +178,8 @@ DLL_CALL void Initialize(sProcessModel processes[], int size)
             Sleep(1);
         };
 
-    }).detach();
+    })
+    .detach();
 };
 
 
