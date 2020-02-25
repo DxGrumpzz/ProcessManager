@@ -114,13 +114,6 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
 };
 
 
-struct sProcessModel
-{
-    const wchar_t* ProcessName;
-    const wchar_t* ProcessArgs;
-};
-
-
 DLL_CALL void Initialize()
 {
     std::thread([]()
