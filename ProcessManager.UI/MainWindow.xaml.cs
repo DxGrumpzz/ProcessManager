@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -35,7 +36,7 @@
 
 
         [DllImport(DLL)]
-        private static extern void Initialize(sProcessModel[] processes, int size);
+        private static extern void Initialize();
 
         [DllImport(DLL, CharSet = CharSet.Unicode)]
         private static extern ulong RunProcess(string processName, string processArgs);
@@ -55,16 +56,7 @@
             // Display processes
             _processList.ForEach(process => AddProcessToList(process));
 
-
-            var s = _processList.Select(process =>
-            new sProcessModel()
-            {
-                ProcessName = process.ProcessName,
-                ProcessArgs = process.ProcessArgs,
-            })
-            .ToArray();
-
-            Initialize(s, s.Length);
+            Initialize();
         }
 
 
@@ -75,6 +67,7 @@
 
             _processList[0].ProcessID = processID;
         }
+
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
         {
