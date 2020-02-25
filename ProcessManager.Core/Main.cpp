@@ -8,7 +8,7 @@
 #include "ProcessManager.h"
 
 
-#define RBG_UNIFORM(uniformColour) RGB(uniformColour,uniformColour,uniformColour) 
+#define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
 
 
 // Takes a DWORD error code and returns its string message 
@@ -58,6 +58,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 };
 
 
+
 // Create the app's main window
 HWND CreateMainWindow(const HINSTANCE& hInstance)
 {
@@ -89,7 +90,7 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
     GetWindowRect(hDesktop, &desktopRECT);
 
     const int monitorWidth = desktopRECT.right - desktopRECT.left;
-    const int monitorHeight = desktopRECT.bottom- desktopRECT.top;
+    const int monitorHeight = desktopRECT.bottom - desktopRECT.top;
 
     constexpr int WINDOW_WIDTH = 800;
     constexpr int WINDOW_HEIGHT = 350;
@@ -108,64 +109,8 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
 
 
     return windowHWND;
-}
-
-
-// _In_opt_ nad _In_ are something called SAL annotations, They mean that a parameter maybe be passed as NULL
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
-{
-    // Create the main window
-    HWND windowHWND = CreateMainWindow(hInstance);
-
-    // Handle window creation errors
-    if (windowHWND == 0)
-    {
-        std::wstring error = GetErrorStringW(GetLastError());
-        error.insert(0, L"An error occured while creating window.\n");
-
-        MessageBoxW(NULL, error.c_str(), NULL, NULL);
-
-        return 1;
-    };
-
-    // Show the main window
-    ShowWindow(windowHWND, nShowCmd);
-
-    // Windows message loop
-    MSG message;
-
-    // Continuously try and get message
-    while (1)
-    {
-        // Peek message returns 1 if there a message is available, 
-        // If there are none it will return 0.
-        // So we continually loop as long as there are messages in queue
-        while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
-        {
-            // If the message is a keystroke get the key's character value
-            TranslateMessage(&message);
-
-            // Send the message to the Window procedure function
-            DispatchMessageW(&message);
-        };
-
-        // To exit the infinite loop check if the current message was a quit message
-        if (message.message == WM_QUIT)
-            break;
-
-        // Hide the processes. 
-        // Why is this here ? read ProcessManager::RunProcess doc
-        for (ProcessModel& process : ProcessManager::ProcessList)
-        {
-            ProcessManager::HideProcess(process);
-        };
-
-        // Because this is an infinite loop a 1ms thread delay is a must
-        Sleep(1);
-    };
-
-    return (int)message.wParam;
 };
+
 
 
 extern "C" __declspec(dllexport) void Initialize()
@@ -228,13 +173,34 @@ extern "C" __declspec(dllexport) void Initialize()
 };
 
 
-
-extern "C" __declspec(dllexport) void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+extern "C" 
+__declspec(dllexport) void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
 {
-    std::wstring processNameW(processName);
-    std::wstring processArgsW(processArgs);
+    std::wstring processNameW(processName); 
+    std::wstring processArgsW;
+    
+    if (processArgs == nullptr)
+        processArgsW = L"";
+    else
+        processArgsW = processArgs;
 
     ProcessManager::ProcessList.emplace_back(processNameW, processArgsW);
 
     ProcessManager::RunProcess(ProcessManager::ProcessList[0]);
+}
+
+
+extern "C" 
+__declspec(dllexport) void CloseProcess(const wchar_t* processName)
+{
+    std::wstring processNameW(processName);
+    
+    for (ProcessModel& process : ProcessManager::ProcessList)
+    {
+        if (process.ProcessName == processNameW)
+        {
+            ProcessManager::CloseProcess(process);
+        };
+    };
+
 }
