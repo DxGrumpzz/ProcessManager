@@ -189,16 +189,13 @@ DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* pro
     return processID;
 };
 
-DLL_CALL void CloseProcess(const wchar_t* processName)
+DLL_CALL void CloseProcess(DWORD processID)
 {
-    std::wstring processNameW(processName);
-    
     for (ProcessModel& process : ProcessManager::ProcessList)
     {
-        if (process.ProcessName == processNameW)
+        if (process.ProcessInfo.dwProcessId == processID)
         {
             ProcessManager::CloseProcess(process);
         };
     };
-
-}
+};
