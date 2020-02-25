@@ -71,7 +71,7 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        private const string DLL = "ProcessManager.Core.dll";
         private class ProcessModel
         {
             public string ProcessName { get; set; }
@@ -82,12 +82,18 @@
         List<ProcessModel> _processList;
 
 
-        [DllImport("ProcessManager.Core.dll")]
+        [DllImport(DLL)]
         private static extern void Initialize();
 
 
-        [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
         private static extern void RunProcess(string processName, string processArgs);
+
+
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        private static extern void CloseProcess(string processName);
+
+
 
         public MainWindow()
         {
@@ -106,17 +112,12 @@
 
         private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
-           RunProcess(_processList[0].ProcessName, _processList[0].ProcessArgs);
+           RunProcess(_processList[1].ProcessName, _processList[1].ProcessArgs);
         }
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
         {
-            //IntPtr hwndMessageWasSentTo = IntPtr.Zero;
-
-            //IntPtr wParam = IntPtr.Zero;
-            //IntPtr lParam = IntPtr.Zero;
-
-            //_process.PostMessage(out hwndMessageWasSentTo, 0x500, wParam, lParam);
+            CloseProcess(_processList[1].ProcessName);
         }
 
         private List<ProcessModel> GetProcessesFromFile(string filePath = "Processes.txt")
