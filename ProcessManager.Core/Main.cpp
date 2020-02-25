@@ -182,11 +182,12 @@ DLL_CALL void Initialize()
 };
 
 
-DLL_CALL void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs)
 {
-    ProcessManager::RunProcess(ProcessManager::ProcessList[0]);
-}
+    DWORD processID = ProcessManager::RunProcess(processName, processArgs);
 
+    return processID;
+};
 
 DLL_CALL void CloseProcess(const wchar_t* processName)
 {
