@@ -236,6 +236,8 @@ private:
         if (!CloseHandle(process.ProcessInfo.hProcess) &&
             !CloseHandle(process.ProcessInfo.hThread))
             return FALSE;
+
+        return TRUE;
     }
 
 };

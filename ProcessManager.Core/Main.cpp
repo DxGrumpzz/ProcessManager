@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <CommCtrl.h>
+#include <thread>
 
 #include "ProcessManager.h"
 
@@ -35,7 +36,7 @@ const wchar_t* windowClassName = L"DesktopApp";
 
 
 // The MainWindow function procedure
-LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -52,7 +53,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 
         default:
-            return DefWindowProcW(hWnd, message, wParam, lParam);
+            return DefWindowProcW(hwnd, message, wParam, lParam);
     };
 };
 
@@ -82,13 +83,23 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
         return NULL;
     };
 
+    const HWND hDesktop = GetDesktopWindow();
+    RECT desktopRECT;
+
+    GetWindowRect(hDesktop, &desktopRECT);
+
+    const int monitorWidth = desktopRECT.right - desktopRECT.left;
+    const int monitorHeight = desktopRECT.bottom- desktopRECT.top;
+
+    constexpr int WINDOW_WIDTH = 800;
+    constexpr int WINDOW_HEIGHT = 350;
 
     // Create the actuall window
     HWND windowHWND = CreateWindowExW(NULL,
                                       windowClassName,
                                       windowTitle,
                                       WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
-                                      0, 0,
+                                      (monitorWidth / 2) - (WINDOW_WIDTH / 2), (monitorHeight / 2) - (WINDOW_HEIGHT / 2),
                                       800, 350,
                                       NULL,
                                       NULL,
@@ -122,7 +133,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     // Windows message loop
     MSG message;
-    
+
     // Continuously try and get message
     while (1)
     {
@@ -153,6 +164,77 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         Sleep(1);
     };
 
-
     return (int)message.wParam;
 };
+
+
+extern "C" __declspec(dllexport) void Initialize()
+{
+    std::thread([]()
+    {
+        HINSTANCE hInstance = GetModuleHandleW(NULL);
+
+
+        HWND windowHWND = CreateMainWindow(hInstance);
+
+        // Handle window creation errors
+        if (windowHWND == 0)
+        {
+            std::wstring error = GetErrorStringW(GetLastError());
+            error.insert(0, L"An error occured while creating window.\n");
+
+            MessageBoxW(NULL, error.c_str(), NULL, NULL);
+            return;
+        };
+
+
+        // Show the main window
+        ShowWindow(windowHWND, SW_HIDE);
+
+        // Windows message loop
+        MSG message;
+
+        // Continuously try and get message
+        while (1)
+        {
+            // Peek message returns 1 if there a message is available, 
+            // If there are none it will return 0.
+            // So we continually loop as long as there are messages in queue
+            while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE))
+            {
+                // If the message is a keystroke get the key's character value
+                TranslateMessage(&message);
+
+                // Send the message to the Window procedure function
+                DispatchMessageW(&message);
+            };
+
+            // To exit the infinite loop check if the current message was a quit message
+            if (message.message == WM_QUIT)
+                break;
+
+            // Hide the processes. 
+            // Why is this here ? read ProcessManager::RunProcess doc
+            for (ProcessModel& process : ProcessManager::ProcessList)
+            {
+                ProcessManager::HideProcess(process);
+            };
+
+            // Because this is an infinite loop a 1ms thread delay is a must
+            Sleep(1);
+        };
+
+    }).detach();
+};
+
+
+
+extern "C" __declspec(dllexport) void RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+{
+    std::wstring processNameW(processName);
+    std::wstring processArgsW(processArgs);
+
+    ProcessManager::ProcessList.emplace_back(processNameW, processArgsW);
+
+    ProcessManager::RunProcess(ProcessManager::ProcessList[0]);
+}
