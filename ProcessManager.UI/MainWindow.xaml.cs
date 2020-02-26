@@ -1,6 +1,5 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -34,7 +33,7 @@
         [DllImport(DLL, CharSet = CharSet.Unicode)]
         private static extern ulong RunProcess(string processName, string processArgs);
 
-        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        [DllImport(DLL)]
         private static extern void CloseProcess(ulong processID);
 
 
@@ -55,7 +54,7 @@
 
 
 
-        private unsafe void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
+        private void Button_Run_Processes_Click(object sender, RoutedEventArgs e)
         {
             _processList.ForEach(process =>
             {
@@ -67,6 +66,14 @@
 
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
+        {
+            _processList.ForEach(process =>
+            {
+                CloseProcess(process.ProcessID);
+            });
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _processList.ForEach(process =>
             {
