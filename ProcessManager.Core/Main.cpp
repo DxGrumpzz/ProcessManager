@@ -41,23 +41,7 @@ const wchar_t* windowClassName = L"DesktopApp";
 // The MainWindow function procedure
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
-        case WM_CLOSE:
-        {
-            // Send a quit message to this window 
-            PostQuitMessage(0);
-
-            // Close processes
-            ProcessManager::CloseEveryProcess();
-
-            return 0;
-        };
-
-
-        default:
             return DefWindowProcW(hwnd, message, wParam, lParam);
-    };
 };
 
 
@@ -66,12 +50,9 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
 {
     WNDCLASSEXW windowClass = { 0 };
     windowClass.cbSize = sizeof(WNDCLASSEXW);
-    windowClass.style = CS_HREDRAW | CS_VREDRAW;
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = windowClassName;
     windowClass.lpfnWndProc = WindowProcedure;
-    windowClass.hbrBackground = CreateSolidBrush(RBG_UNIFORM(0xE1));
-    windowClass.hCursor = LoadCursorW(NULL, IDC_ARROW);
 
     // Register the window
     ATOM registerClassResult = RegisterClassExW(&windowClass);
@@ -86,24 +67,24 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
         return NULL;
     };
 
-    const HWND hDesktop = GetDesktopWindow();
-    RECT desktopRECT;
+    //const HWND hDesktop = GetDesktopWindow();
+    //RECT desktopRECT;
 
-    GetWindowRect(hDesktop, &desktopRECT);
+    //GetWindowRect(hDesktop, &desktopRECT);
 
-    const int monitorWidth = desktopRECT.right - desktopRECT.left;
-    const int monitorHeight = desktopRECT.bottom - desktopRECT.top;
+    //const int monitorWidth = desktopRECT.right - desktopRECT.left;
+    //const int monitorHeight = desktopRECT.bottom - desktopRECT.top;
 
-    constexpr int WINDOW_WIDTH = 800;
-    constexpr int WINDOW_HEIGHT = 350;
+    //constexpr int WINDOW_WIDTH = 800;
+    //constexpr int WINDOW_HEIGHT = 350;
 
     // Create the actuall window
     HWND windowHWND = CreateWindowExW(NULL,
                                       windowClassName,
-                                      windowTitle,
-                                      WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
-                                      (monitorWidth / 2) - (WINDOW_WIDTH / 2), (monitorHeight / 2) - (WINDOW_HEIGHT / 2),
-                                      800, 350,
+                                      L" ",
+                                      NULL,//WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
+                                      0, 0,//(monitorWidth / 2) - (WINDOW_WIDTH / 2), (monitorHeight / 2) - (WINDOW_HEIGHT / 2),
+                                      0, 0,//800, 350,
                                       NULL,
                                       NULL,
                                       hInstance,
@@ -169,7 +150,6 @@ DLL_CALL void Initialize()
             // Because this is an infinite loop a 1ms thread delay is a must
             Sleep(1);
         };
-
     })
     .detach();
 };
