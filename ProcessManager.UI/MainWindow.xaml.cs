@@ -1,11 +1,12 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Windows;
-    using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -19,7 +20,9 @@
             public string ProcessArgs { get; set; }
 
             public ulong ProcessID { get; set; }
-        }
+
+            public bool IsRunning => ProcessID != 0;
+        };
 
 
         private const string DLL = "ProcessManager.Core.dll";
@@ -40,13 +43,22 @@
 
         public MainWindow()
         {
+
+            if (File.Exists("Processes.txt") == false)
+            {
+                MessageBox.Show("Unable to find Processes.txt");
+                Environment.Exit(1);
+                return;
+            };
+
+
             InitializeComponent();
 
             // Setup process list
             _processList = GetProcessesFromFile();
 
             // Display processes
-            _processList.ForEach(process => AddProcessToList(process));
+            _processList.ForEach(process => ProcessList.Items.Add(process));
 
 
             Initialize();
@@ -61,9 +73,7 @@
                 var processID = RunProcess(process.ProcessName, process.ProcessArgs);
                 process.ProcessID = processID;
             });
-
         }
-
 
         private void Button_Close_Processes_Click(object sender, RoutedEventArgs e)
         {
@@ -73,12 +83,37 @@
             });
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             _processList.ForEach(process =>
             {
                 CloseProcess(process.ProcessID);
             });
+        }
+
+        private void RunProcessButtonClick(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement button = (FrameworkElement)sender;
+            ProcessModel process = (ProcessModel)button.DataContext;
+
+            if (process.IsRunning == false)
+            {
+                ulong processID = RunProcess(process.ProcessName, process.ProcessArgs);
+                process.ProcessID = processID;
+            };
+        }
+
+        private void CloseProcessButtonClick(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement button = (FrameworkElement)sender;
+            ProcessModel process = (ProcessModel)button.DataContext;
+
+
+            if (process.IsRunning == true)
+            {
+                CloseProcess(process.ProcessID);
+                process.ProcessID = 0;
+            };
         }
 
 
@@ -109,13 +144,6 @@
             return processList;
         }
 
-        private void AddProcessToList(ProcessModel process)
-        {
-            ProcessList.Children.Add(new TextBlock()
-            {
-                Text = process.ProcessName,
-                TextAlignment = TextAlignment.Center,
-            });
-        }
+        
     };
 };
