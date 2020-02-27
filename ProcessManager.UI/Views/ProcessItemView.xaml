@@ -6,9 +6,10 @@
              xmlns:local="clr-namespace:ProcessManager.UI"
              mc:Ignorable="d" 
              
-             d:DesignHeight="450" 
-             d:DesignWidth="800">
+             d:DesignHeight="25" 
+             d:DesignWidth="250">
 
+    
     <Grid Margin="0,1">
 
         <Grid.ColumnDefinitions>
@@ -31,10 +32,14 @@
 
             <Button Content="Run"
                                    
-                     Margin="0,0,5,0"/>
+                     Margin="0,0,5,0"
+                    
+                     Command="{Binding RunProcessCommand}"/>
 
 
-            <Button Content="Close" />
+            <Button Content="Close" 
+                    
+                    Command="{Binding CloseProcessCommand}"/>
 
         </StackPanel>
 
