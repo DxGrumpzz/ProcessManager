@@ -13,31 +13,8 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        private class ProcessModel
-        {
-            public string ProcessName { get; set; }
-            public string ProcessArgs { get; set; }
-
-            public ulong ProcessID { get; set; }
-
-            public bool IsRunning => ProcessID != 0;
-        };
-
-
-        private const string DLL = "ProcessManager.Core.dll";
-
+      
         List<ProcessModel> _processList;
-
-
-        [DllImport(DLL)]
-        private static extern void Initialize();
-
-        [DllImport(DLL, CharSet = CharSet.Unicode)]
-        private static extern ulong RunProcess(string processName, string processArgs);
-
-        [DllImport(DLL)]
-        private static extern void CloseProcess(ulong processID);
 
 
 
@@ -61,7 +38,7 @@
             _processList.ForEach(process => ProcessList.Items.Add(process));
 
 
-            Initialize();
+            CoreDLL.Initialize();
         }
 
 
@@ -70,7 +47,7 @@
         {
             _processList.ForEach(process =>
             {
-                var processID = RunProcess(process.ProcessName, process.ProcessArgs);
+                var processID = CoreDLL.RunProcess(process.ProcessName, process.ProcessArgs);
                 process.ProcessID = processID;
             });
         }
@@ -79,7 +56,7 @@
         {
             _processList.ForEach(process =>
             {
-                CloseProcess(process.ProcessID);
+                CoreDLL.CloseProcess(process.ProcessID);
             });
         }
 
@@ -87,7 +64,7 @@
         {
             _processList.ForEach(process =>
             {
-                CloseProcess(process.ProcessID);
+                CoreDLL.CloseProcess(process.ProcessID);
             });
         }
 
@@ -98,7 +75,7 @@
 
             if (process.IsRunning == false)
             {
-                ulong processID = RunProcess(process.ProcessName, process.ProcessArgs);
+                ulong processID = CoreDLL.RunProcess(process.ProcessName, process.ProcessArgs);
                 process.ProcessID = processID;
             };
         }
@@ -111,7 +88,7 @@
 
             if (process.IsRunning == true)
             {
-                CloseProcess(process.ProcessID);
+                CoreDLL.CloseProcess(process.ProcessID);
                 process.ProcessID = 0;
             };
         }
