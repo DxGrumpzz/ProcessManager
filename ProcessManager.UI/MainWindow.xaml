@@ -12,17 +12,21 @@
         Closing="Window_Closing">
 
 
+    
     <Grid Margin="10">
 
         <StackPanel HorizontalAlignment="Left">
 
             <Button Content="Run processes" 
-                    Click="Button_Run_Processes_Click"
+                    
+                    Command="{Binding RunProcessesCommnad}"
                     
                     Margin="0,0,0,10"/>
 
+            
             <Button Content="Close processes"
-                    Click="Button_Close_Processes_Click"/>
+                    
+                    Command="{Binding CloseProcessCommand}"/>
 
         </StackPanel>
 
