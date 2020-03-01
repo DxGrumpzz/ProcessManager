@@ -9,5 +9,7 @@
     {
         public static List<ProcessModel> ProcessList { get; set; }
 
+        public static IProcessLoader ProcessLoader { get; set; }
+
     };
 };
