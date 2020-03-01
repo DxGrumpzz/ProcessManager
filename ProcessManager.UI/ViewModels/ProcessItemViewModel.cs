@@ -26,12 +26,20 @@
 
         private void ExecuteRunProcessCommand()
         {
-            
+            if (Process.IsRunning == false)
+            {
+                ulong processID = CoreDLL.RunProcess(Process.ProcessName, Process.ProcessArgs);
+                Process.ProcessID = processID;
+            };
         }
 
         private void ExecuteCloseProcessCommand()
         {
-
+            if (Process.IsRunning == true)
+            {
+                CoreDLL.CloseProcess(Process.ProcessID);
+                Process.ProcessID = 0;
+            };
         }
 
     };
