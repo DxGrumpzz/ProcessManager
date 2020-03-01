@@ -1,9 +1,8 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Windows;
 
     /// <summary>
@@ -23,9 +22,7 @@ namespace ProcessManager.UI
                 return;
             };
 
-
-            // Setup process list
-            DI.ProcessList = GetProcessesFromFile();
+            SetupDI();
 
             CoreDLL.Initialize();
 
@@ -33,6 +30,7 @@ namespace ProcessManager.UI
                 new MainWindowViewModel(DI.ProcessList)))
                 .Show();
         }
+
 
         protected override void OnExit(ExitEventArgs e)
         {
@@ -46,9 +44,11 @@ namespace ProcessManager.UI
 
 
         private static void SetupDI()
-            {
-                string currentLine = lines.ElementAt(a).ToLower();
+        {
+            // Setup file process loader
+            DI.ProcessLoader = new ProcessLoader();
 
+            // Setup process list
             DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile("Processes.txt"));
         }
 
