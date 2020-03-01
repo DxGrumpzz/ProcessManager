@@ -26,7 +26,7 @@
             
             <Button Content="Close processes"
                     
-                    Command="{Binding CloseProcessCommand}"/>
+                    Command="{Binding CloseProcessesCommnad}"/>
 
         </StackPanel>
 
