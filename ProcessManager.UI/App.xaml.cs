@@ -14,18 +14,24 @@
         {
             base.OnStartup(e);
 
-
+            // Check if the processes file exists
             if (File.Exists("Processes.txt") == false)
             {
                 MessageBox.Show("Unable to find Processes.txt");
+                
+                // Exit application if it isn't
                 Environment.Exit(1);
                 return;
             };
 
+            // Setup DI stuff
             SetupDI();
 
+            // Initialize ProcessManager functionality
             CoreDLL.Initialize();
 
+
+            // Create the main window
             (Current.MainWindow = new MainWindow(
                 new MainWindowViewModel(DI.ProcessList)))
                 .Show();
@@ -36,6 +42,7 @@
         {
             base.OnExit(e);
 
+            // Close the processes when app exists
             DI.ProcessList.ForEach(process =>
             {
                 CoreDLL.CloseProcess(process.ProcessID);

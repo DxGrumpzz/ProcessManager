@@ -22,15 +22,17 @@
             <ColumnDefinition Width="AUTO"/>
         </Grid.ColumnDefinitions>
         
+        
         <StackPanel HorizontalAlignment="Left">
 
+            <!-- Run all processes button -->
             <Button Content="Run processes" 
                     
                     Command="{Binding RunProcessesCommnad}"
                     
                     Margin="0,0,0,10"/>
 
-            
+            <!-- Close all processes button -->
             <Button Content="Close processes"
                     
                     Command="{Binding CloseProcessesCommnad}"/>
@@ -38,6 +40,7 @@
         </StackPanel>
 
 
+        <!-- The list of processes that will be ran -->
         <ItemsControl HorizontalAlignment="Right"
                       
                       Grid.Column="1"
@@ -53,7 +56,6 @@
                 </DataTemplate>
 
             </ItemsControl.ItemTemplate>
-
 
             <ItemsControl.ItemsPanel>
 
