@@ -34,6 +34,16 @@
                 .Show();
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            DI.ProcessList.ForEach(process =>
+            {
+                CoreDLL.CloseProcess(process.ProcessID);
+            });
+        }
+
         private List<ProcessModel> GetProcessesFromFile(string filePath = "Processes.txt")
         {
             var lines = File.ReadAllLines(filePath)
