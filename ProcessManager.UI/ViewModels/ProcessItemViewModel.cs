@@ -37,24 +37,30 @@
 
         private void ExecuteRunProcessCommand()
         {
-            if (Process.IsRunning == false)
-            {
-                ulong processID = CoreDLL.RunProcess(Process.ProcessName, Process.ProcessArgs);
-                Process.ProcessID = processID;
+            if (Process.RunProcess() == true)
+                ProcessRunning = true;
 
-                ProcessRunning = processID != 0 ? true : false;
-            };
+            //if (Process.IsRunning == false)
+            //{
+            //    ulong processID = CoreDLL.RunProcess(Process.ProcessName, Process.ProcessArgs);
+            //    Process.ProcessID = processID;
+
+            //    ProcessRunning = processID != 0 ? true : false;
+            //};
         }
 
         private void ExecuteCloseProcessCommand()
         {
-            if (Process.IsRunning == true)
-            {
-                CoreDLL.CloseProcess(Process.ProcessID);
-                Process.ProcessID = 0;
-
+            if(Process.CloseProcess() == true)
                 ProcessRunning = false;
-            };
+
+            //if (Process.IsRunning == true)
+            //{
+            //    CoreDLL.CloseProcess(Process.ProcessID);
+            //    Process.ProcessID = 0;
+
+            //    ProcessRunning = false;
+            //};
         }
 
     };

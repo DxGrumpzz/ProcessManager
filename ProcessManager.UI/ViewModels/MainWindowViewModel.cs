@@ -36,13 +36,8 @@
             {
                 ProcessModel process = processVM.Process;
 
-                if (process.IsRunning == false)
-                {
-                    ulong processID = CoreDLL.RunProcess(process.ProcessName, process.ProcessArgs);
-                    process.ProcessID = processID;
-
-                    processVM.ProcessRunning = processID != 0 ? true : false;
-                };
+                if (process.RunProcess() == true)
+                    processVM.ProcessRunning = true;
             });
         }
 
@@ -51,14 +46,9 @@
             Processes.ForEach(processVM =>
             {
                 ProcessModel process = processVM.Process;
-                
-                if (process.IsRunning == true)
-                {
-                    CoreDLL.CloseProcess(process.ProcessID);
-                    process.ProcessID = 0;
 
+                if (process.CloseProcess() == true)
                     processVM.ProcessRunning = false;
-                };
             });
         }
     };
