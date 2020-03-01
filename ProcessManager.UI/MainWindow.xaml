@@ -5,16 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProcessManager.UI"
         mc:Ignorable="d"
-        Title="MainWindow" 
-        Height="450" 
-        Width="800"
+       
+        Title="Process Manager" 
+      
+        Height="200" 
+        Width="600"
+        
+        MinWidth="195"
         
         Closing="Window_Closing">
-
 
     
     <Grid Margin="10">
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="AUTO"/>
+        </Grid.ColumnDefinitions>
+        
         <StackPanel HorizontalAlignment="Left">
 
             <Button Content="Run processes" 
@@ -32,6 +41,8 @@
 
 
         <ItemsControl HorizontalAlignment="Right"
+                      
+                      Grid.Column="1"
                       
                       ItemsSource="{Binding Processes}">
 
