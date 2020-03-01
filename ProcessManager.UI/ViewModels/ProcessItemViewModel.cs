@@ -5,12 +5,23 @@
     /// <summary>
     /// 
     /// </summary>
-    public class ProcessItemViewModel
+    public class ProcessItemViewModel : BaseViewModel
     {
+        private bool _processRunning;
 
         public ProcessModel Process { get; set; }
 
+
         public string ProcessName => Process.ProcessName;
+        public bool ProcessRunning
+        {
+            get => _processRunning;
+            set 
+            { 
+                _processRunning = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         public ICommand RunProcessCommand { get; }
@@ -30,6 +41,8 @@
             {
                 ulong processID = CoreDLL.RunProcess(Process.ProcessName, Process.ProcessArgs);
                 Process.ProcessID = processID;
+
+                ProcessRunning = processID != 0 ? true : false;
             };
         }
 
@@ -39,6 +52,8 @@
             {
                 CoreDLL.CloseProcess(Process.ProcessID);
                 Process.ProcessID = 0;
+
+                ProcessRunning = false;
             };
         }
 
