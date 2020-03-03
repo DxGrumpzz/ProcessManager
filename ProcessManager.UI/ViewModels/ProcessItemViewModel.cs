@@ -8,6 +8,7 @@
     /// </summary>
     public class ProcessItemViewModel : BaseViewModel
     {
+
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -23,10 +24,6 @@
         /// </summary>
         public ProcessModel Process { get; set; }
 
-        /// <summary>
-        /// The name of this process
-        /// </summary>
-        public string ProcessName => Process.ProcessName;
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
