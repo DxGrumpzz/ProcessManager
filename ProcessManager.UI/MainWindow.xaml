@@ -11,6 +11,7 @@
         Height="200" 
         Width="600"
         
+        MinHeight="125"
         MinWidth="195">
 
     
@@ -34,7 +35,7 @@
 
             <!-- Close all processes button -->
             <Button Content="Close processes"
-                    
+                  
                     Command="{Binding CloseProcessesCommnad}"/>
 
         </StackPanel>
