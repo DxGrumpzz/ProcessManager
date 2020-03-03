@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -54,6 +54,16 @@ namespace ProcessManager.UI
         {
             // Setup file process loader
             DI.ProcessLoader = new ProcessLoader("Processes.txt");
+
+            // Check if the Processes file is valid
+            if(DI.ProcessLoader.IsProcessesFileFileValid() == false)
+            {
+                MessageBox.Show("Processes.txt is invalid");
+
+                // Exit application if it isn't
+                Environment.Exit(1);
+                return;
+            };
 
             // Setup process list
             DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile());

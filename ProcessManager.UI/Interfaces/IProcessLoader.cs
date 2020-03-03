@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
 
@@ -12,8 +12,12 @@ namespace ProcessManager.UI
         /// </summary>
         /// <returns></returns>
         public IEnumerable<ProcessModel> GetProcessesFromFile();
+        
+        /// <summary>
+        /// Checks if the Processes file is valid
+        /// </summary>
         /// <returns></returns>
-        public IEnumerable<ProcessModel> GetProcessesFromFile(string filePath);
-    
+        public bool IsProcessesFileFileValid();
+
     };
 };

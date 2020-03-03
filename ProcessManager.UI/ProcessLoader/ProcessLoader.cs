@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.IO;
@@ -55,6 +55,61 @@ namespace ProcessManager.UI
             };
 
             return processList;
+        }
+
+
+        /// <summary>
+        /// Check if Processes.txt is valid
+        /// </summary>
+        /// <param name="fileData"></param>
+        /// <returns></returns>
+        public bool IsProcessesFileFileValid()
+        {
+            // The process file must contain at least 2 lines for it to be valid
+            if (_fileLines.Length < 2)
+                return false;
+
+            // The [processes] keyword must show up at least once
+            if (_fileLines.Count(line => line.ToLower() == "[process]") < 1)
+                return false;
+
+            // Get processes 
+            var processPaths = GetProcessPaths(_fileLines);
+
+            // Check if the process paths are valid
+            foreach (string processPath in processPaths)
+            {
+                if (File.Exists(processPath) == false)
+                {
+                    return false;
+                };
+            };
+
+            // We reached here, Processes file is valid
+            return true;
+        }
+
+
+        /// <summary>
+        /// Reads the processes file and retrieves the process paths
+        /// </summary>
+        /// <param name="fileData"> The porcess file inner text </param>
+        /// <returns></returns>
+        private IEnumerable<string> GetProcessPaths(string[] fileData)
+        {
+            // Go through every line
+            for (int a = 0; a < fileData.Length; a++)
+            {
+                // Get the current line being read
+                string currentLine = fileData[a].ToLower();
+
+                // If the current line specifies a process
+                if(currentLine == "[process]")
+                {
+                    // Read the next line and "return" the process path
+                    yield return fileData[++a]; 
+                };
+            };
         }
 
     };
