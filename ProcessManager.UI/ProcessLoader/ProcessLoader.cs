@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.IO;
@@ -9,6 +9,18 @@
     /// </summary>
     public class ProcessLoader : IProcessLoader
     {
+        private string[] _fileLines;
+
+        public ProcessLoader(string filePath)
+        {
+            // Read the file line-by-line
+            _fileLines = File.ReadAllLines(filePath)
+                // Remove empty lines
+                .Where(line => string.IsNullOrWhiteSpace(line) == false)
+                .ToArray();
+        }
+
+
         /// <summary>
         /// Retrieves an <see cref="IEnumerable{T}"/> of ProcessModel from a file
         /// </summary>

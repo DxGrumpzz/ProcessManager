@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -53,7 +53,7 @@
         private static void SetupDI()
         {
             // Setup file process loader
-            DI.ProcessLoader = new ProcessLoader();
+            DI.ProcessLoader = new ProcessLoader("Processes.txt");
 
             // Setup process list
             DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile("Processes.txt"));
