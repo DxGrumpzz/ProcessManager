@@ -10,7 +10,7 @@
         /// <summary>
         /// The path/name of the process 
         /// </summary>
-        public string ProcessName { get; set; }
+        public string ProcessPath { get; set; }
 
         /// <summary>
         /// The process' arguments
@@ -39,7 +39,7 @@
                 return false;
 
             // Call WinApi function to create the process and set the process ID
-            ulong result = CoreDLL.RunProcess(ProcessName, ProcessArgs);
+            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs);
             ProcessID = result;
 
             // If process ID returned as 0 it means process creation failed

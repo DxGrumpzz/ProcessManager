@@ -36,7 +36,7 @@
                     // Add a new ProcessModel to the list with the name of the process
                     processList.Add(new ProcessModel()
                     {
-                        ProcessName = lines.ElementAt(++a),
+                        ProcessPath = lines.ElementAt(++a),
                     });
                 }
                 // If the current line specifies a process' arguments
