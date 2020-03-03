@@ -56,7 +56,7 @@ namespace ProcessManager.UI
             DI.ProcessLoader = new ProcessLoader("Processes.txt");
 
             // Setup process list
-            DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile("Processes.txt"));
+            DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile());
         }
 
     };
