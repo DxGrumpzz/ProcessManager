@@ -19,11 +19,12 @@
 
 
         <!-- The name of this process -->
-        <TextBlock Text="{Binding ProcessName}"
-                                   
-                    TextAlignment="Center"
-                    
-                    Margin="0,0,10,0"/>
+        <TextBlock Text="{Binding Process.ProcessPath}"
+                   
+                   TextTrimming="CharacterEllipsis"
+                   TextAlignment="Center"
+                   
+                   Margin="0,0,10,0"/>
 
 
         <!-- Run and close buttons container -->
