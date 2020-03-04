@@ -55,7 +55,7 @@ public:
             const_cast<wchar_t*>(process.ProcessArgs.c_str()),
             NULL, NULL,
             FALSE,
-            // Create a suspended process, A process that will start paused until ResumeThread is called
+            // Create a suspended process, A process that will start paused until ResumeThread is called.
             // Run the process without a window, Only works on Console app for some reason 
             CREATE_SUSPENDED | CREATE_NO_WINDOW,
             NULL,
@@ -229,6 +229,36 @@ public:
                 process->ProcessArgs = line;
             };
         };
+    };
+
+
+    // Returns a reference to a running process
+    static ProcessModel* GetProcess(DWORD processID)
+    {
+        for (ProcessModel& process : ProcessManager::ProcessList)
+        {
+            if (process.ProcessInfo.dwProcessId == processID)
+            {
+                return &process;
+            };
+        };
+
+        return nullptr;
+    };
+
+
+    // Returns a reference to a running process
+    static ProcessModel* GetProcess(const wchar_t* processName)
+    {
+        for (ProcessModel& process : ProcessManager::ProcessList)
+        {
+            if (process.ProcessName.c_str() == processName)
+            {
+                return &process;
+            };
+        };
+
+        return nullptr;
     };
 
 
