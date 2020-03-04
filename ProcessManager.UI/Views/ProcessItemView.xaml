@@ -30,20 +30,27 @@
         <!-- Run and close buttons container -->
         <StackPanel Orientation="Horizontal"
                                     
-                    Grid.Column="1"
-                    HorizontalAlignment="Right">
+                    Grid.Column="1">
 
+            <!-- Applies a uniform margin to every button-->
+            <StackPanel.Resources>
+                
+                <Style TargetType="{x:Type Button}">
+                
+                    <Setter Property="Margin" Value="5,0,0,0"/>
+                
+                </Style>
+            
+            </StackPanel.Resources>
 
+            
             <!-- Process Run buttons -->
             <Button Content="Run"
                     
                     IsEnabled="{Binding ProcessRunning,
                     Converter={local:InvertBooleanValueConverter}}"
-                
-                    Margin="0,0,5,0"
                     
                     Command="{Binding RunProcessCommand}"/>
-
 
             <!-- Close Process buttons -->
             <Button Content="Close" 
@@ -52,8 +59,22 @@
                     
                     Command="{Binding CloseProcessCommand}"/>
 
-        </StackPanel>
 
+            
+            <!-- Hide a process buttons -->
+            <Button Content="Show"
+                    
+                    Command="{Binding ShowProcessCommand}"/>
+
+
+            <!-- Close Process buttons -->
+            <Button Content="Hide" 
+                    
+                    Command="{Binding HideProcessCommand}"/>
+
+
+        </StackPanel>
+        
     </Grid>
 
 </UserControl>

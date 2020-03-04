@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Diagnostics;
     using System.Windows.Input;
 
@@ -40,16 +41,37 @@
 
         #endregion
 
+
+        #region Commands
+
         public ICommand RunProcessCommand { get; }
         public ICommand CloseProcessCommand { get; }
+
+
+        public ICommand ShowProcessCommand { get; }
+        public ICommand HideProcessCommand { get; }
+
+        #endregion
 
 
         public ProcessItemViewModel()
         {
             RunProcessCommand = new RelayCommand(ExecuteRunProcessCommand);
             CloseProcessCommand= new RelayCommand(ExecuteCloseProcessCommand);
+
+            ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
+            HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
         }
 
+        private void ExecuteHideProcessCommand()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ExecuteShowProcessCommand()
+        {
+            throw new NotImplementedException();
+        }
 
         private void ExecuteRunProcessCommand()
         {
