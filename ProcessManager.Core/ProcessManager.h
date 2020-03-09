@@ -2,12 +2,23 @@
 #include <vector>
 #include <msxml.h>
 #include <fstream>
+#include <algorithm>
 
 #include "ProcessModel.h"
+
 
 // A class that is responsible for interaction with the ProcessModel
 class ProcessManager
 {
+
+private:
+
+    struct param_enum
+    {
+        DWORD ulPID;
+        HWND hWnd_out;
+    };
+
 
 public:
 
@@ -39,8 +50,42 @@ private:
     };
 
 
-
 public:
+
+    static HWND find_specific_window(unsigned long process_id)
+    {
+        param_enum param_data;
+        param_data.ulPID = process_id;
+        param_data.hWnd_out = NULL;
+
+        while (param_data.hWnd_out == NULL)
+        {
+            EnumWindows(enum_windows_callback, (LPARAM)&param_data);
+        };
+
+        return param_data.hWnd_out;
+    }
+
+    static BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam)
+    {
+        if (IsWindowVisible(handle) == TRUE)
+        {
+            param_enum& param_data = *(param_enum*)lParam;
+
+            DWORD currentProcess = 0;
+            GetWindowThreadProcessId(handle, &currentProcess);
+
+            if (param_data.ulPID == currentProcess)
+            {
+                param_data.hWnd_out = handle;
+                
+                return FALSE;
+            };
+        };
+
+        return TRUE;
+    }
+
 
     // Runs a single process
     static BOOL RunProcess(ProcessModel& process)
@@ -48,16 +93,18 @@ public:
         // Fix process arguments string if needed
         NormalizeArgs(process);
 
+        DWORD threadID = GetCurrentThreadId();
+
         // Create/run the process
         if (!CreateProcessW(process.ProcessName.c_str(),
             // Because the argument string will be appended to the default path argument 
             // a const cast must be used to convert the LPCWSTR to a LPWSTR
             const_cast<wchar_t*>(process.ProcessArgs.c_str()),
             NULL, NULL,
-            FALSE,
+            TRUE,
             // Create a suspended process, A process that will start paused until ResumeThread is called.
             // Run the process without a window, Only works on Console app for some reason 
-            CREATE_SUSPENDED | CREATE_NO_WINDOW,
+            NULL,// CREATE_SUSPENDED, | CREATE_NO_WINDOW,
             NULL,
             NULL,
             &process.info,
@@ -71,20 +118,27 @@ public:
             return FALSE;
         };
 
+        HWND hwnd = find_specific_window(process.GetPID());
+
+        process.MainHandle = hwnd;
+
         // Setup the hook function so it will only call the function when the process has finished initialization
         // The hook function will ONLY be called when the app's main window receives and dispatches a message
-        process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
+        //process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
 
-        // After hooking the process resume normal execution
-        if (!ResumeThread(process.ProcessInfo.hThread))
-        {
-            CleanupProcessHandles(process);
+        //// After hooking the process resume normal execution
+        //if (!ResumeThread(process.ProcessInfo.hThread))
+        //{
+        //    CleanupProcessHandles(process);
 
-            return FALSE;
-        };
+        //    return FALSE;
+        //};
+
 
         return TRUE;
     };
+
+
 
     // Runs a single process
     static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs)
