@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Runtime.InteropServices;
 
@@ -34,6 +34,12 @@
         [DllImport(DLL)]
         public static extern void CloseProcess(ulong processID);
 
+
+        [DllImport(DLL)]
+        public static extern bool HideProcess(ulong processID);
+
+        [DllImport(DLL)]
+        public static extern bool ShowProcess(ulong processID);
 
     };
 };
