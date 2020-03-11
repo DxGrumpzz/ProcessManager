@@ -195,3 +195,30 @@ DLL_CALL void CloseProcess(DWORD processID)
         };
     };
 };
+
+
+DLL_CALL bool ShowProcess(DWORD processID)
+{
+    ProcessModel* process = ProcessManager::GetProcess(processID);
+
+    if (process == nullptr)
+        return false;
+
+    ShowWindow(process->MainWindowHandle, SW_SHOW);
+
+    return true;
+};
+
+
+DLL_CALL bool HideProcess(DWORD processID)
+{
+    ProcessModel* process = ProcessManager::GetProcess(processID);
+
+    if (process == nullptr)
+        return false;
+
+    ShowWindow(process->MainWindowHandle, SW_HIDE);
+
+    return true;
+};
+
