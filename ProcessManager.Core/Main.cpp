@@ -140,12 +140,35 @@ DLL_CALL void Initialize()
             if (message.message == WM_QUIT)
                 break;
 
-            // Hide the processes. 
-            // Why is this here ? read ProcessManager::RunProcess doc
-            for (ProcessModel& process : ProcessManager::ProcessList)
-            {
-                ProcessManager::HideProcess(process);
-            };
+            //// Hide the processes. 
+            //// Why is this here ? read ProcessManager::RunProcess doc
+            //for (ProcessModel& process : ProcessManager::ProcessList)
+            //{
+            //    if (process.HideProcess == true)
+            //    {
+            //        // Go through every handle, and run ShowWindow with SW_HIDE
+            //        for (const HWND& hwnd : process.handles)
+            //        {
+            //            ShowWindowAsync(hwnd, SW_HIDE);
+            //        };
+
+            //        process.IsProcessShown = false;
+            //    }
+            //    else
+            //    {
+            //        if (process.IsProcessShown == false)
+            //        {
+            //            // Go through every handle, and run ShowWindow with SW_HIDE
+            //            for (const HWND& hwnd : process.handles)
+            //            {
+            //                ShowWindowAsync(hwnd, SW_SHOW);
+            //            };
+
+            //            process.IsProcessShown = true;
+            //        };
+            //    };
+            //    //ProcessManager::HideProcess(process);
+            //};
 
             // Because this is an infinite loop a 1ms thread delay is a must
             Sleep(1);
