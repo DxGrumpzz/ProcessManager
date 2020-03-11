@@ -41,7 +41,9 @@
             }
         }
 
-
+        /// <summary>
+        /// A boolean flag that indicates if the current process is shown
+        /// </summary>
         public bool ProcessVisible
         {
             get => _processVisible;
