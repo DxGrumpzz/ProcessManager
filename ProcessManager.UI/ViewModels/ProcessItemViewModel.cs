@@ -65,12 +65,12 @@
 
         private void ExecuteHideProcessCommand()
         {
-            throw new NotImplementedException();
+            CoreDLL.HideProcess(Process.ProcessID);
         }
 
         private void ExecuteShowProcessCommand()
         {
-            throw new NotImplementedException();
+            CoreDLL.ShowProcess(Process.ProcessID);
         }
 
         private void ExecuteRunProcessCommand()
