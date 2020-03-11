@@ -66,18 +66,44 @@ public:
 public:
 
     // Returns a process' MainWindow handle
-    static HWND GetProcessHWND(DWORD process_id)
+    static HWND GetProcessHWND(DWORD processID)
     {
         // Create a WndEnumProcParam struct to hold the data
         WndEnumProcParam wndEnumProcParam;
-        wndEnumProcParam.ProcessID = process_id;
+        wndEnumProcParam.ProcessID = processID;
         wndEnumProcParam.HwndOut = NULL;
 
         // Continue iteration while the out HWND variable is null
         while (wndEnumProcParam.HwndOut == NULL)
         {
             // This function iterates through every top-level window,
-            EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&wndEnumProcParam));
+            EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
+            {
+                // Only if the current window is visible to the user
+                if (IsWindowVisible(handle) == TRUE)
+                {
+                    // Convert the LPARAM to WndEnumProcParam
+                    WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
+
+                    // Get the process PID
+                    DWORD currentProcess = 0;
+                    GetWindowThreadProcessId(handle, &currentProcess);
+
+                    // Compare the id's, 
+                    // if they match
+                    if (param_data.ProcessID == currentProcess)
+                    {
+                        // Set the HWND out variable 
+                        param_data.HwndOut = handle;
+
+                        // Return false(0) to stop the window iteration 
+                        return FALSE;
+                    };
+                };
+
+                return TRUE;
+            },
+                        reinterpret_cast<LPARAM>(&wndEnumProcParam));
         };
 
         return wndEnumProcParam.HwndOut;
