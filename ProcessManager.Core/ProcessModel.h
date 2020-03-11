@@ -23,6 +23,9 @@ public:
     // A set of arguments that can be passed to CreateProcessW
     STARTUPINFOW info = { 0 };
 
+
+    HWND MainWindowHandle;
+
     // Because a single process can have multiple HWND's associated with it stores the process HWND's in a list
     std::vector<HWND> handles;
 
@@ -51,6 +54,15 @@ public:
                      L"" :
                      processArgs))
     {
+    };
+
+
+public:
+
+    // Retrieve the process PID
+    DWORD GetPID() const
+    {
+        return ProcessInfo.dwProcessId;
     };
 
 };

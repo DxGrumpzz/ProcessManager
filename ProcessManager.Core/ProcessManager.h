@@ -13,17 +13,15 @@ class ProcessManager
 
 private:
 
-    struct param_enum
+    // A struct that stores information about a process in-between WNDENUMPROC calls
+    struct WndEnumProcParam
     {
-        DWORD ulPID;
-        HWND hWnd_out;
+        // The process' PID
+        DWORD ProcessID;
+
+        // An "out" variable that will contain the process' main window HWND
+        HWND HwndOut;
     };
-
-
-public:
-
-    // The list of processes that will be ran
-    static std::vector<ProcessModel> ProcessList;
 
 
 private:
@@ -33,13 +31,22 @@ private:
     {
         // Get the current process ID
         DWORD processId;
-        GetWindowThreadProcessId(hwnd, &processId);
+        DWORD threadID = GetWindowThreadProcessId(hwnd, &processId);
 
         for (ProcessModel& process : ProcessList)
         {
             // Match the ID with the created process
             if (process.ProcessInfo.dwProcessId == processId)
             {
+                int titleLength = GetWindowTextLengthW(hwnd) + 1;
+
+                std::vector<wchar_t> buf(titleLength);
+                GetWindowTextW(hwnd, &buf[0], titleLength);
+                std::wstring title = &buf[0];
+
+                if (title.empty() == true)
+                    return;
+
                 // Add the process HWND to the process handles list
                 process.handles.push_back(hwnd);
 
@@ -52,33 +59,50 @@ private:
 
 public:
 
-    static HWND find_specific_window(unsigned long process_id)
-    {
-        param_enum param_data;
-        param_data.ulPID = process_id;
-        param_data.hWnd_out = NULL;
+    // The list of processes that will be ran
+    static std::vector<ProcessModel> ProcessList;
 
-        while (param_data.hWnd_out == NULL)
+
+public:
+
+    // Returns a process' MainWindow handle
+    static HWND GetProcessHWND(DWORD process_id)
+    {
+        // Create a WndEnumProcParam struct to hold the data
+        WndEnumProcParam wndEnumProcParam;
+        wndEnumProcParam.ProcessID = process_id;
+        wndEnumProcParam.HwndOut = NULL;
+
+        // Continue iteration while the out HWND variable is null
+        while (wndEnumProcParam.HwndOut == NULL)
         {
-            EnumWindows(enum_windows_callback, (LPARAM)&param_data);
+            // This function iterates through every top-level window,
+            EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&wndEnumProcParam));
         };
 
-        return param_data.hWnd_out;
+        return wndEnumProcParam.HwndOut;
     }
 
-    static BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam)
+    static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
     {
+        // Only if the current window is visible to the user
         if (IsWindowVisible(handle) == TRUE)
         {
-            param_enum& param_data = *(param_enum*)lParam;
+            // Convert the LPARAM to WndEnumProcParam
+            WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
 
+            // Get the process PID
             DWORD currentProcess = 0;
             GetWindowThreadProcessId(handle, &currentProcess);
 
-            if (param_data.ulPID == currentProcess)
+            // Compare the id's, 
+            // if they match
+            if (param_data.ProcessID == currentProcess)
             {
-                param_data.hWnd_out = handle;
+                // Set the HWND out variable 
+                param_data.HwndOut = handle;
                 
+                // Return false(0) to stop the window iteration 
                 return FALSE;
             };
         };
@@ -87,13 +111,12 @@ public:
     }
 
 
+
     // Runs a single process
     static BOOL RunProcess(ProcessModel& process)
     {
         // Fix process arguments string if needed
         NormalizeArgs(process);
-
-        DWORD threadID = GetCurrentThreadId();
 
         // Create/run the process
         if (!CreateProcessW(process.ProcessName.c_str(),
@@ -118,9 +141,9 @@ public:
             return FALSE;
         };
 
-        HWND hwnd = find_specific_window(process.GetPID());
+        // If prcess creation was successful, Get the hanlde for the process' main window
+        process.MainWindowHandle = GetProcessHWND(process.GetPID());
 
-        process.MainHandle = hwnd;
 
         // Setup the hook function so it will only call the function when the process has finished initialization
         // The hook function will ONLY be called when the app's main window receives and dispatches a message
