@@ -28,7 +28,7 @@
             SetupDI();
 
             // Initialize ProcessManager functionality
-            CoreDLL.Initialize();
+            // CoreDLL.Initialize();
 
 
             // Create the main window
