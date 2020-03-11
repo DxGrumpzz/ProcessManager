@@ -23,6 +23,11 @@
         public ulong ProcessID { get; set; }
 
         /// <summary>
+        /// A boolean flag that indicates if this process will start invisible
+        /// </summary>
+        public bool VisibleOnStartup { get; set; }
+
+        /// <summary>
         /// A boolean flag that determines if a process is running
         /// </summary>
         public bool IsRunning => ProcessID != 0;
