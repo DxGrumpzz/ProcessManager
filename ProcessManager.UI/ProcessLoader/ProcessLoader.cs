@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="filePath"> The path to the file </param>
         /// <returns></returns>
-        public IEnumerable<ProcessModel> GetProcessesFromFile()
+        public IEnumerable<ProcessModel> GetProcessListFromFile()
         {
             // Stores the processes
             List<ProcessModel> processList = new List<ProcessModel>();
