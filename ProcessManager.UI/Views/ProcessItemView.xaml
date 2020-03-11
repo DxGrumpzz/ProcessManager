@@ -1,4 +1,4 @@
-<UserControl x:Class="ProcessManager.UI.ProcessItemView"
+﻿<UserControl x:Class="ProcessManager.UI.ProcessItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -29,21 +29,12 @@
 
         <!-- Run and close buttons container -->
         <StackPanel Orientation="Horizontal"
-                                    
+                    
                     local:UniformMargin.Margin="5,0,0,0"
                     
                     Grid.Column="1">
 
-                
-                <Style TargetType="{x:Type Button}">
-                
-                    <Setter Property="Margin" Value="5,0,0,0"/>
-                
-                </Style>
-            
-            </StackPanel.Resources>
 
-            
             <!-- Process Run buttons -->
             <Button Content="Run"
                     
@@ -51,6 +42,7 @@
                     Converter={local:InvertBooleanValueConverter}}"
                     
                     Command="{Binding RunProcessCommand}"/>
+
 
             <!-- Close Process buttons -->
             <Button Content="Close" 
@@ -61,20 +53,76 @@
 
 
             
-            <!-- Hide a process buttons -->
+            <!-- Show a process buttons -->
             <Button Content="Show"
                     
-                    Command="{Binding ShowProcessCommand}"/>
+                    Command="{Binding ShowProcessCommand}">
 
+                <Button.Style>
+                    
+                    <Style TargetType="{x:Type Button}">
 
-            <!-- Close Process buttons -->
+                        <Style.Triggers>
+                       
+                            <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+
+                                <Setter Property="IsEnabled" Value="False"/>
+
+                            </DataTrigger>
+
+                            
+                            <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
+
+                                <Setter Property="IsEnabled" Value="False"/>
+
+                            </DataTrigger>
+
+                        </Style.Triggers>
+
+                    </Style>
+
+                </Button.Style>
+
+            </Button>
+            
+
+            <!-- Hide a process buttons -->
             <Button Content="Hide" 
                     
-                    Command="{Binding HideProcessCommand}"/>
+                    Command="{Binding HideProcessCommand}">
 
+                <Button.Style>
+
+                    <Style TargetType="{x:Type Button}">
+
+                        <Style.Triggers>
+                            
+                            <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+
+                                <Setter Property="IsEnabled" Value="False"/>
+
+                            </DataTrigger>
+
+                            
+                            <DataTrigger Binding="{Binding ProcessVisible, 
+                                         Converter={local:InvertBooleanValueConverter}}" 
+                                         
+                                         Value="True">
+
+                                <Setter Property="IsEnabled" Value="False"/>
+
+                            </DataTrigger>
+
+                        </Style.Triggers>
+
+                    </Style>
+
+                </Button.Style>
+
+            </Button>
 
         </StackPanel>
-        
+
     </Grid>
 
 </UserControl>

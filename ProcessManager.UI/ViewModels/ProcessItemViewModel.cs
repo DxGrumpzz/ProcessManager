@@ -1,6 +1,5 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
     using System.Windows.Input;
 
@@ -14,6 +13,9 @@
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _processRunning;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _processVisible;
 
         #endregion
 
@@ -39,6 +41,18 @@
             }
         }
 
+
+        public bool ProcessVisible
+        {
+            get => _processVisible;
+            set
+            {
+                _processVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         #endregion
 
 
@@ -57,7 +71,7 @@
         public ProcessItemViewModel()
         {
             RunProcessCommand = new RelayCommand(ExecuteRunProcessCommand);
-            CloseProcessCommand= new RelayCommand(ExecuteCloseProcessCommand);
+            CloseProcessCommand = new RelayCommand(ExecuteCloseProcessCommand);
 
             ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
             HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
@@ -65,24 +79,31 @@
 
         private void ExecuteHideProcessCommand()
         {
-            CoreDLL.HideProcess(Process.ProcessID);
+            if (CoreDLL.HideProcess(Process.ProcessID) == true)
+                ProcessVisible = false;
         }
 
         private void ExecuteShowProcessCommand()
         {
-            CoreDLL.ShowProcess(Process.ProcessID);
+            if (CoreDLL.ShowProcess(Process.ProcessID) == true)
+                ProcessVisible = true;
         }
 
         private void ExecuteRunProcessCommand()
         {
             if (Process.RunProcess() == true)
+            {
                 ProcessRunning = true;
+                ProcessVisible = true;
+            };
         }
 
         private void ExecuteCloseProcessCommand()
         {
-            if(Process.CloseProcess() == true)
+            if (Process.CloseProcess() == true)
+            {
                 ProcessRunning = false;
+            };
         }
 
     };
