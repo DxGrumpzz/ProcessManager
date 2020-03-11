@@ -15,6 +15,7 @@
 
 # User defined process list to run
 ProcessManager/Processes.txt
+*Processes.txt
 
 # Build results
 [Dd]ebug/
@@ -341,5 +342,3 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-
-
