@@ -122,14 +122,14 @@ public:
             DWORD currentProcess = 0;
             GetWindowThreadProcessId(handle, &currentProcess);
 
-            // Compare the id's, 
+            // Compare the id's,
             // if they match
             if (param_data.ProcessID == currentProcess)
             {
-                // Set the HWND out variable 
+                // Set the HWND out variable
                 param_data.HwndOut = handle;
-                
-                // Return false(0) to stop the window iteration 
+
+                // Return false(0) to stop the window iteration
                 return FALSE;
             };
         };
@@ -193,12 +193,14 @@ public:
             return FALSE;
         };
 
-        // If prcess creation was successful, Get the hanlde for the process' main window
+        // If prcess creation was successful, 
+
+        // Get the hanlde for the process' main window
         process.MainWindowHandle = GetProcessHWND(process.GetPID());
 
         // Get the rest of the handles
         process.handles = GetProcessHWNDs(process.GetPID());
-
+        
         // Setup the hook function so it will only call the function when the process has finished initialization
         // The hook function will ONLY be called when the app's main window receives and dispatches a message
         //process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
@@ -207,7 +209,6 @@ public:
         //if (!ResumeThread(process.ProcessInfo.hThread))
         //{
         //    CleanupProcessHandles(process);
-
         //    return FALSE;
         //};
 
@@ -253,6 +254,22 @@ public:
 
             if (!CleanupProcessHandles(process))
                 return FALSE;
+
+            if (ProcessManager::ProcessList.size() == 1)
+            {
+                ProcessManager::ProcessList.clear();
+            }
+            else
+            {
+                ProcessManager::ProcessList.erase(
+                    std::remove_if(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(),
+                    [&](const ProcessModel& currentProcess)
+                {
+                    return process.ProcessInfo.dwProcessId == currentProcess.ProcessInfo.dwProcessId;
+                }));
+            };
+
+            //ProcessManager::ProcessList.erase(process);
         }
         // Don't do anything if the process is closed
         else
@@ -361,6 +378,7 @@ public:
             };
         };
     };
+
 
 
     // Returns a reference to a running process
