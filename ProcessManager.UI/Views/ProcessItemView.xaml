@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ProcessManager.UI.ProcessItemView"
+<UserControl x:Class="ProcessManager.UI.ProcessItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -30,10 +30,10 @@
         <!-- Run and close buttons container -->
         <StackPanel Orientation="Horizontal"
                                     
+                    local:UniformMargin.Margin="5,0,0,0"
+                    
                     Grid.Column="1">
 
-            <!-- Applies a uniform margin to every button-->
-            <StackPanel.Resources>
                 
                 <Style TargetType="{x:Type Button}">
                 
