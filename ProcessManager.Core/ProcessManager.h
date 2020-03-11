@@ -109,6 +109,7 @@ public:
         return wndEnumProcParam.HwndOut;
     }
 
+    /*
     static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
     {
         // Only if the current window is visible to the user
@@ -134,6 +135,31 @@ public:
         };
 
         return TRUE;
+    }
+    */
+
+
+    static std::vector<HWND> GetProcessHWNDs(DWORD processID)
+    {
+        std::pair<std::vector<HWND>, DWORD> param = std::make_pair(std::vector<HWND>(), processID);
+
+        EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
+        {
+            std::pair<std::vector<HWND>, DWORD>& param = *reinterpret_cast<std::pair<std::vector<HWND>, DWORD>*>(lParam);
+
+            DWORD currentProcess = 0;
+            GetWindowThreadProcessId(handle, &currentProcess);
+
+            if (param.second == currentProcess)
+            {
+                param.first.push_back(handle);
+            };
+
+            return TRUE;
+
+        }, reinterpret_cast<LPARAM>(&param));
+
+        return param.first;
     }
 
 
@@ -170,6 +196,8 @@ public:
         // If prcess creation was successful, Get the hanlde for the process' main window
         process.MainWindowHandle = GetProcessHWND(process.GetPID());
 
+        // Get the rest of the handles
+        process.handles = GetProcessHWNDs(process.GetPID());
 
         // Setup the hook function so it will only call the function when the process has finished initialization
         // The hook function will ONLY be called when the app's main window receives and dispatches a message
