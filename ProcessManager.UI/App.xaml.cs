@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -53,12 +53,13 @@
         private static void SetupDI()
         {
             // Setup file process loader
-            DI.ProcessLoader = new ProcessLoader("Processes.txt");
+            DI.ProcessLoader = new JsonProcessLoader("ProcessList.json");
 
-            // Check if the Processes file is valid
-            if(DI.ProcessLoader.IsProcessesFileFileValid() == false)
+            // Check if process list file is valid
+            var processList = DI.ProcessLoader.GetProcessListFromFile();
+            if(processList == null)
             {
-                MessageBox.Show("Processes.txt is invalid");
+                MessageBox.Show("ProcessList.json contains invalid data", "Error");
 
                 // Exit application if it isn't
                 Environment.Exit(1);
@@ -66,7 +67,7 @@
             };
 
             // Setup process list
-            DI.ProcessList = new List<ProcessModel>(DI.ProcessLoader.GetProcessesFromFile());
+            DI.ProcessList = new List<ProcessModel>(processList);
         }
 
     };
