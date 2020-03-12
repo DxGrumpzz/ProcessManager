@@ -1,15 +1,7 @@
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <fstream>
-#include <CommCtrl.h>
-#include <thread>
-
 #include "ProcessManager.h"
 #include "ProcessModel.h"
 
 
-#define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
 
 #define DLL_CALL extern "C" __declspec(dllexport) 
 
@@ -34,6 +26,59 @@ std::wstring GetErrorStringW(DWORD error)
 };
 
 
+
+DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, bool visibleOnStartup)
+{
+    DWORD processID = ProcessManager::RunProcess(processName, processArgs, visibleOnStartup);
+
+    return processID;
+};
+
+
+DLL_CALL void CloseProcess(DWORD processID)
+{
+    for (ProcessModel& process : ProcessManager::ProcessList)
+    {
+        if (process.ProcessInfo.dwProcessId == processID)
+        {
+            ProcessManager::CloseProcess(process);
+        };
+    };
+};
+
+
+
+DLL_CALL bool ShowProcess(DWORD processID)
+{
+    ProcessModel* process = ProcessManager::GetProcess(processID);
+
+    if (process == nullptr)
+        return false;
+
+    ShowWindow(process->MainWindowHandle, SW_SHOW);
+
+    return true;
+};
+
+
+
+DLL_CALL bool HideProcess(DWORD processID)
+{
+    ProcessModel* process = ProcessManager::GetProcess(processID);
+
+    if (process == nullptr)
+        return false;
+
+    ShowWindow(process->MainWindowHandle, SW_HIDE);
+
+    return true;
+};
+
+
+/*
+#define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
+
+
 const wchar_t* windowTitle = L"Process manager";
 const wchar_t* windowClassName = L"DesktopApp";
 
@@ -41,7 +86,7 @@ const wchar_t* windowClassName = L"DesktopApp";
 // The MainWindow function procedure
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-            return DefWindowProcW(hwnd, message, wParam, lParam);
+    return DefWindowProcW(hwnd, message, wParam, lParam);
 };
 
 
@@ -94,6 +139,160 @@ HWND CreateMainWindow(const HINSTANCE& hInstance)
     return windowHWND;
 };
 
+
+
+//
+//struct ProcessData
+//{
+//    const wchar_t* Path;
+//    const wchar_t* Args;
+//
+//    HWND MainWindowHandle;
+//    HWND* Handles;
+//
+//    PROCESS_INFORMATION ProcessInfo;
+//};
+//
+//
+//
+//// A struct that stores information about a process in-between WNDENUMPROC calls
+//struct WndEnumProcParam
+//{
+//    // The process' PID
+//    DWORD ProcessID;
+//
+//    // An "out" variable that will contain the process' main window HWND
+//    HWND HwndOut;
+//};
+//
+//// Returns a process' MainWindow handle
+//HWND GetProcessHWND(DWORD processID)
+//{
+//    // Create a WndEnumProcParam struct to hold the data
+//    WndEnumProcParam wndEnumProcParam;
+//    wndEnumProcParam.ProcessID = processID;
+//    wndEnumProcParam.HwndOut = NULL;
+//
+//    // Continue iteration while the out HWND variable is null
+//    while (wndEnumProcParam.HwndOut == NULL)
+//    {
+//        // This function iterates through every top-level window,
+//        EnumWindows(
+//            [](HWND handle, LPARAM lParam) -> BOOL
+//        {
+//            // Only if the current window is visible to the user
+//            if (IsWindowVisible(handle) == TRUE)
+//            {
+//                // Convert the LPARAM to WndEnumProcParam
+//                WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
+//
+//                // Get the process PID
+//                DWORD currentProcess = 0;
+//                GetWindowThreadProcessId(handle, &currentProcess);
+//
+//                // Compare the id's, 
+//                // if they match
+//                if (param_data.ProcessID == currentProcess)
+//                {
+//                    // Set the HWND out variable 
+//                    param_data.HwndOut = handle;
+//
+//                    // Return false(0) to stop the window iteration 
+//                    return FALSE;
+//                };
+//            };
+//
+//            return TRUE;
+//        }, reinterpret_cast<LPARAM>(&wndEnumProcParam));
+//    };
+//
+//    return wndEnumProcParam.HwndOut;
+//}
+//
+//std::vector<HWND> GetProcessHWNDs(DWORD processID)
+//{
+//    std::pair<std::vector<HWND>, DWORD> param = std::make_pair(std::vector<HWND>(), processID);
+//
+//    EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
+//    {
+//        std::pair<std::vector<HWND>, DWORD>& param = *reinterpret_cast<std::pair<std::vector<HWND>, DWORD>*>(lParam);
+//
+//        DWORD currentProcess = 0;
+//        GetWindowThreadProcessId(handle, &currentProcess);
+//
+//        if (param.second == currentProcess)
+//        {
+//            param.first.push_back(handle);
+//        };
+//
+//        return TRUE;
+//
+//    }, reinterpret_cast<LPARAM>(&param));
+//
+//    return param.first;
+//}
+//
+//
+//
+//DLL_CALL bool Test_RunProcess(ProcessData& processData)
+//{
+//    STARTUPINFOW startupInfo = { 0 };
+//    std::wstring error;
+//
+//    if (!CreateProcessW(processData.Path,
+//        const_cast<wchar_t*>(processData.Args),
+//        NULL, NULL,
+//        FALSE,
+//        NULL,
+//        NULL,
+//        NULL,
+//        &startupInfo,
+//        &processData.ProcessInfo))
+//    {
+//        error = GetErrorStringW(GetLastError());
+//
+//        CloseHandle(processData.ProcessInfo.hProcess);
+//        CloseHandle(processData.ProcessInfo.hThread);
+//
+//        return false;
+//    };
+//
+//    processData.MainWindowHandle = GetProcessHWND(processData.ProcessInfo.dwProcessId);
+//
+//    return true;
+//};
+//
+//
+//DLL_CALL int Test_GetProcessHandlesCount(DWORD processID)
+//{
+//    auto processHandles = GetProcessHWNDs(processID);
+//
+//    return processHandles.size();
+//};
+//
+//
+//
+//DLL_CALL void Test_GetProcessHandles(DWORD processID, HWND* handles, int handleCount)
+//{
+//    auto processHandles = GetProcessHWNDs(processID);
+//
+//    for (int a = 0; a < handleCount; a++)
+//    {
+//        handles[a] = processHandles[a];
+//    };
+//
+//};
+//
+//
+//DLL_CALL void Test_CloseProcess(DWORD processID)
+//{
+//    HANDLE processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+//
+//    TerminateProcess(processHandle, 0);
+//
+//    CloseHandle(processHandle);
+//};
+//
 
 DLL_CALL void Initialize()
 {
@@ -174,51 +373,6 @@ DLL_CALL void Initialize()
             Sleep(1);
         };
     })
-    .detach();
+        .detach();
 };
-
-
-DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, bool visibleOnStartup)
-{
-    DWORD processID = ProcessManager::RunProcess(processName, processArgs, visibleOnStartup);
-
-    return processID;
-};
-
-DLL_CALL void CloseProcess(DWORD processID)
-{
-    for (ProcessModel& process : ProcessManager::ProcessList)
-    {
-        if (process.ProcessInfo.dwProcessId == processID)
-        {
-            ProcessManager::CloseProcess(process);
-        };
-    };
-};
-
-
-DLL_CALL bool ShowProcess(DWORD processID)
-{
-    ProcessModel* process = ProcessManager::GetProcess(processID);
-
-    if (process == nullptr)
-        return false;
-
-    ShowWindow(process->MainWindowHandle, SW_SHOW);
-
-    return true;
-};
-
-
-DLL_CALL bool HideProcess(DWORD processID)
-{
-    ProcessModel* process = ProcessManager::GetProcess(processID);
-
-    if (process == nullptr)
-        return false;
-
-    ShowWindow(process->MainWindowHandle, SW_HIDE);
-
-    return true;
-};
-
+*/

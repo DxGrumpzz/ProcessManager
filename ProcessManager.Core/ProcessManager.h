@@ -24,38 +24,6 @@ private:
     };
 
 
-private:
-
-    // A WinEventHook function used to get a process HWND's
-    static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
-        // Get the current process ID
-        DWORD processId;
-        DWORD threadID = GetWindowThreadProcessId(hwnd, &processId);
-
-        for (ProcessModel& process : ProcessList)
-        {
-            // Match the ID with the created process
-            if (process.ProcessInfo.dwProcessId == processId)
-            {
-                int titleLength = GetWindowTextLengthW(hwnd) + 1;
-
-                std::vector<wchar_t> buf(titleLength);
-                GetWindowTextW(hwnd, &buf[0], titleLength);
-                std::wstring title = &buf[0];
-
-                if (title.empty() == true)
-                    return;
-
-                // Add the process HWND to the process handles list
-                process.handles.push_back(hwnd);
-
-                // Set creating flag
-                process.Creating = true;
-            };
-        };
-    };
-
 
 public:
 
@@ -109,36 +77,6 @@ public:
         return wndEnumProcParam.HwndOut;
     }
 
-    /*
-    static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
-    {
-        // Only if the current window is visible to the user
-        if (IsWindowVisible(handle) == TRUE)
-        {
-            // Convert the LPARAM to WndEnumProcParam
-            WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
-
-            // Get the process PID
-            DWORD currentProcess = 0;
-            GetWindowThreadProcessId(handle, &currentProcess);
-
-            // Compare the id's,
-            // if they match
-            if (param_data.ProcessID == currentProcess)
-            {
-                // Set the HWND out variable
-                param_data.HwndOut = handle;
-
-                // Return false(0) to stop the window iteration
-                return FALSE;
-            };
-        };
-
-        return TRUE;
-    }
-    */
-
-
     static std::vector<HWND> GetProcessHWNDs(DWORD processID)
     {
         std::pair<std::vector<HWND>, DWORD> param = std::make_pair(std::vector<HWND>(), processID);
@@ -163,7 +101,6 @@ public:
     }
 
 
-
     // Runs a single process
     static BOOL RunProcess(ProcessModel& process)
     {
@@ -176,10 +113,8 @@ public:
             // a const cast must be used to convert the LPCWSTR to a LPWSTR
             const_cast<wchar_t*>(process.ProcessArgs.c_str()),
             NULL, NULL,
-            TRUE,
-            // Create a suspended process, A process that will start paused until ResumeThread is called.
-            // Run the process without a window, Only works on Console app for some reason 
-            NULL,// CREATE_SUSPENDED, | CREATE_NO_WINDOW,
+            FALSE,
+            NULL,
             NULL,
             NULL,
             &process.info,
@@ -200,18 +135,6 @@ public:
 
         // Get the rest of the handles
         process.handles = GetProcessHWNDs(process.GetPID());
-        
-        // Setup the hook function so it will only call the function when the process has finished initialization
-        // The hook function will ONLY be called when the app's main window receives and dispatches a message
-        //process.Hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventHookCallback, process.ProcessInfo.dwProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-        //// After hooking the process resume normal execution
-        //if (!ResumeThread(process.ProcessInfo.hThread))
-        //{
-        //    CleanupProcessHandles(process);
-        //    return FALSE;
-        //};
-
 
         return TRUE;
     };
@@ -223,7 +146,6 @@ public:
         ProcessModel process(processName, processArgs);
         BOOL result = ProcessManager::RunProcess(process);
 
-       
 
         if (result == FALSE)
         {
@@ -287,127 +209,12 @@ public:
     }
 
 
-    // Creates and runs every process in the list
-    static void RunEveryProcess()
-    {
-        for (ProcessModel& process : ProcessManager::ProcessList)
-        {
-            ProcessManager::RunProcess(process);
-        };
-    };
-
-    // Closes every process in the list
-    static void CloseEveryProcess()
-    {
-        for (ProcessModel& process : ProcessManager::ProcessList)
-        {
-            ProcessManager::CloseProcess(process);
-        };
-    };
-
-
-    // Hides a process (Only the visible window, nothing sketchy)
-    static void HideProcess(ProcessModel& process)
-    {
-        // If the process is in "creation" mode
-        if (process.Creating == true)
-        {
-            // Go through every handle, and run ShowWindow with SW_HIDE
-            for (const HWND& hwnd : process.handles)
-            {
-                ShowWindowAsync(hwnd, SW_HIDE);
-            };
-
-            // Set creating flag
-            process.Creating = false;
-        };
-    };
-
-
-    // Returns a list of ProcessModel which contain name and arguments of a process 
-    static void GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
-    {
-        // The processes file
-        std::wifstream file(filename);
-
-        // If file is invalid
-        if (!file)
-        {
-            std::wstring error = L"File error. \nCould not open: ";
-            error.append(filename);
-
-            size_t outputSize = error.size() + 1;
-
-            char* outputString = new char[outputSize];
-
-            size_t charsConverted = 0;
-
-            const wchar_t* inputW = error.c_str();
-
-            wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
-
-            throw std::exception(outputString);
-            delete[] outputString;
-        };
-
-
-        // This is absolute aids. 
-        // This will improve
-
-
-        // Iterate through the file line by line
-        // Store current read line 
-        std::wstring line;
-        while (std::getline(file, line))
-        {
-            // If current line is the process name
-            if (line == L"[Process]")
-            {
-                // Read process name into current line
-                std::getline(file, line);
-
-                // Add the process to the list
-                ProcessManager::ProcessList.emplace_back(line, L"");
-            }
-            // If current line is the process' arguments
-            else if (line == L"[Args]")
-            {
-                // Read next line
-                std::getline(file, line);
-
-                // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
-                line.insert(line.begin(), ' ');
-
-                // Set the process' arguments
-                auto process = (ProcessManager::ProcessList.end() - 1);
-                process->ProcessArgs = line;
-            };
-        };
-    };
-
-
-
     // Returns a reference to a running process
     static ProcessModel* GetProcess(DWORD processID)
     {
         for (ProcessModel& process : ProcessManager::ProcessList)
         {
             if (process.ProcessInfo.dwProcessId == processID)
-            {
-                return &process;
-            };
-        };
-
-        return nullptr;
-    };
-
-
-    // Returns a reference to a running process
-    static ProcessModel* GetProcess(const wchar_t* processName)
-    {
-        for (ProcessModel& process : ProcessManager::ProcessList)
-        {
-            if (process.ProcessName.c_str() == processName)
             {
                 return &process;
             };
@@ -443,3 +250,165 @@ private:
     }
 
 };
+
+
+/*
+
+
+    // A WinEventHook function used to get a process HWND's
+    static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
+    {
+        // Get the current process ID
+        DWORD processId;
+        DWORD threadID = GetWindowThreadProcessId(hwnd, &processId);
+
+        for (ProcessModel& process : ProcessList)
+        {
+            // Match the ID with the created process
+            if (process.ProcessInfo.dwProcessId == processId)
+            {
+                int titleLength = GetWindowTextLengthW(hwnd) + 1;
+
+                std::vector<wchar_t> buf(titleLength);
+                GetWindowTextW(hwnd, &buf[0], titleLength);
+                std::wstring title = &buf[0];
+
+                if (title.empty() == true)
+                    return;
+
+                // Add the process HWND to the process handles list
+                process.handles.push_back(hwnd);
+
+                // Set creating flag
+                process.Creating = true;
+            };
+        };
+    };
+
+
+
+    // Hides a process (Only the visible window, nothing sketchy)
+    static void HideProcess(ProcessModel& process)
+    {
+        // If the process is in "creation" mode
+        if (process.Creating == true)
+        {
+            // Go through every handle, and run ShowWindow with SW_HIDE
+            for (const HWND& hwnd : process.handles)
+            {
+                ShowWindowAsync(hwnd, SW_HIDE);
+            };
+
+            // Set creating flag
+            process.Creating = false;
+        };
+    };
+
+
+    // Returns a list of ProcessModel which contain name and arguments of a process
+    static void GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
+    {
+        // The processes file
+        std::wifstream file(filename);
+
+        // If file is invalid
+        if (!file)
+        {
+            std::wstring error = L"File error. \nCould not open: ";
+            error.append(filename);
+
+            size_t outputSize = error.size() + 1;
+
+            char* outputString = new char[outputSize];
+
+            size_t charsConverted = 0;
+
+            const wchar_t* inputW = error.c_str();
+
+            wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
+
+            throw std::exception(outputString);
+            delete[] outputString;
+        };
+
+
+        // This is absolute aids.
+        // This will improve
+
+
+        // Iterate through the file line by line
+        // Store current read line
+        std::wstring line;
+        while (std::getline(file, line))
+        {
+            // If current line is the process name
+            if (line == L"[Process]")
+            {
+                // Read process name into current line
+                std::getline(file, line);
+
+                // Add the process to the list
+                ProcessManager::ProcessList.emplace_back(line, L"");
+            }
+            // If current line is the process' arguments
+            else if (line == L"[Args]")
+            {
+                // Read next line
+                std::getline(file, line);
+
+                // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
+                line.insert(line.begin(), ' ');
+
+                // Set the process' arguments
+                auto process = (ProcessManager::ProcessList.end() - 1);
+                process->ProcessArgs = line;
+            };
+        };
+    };
+
+
+    // Returns a reference to a running process
+    static ProcessModel* GetProcess(const wchar_t* processName)
+    {
+        for (ProcessModel& process : ProcessManager::ProcessList)
+        {
+            if (process.ProcessName.c_str() == processName)
+            {
+                return &process;
+            };
+        };
+
+        return nullptr;
+    };
+
+
+
+
+static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
+{
+    // Only if the current window is visible to the user
+    if (IsWindowVisible(handle) == TRUE)
+    {
+        // Convert the LPARAM to WndEnumProcParam
+        WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
+
+        // Get the process PID
+        DWORD currentProcess = 0;
+        GetWindowThreadProcessId(handle, &currentProcess);
+
+        // Compare the id's,
+        // if they match
+        if (param_data.ProcessID == currentProcess)
+        {
+            // Set the HWND out variable
+            param_data.HwndOut = handle;
+
+            // Return false(0) to stop the window iteration
+            return FALSE;
+        };
+    };
+
+    return TRUE;
+}
+*/
+
