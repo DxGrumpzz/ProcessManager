@@ -44,7 +44,7 @@
                 return false;
 
             // Call WinApi function to create the process and set the process ID
-            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs);
+            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs, VisibleOnStartup);
             ProcessID = result;
 
             // If process ID returned as 0 it means process creation failed

@@ -217,18 +217,24 @@ public:
     };
 
 
-
     // Runs a single process
-    static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs)
+    static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, bool visibleOnStartup)
     {
         ProcessModel process(processName, processArgs);
         BOOL result = ProcessManager::RunProcess(process);
 
+       
+
         if (result == FALSE)
+        {
             return 0;
+        }
         else
         {
             ProcessManager::ProcessList.push_back(process);
+
+            if (visibleOnStartup == false)
+                ShowWindow(process.MainWindowHandle, SW_HIDE);
 
             return process.ProcessInfo.dwProcessId;
         };

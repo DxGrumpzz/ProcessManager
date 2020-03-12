@@ -25,7 +25,7 @@
         /// <param name="processArgs"> The process' arguments </param>
         /// <returns></returns>
         [DllImport(DLL, CharSet = CharSet.Unicode)]
-        public static extern ulong RunProcess(string processName, string processArgs);
+        public static extern ulong RunProcess(string processName, string processArgs, bool visibleOnStartup);
 
         /// <summary>
         /// Closes a single process

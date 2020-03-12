@@ -95,8 +95,12 @@
         {
             if (Process.RunProcess() == true)
             {
+                if(Process.VisibleOnStartup == false)
+                    ProcessVisible = false;
+                else
+                    ProcessVisible = false;
+
                 ProcessRunning = true;
-                ProcessVisible = true;
             };
         }
 
