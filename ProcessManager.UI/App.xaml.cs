@@ -14,10 +14,11 @@ namespace ProcessManager.UI
         {
             base.OnStartup(e);
 
+
             // Check if the processes file exists
-            if (File.Exists("Processes.txt") == false)
+            if (File.Exists("ProcessList.json") == false)
             {
-                MessageBox.Show("Unable to find Processes.txt");
+                MessageBox.Show("Unable to find ProcessList.json");
                 
                 // Exit application if it isn't
                 Environment.Exit(1);
@@ -57,7 +58,7 @@ namespace ProcessManager.UI
 
             // Check if process list file is valid
             var processList = DI.ProcessLoader.GetProcessListFromFile();
-            if(processList == null)
+            if (processList == null)
             {
                 MessageBox.Show("ProcessList.json contains invalid data", "Error");
 
