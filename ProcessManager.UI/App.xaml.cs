@@ -28,9 +28,6 @@ namespace ProcessManager.UI
             // Setup DI stuff
             SetupDI();
 
-            // Initialize ProcessManager functionality
-            // CoreDLL.Initialize();
-
 
             // Create the main window
             (Current.MainWindow = new MainWindow(
@@ -46,7 +43,7 @@ namespace ProcessManager.UI
             // Close the processes when app exists
             DI.ProcessList.ForEach(process =>
             {
-                CoreDLL.CloseProcess(process.ProcessID);
+                process.CloseProcess();
             });
         }
 
