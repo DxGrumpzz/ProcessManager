@@ -6,6 +6,8 @@
 
 #include "ProcessManager.h"
 
+typedef void(*ProcessClosedCallback)(void);
+
 // Encapsulates a process information
 class ProcessModel
 {
@@ -34,7 +36,9 @@ public:
 
     // A WinEventHook function used to get the the process HWND's
     HWINEVENTHOOK Hook;
+    
 
+    ProcessClosedCallback ProcessClosedCallback;
 
 
 public:

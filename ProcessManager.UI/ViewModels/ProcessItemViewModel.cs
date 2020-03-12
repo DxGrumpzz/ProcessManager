@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Diagnostics;
     using System.Windows.Input;
 
@@ -77,7 +78,14 @@
 
             ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
             HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
+
         }
+
+        public void BindProcessClosedCallback()
+        {
+            Process.ProcessClosedEvent += ProcessClosedCallback;
+        }
+
 
         private void ExecuteHideProcessCommand()
         {
@@ -100,6 +108,7 @@
                 else
                     ProcessVisible = true;
 
+                
                 ProcessRunning = true;
             };
         }
@@ -110,6 +119,13 @@
             {
                 ProcessRunning = false;
             };
+        }
+
+
+
+        private void ProcessClosedCallback()
+        {
+            ProcessRunning = false;
         }
 
     };

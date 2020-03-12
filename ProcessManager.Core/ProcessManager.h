@@ -101,6 +101,35 @@ public:
     }
 
 
+
+    static void CALLBACK WaitOrTimerCallback(
+        _In_  PVOID lpParameter,
+        _In_  BOOLEAN TimerOrWaitFired
+    )
+    { 
+        DWORD processID = reinterpret_cast<DWORD>(lpParameter);
+
+        ProcessModel* process = ProcessManager::GetProcess(processID);
+        
+        process->ProcessClosedCallback();
+
+
+        if (ProcessManager::ProcessList.size() == 1)
+        {
+            ProcessManager::ProcessList.clear();
+        }
+        else
+        {
+            ProcessManager::ProcessList.erase(
+                std::remove_if(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(),
+                [&](const ProcessModel& currentProcess)
+            {
+                return process->ProcessInfo.dwProcessId == currentProcess.ProcessInfo.dwProcessId;
+            }));
+        };
+    }
+
+
     // Runs a single process
     static BOOL RunProcess(ProcessModel& process)
     {
@@ -136,16 +165,23 @@ public:
         // Get the rest of the handles
         process.handles = GetProcessHWNDs(process.GetPID());
 
+
+        auto s = reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId);
+
+        HANDLE hNewHandle;
+        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, WaitOrTimerCallback, s, INFINITE, WT_EXECUTEONLYONCE);
+
         return TRUE;
     };
 
+    
 
     // Runs a single process
-    static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, bool visibleOnStartup)
+    static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
     {
         ProcessModel process(processName, processArgs);
         BOOL result = ProcessManager::RunProcess(process);
-
+        
 
         if (result == FALSE)
         {
@@ -153,6 +189,8 @@ public:
         }
         else
         {
+            process.ProcessClosedCallback = processClosedCallback;
+
             ProcessManager::ProcessList.push_back(process);
 
             if (visibleOnStartup == false)
@@ -174,7 +212,7 @@ public:
         if (exitCode == STILL_ACTIVE)
         {
             // Unhook the WinEvent from the process
-            UnhookWinEvent(process.Hook);
+            //UnhookWinEvent(process.Hook);
 
             // Close the process
             if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
@@ -183,19 +221,6 @@ public:
             if (!CleanupProcessHandles(process))
                 return FALSE;
 
-            if (ProcessManager::ProcessList.size() == 1)
-            {
-                ProcessManager::ProcessList.clear();
-            }
-            else
-            {
-                ProcessManager::ProcessList.erase(
-                    std::remove_if(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(),
-                    [&](const ProcessModel& currentProcess)
-                {
-                    return process.ProcessInfo.dwProcessId == currentProcess.ProcessInfo.dwProcessId;
-                }));
-            };
 
             //ProcessManager::ProcessList.erase(process);
         }
@@ -411,4 +436,3 @@ static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
     return TRUE;
 }
 */
-

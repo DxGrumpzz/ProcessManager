@@ -27,9 +27,9 @@ std::wstring GetErrorStringW(DWORD error)
 
 
 
-DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, bool visibleOnStartup)
+DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback,bool visibleOnStartup)
 {
-    DWORD processID = ProcessManager::RunProcess(processName, processArgs, visibleOnStartup);
+    DWORD processID = ProcessManager::RunProcess(processName, processArgs, processClosedCallback, visibleOnStartup);
 
     return processID;
 };

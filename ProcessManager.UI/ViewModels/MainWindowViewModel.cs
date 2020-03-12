@@ -18,15 +18,21 @@
 
         public ICommand RunProcessesCommnad { get; }
         public ICommand CloseProcessesCommnad { get; }
- 
+
 
         public MainWindowViewModel(IEnumerable<ProcessModel> processes)
         {
             // "Convert" the list of ProcessModels to ProcessItemViewModel
             Processes = new List<ProcessItemViewModel>(processes.Select(process =>
-            new ProcessItemViewModel()
             {
-                Process = process,
+                var vm = new ProcessItemViewModel()
+                {
+                    Process = process,
+                };
+                
+                vm.BindProcessClosedCallback();
+
+                return vm;
             }));
 
             RunProcessesCommnad = new RelayCommand(ExecuteRunProcessesCommnad);

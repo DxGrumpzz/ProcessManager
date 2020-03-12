@@ -33,6 +33,9 @@
         public bool IsRunning => ProcessID != 0;
 
 
+        public event Action ProcessClosedEvent;
+
+
         /// <summary>
         /// Run the current process
         /// </summary>
@@ -44,7 +47,7 @@
                 return false;
 
             // Call WinApi function to create the process and set the process ID
-            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs, VisibleOnStartup);
+            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
             ProcessID = result;
 
             // If process ID returned as 0 it means process creation failed

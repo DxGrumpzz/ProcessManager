@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -25,7 +26,7 @@
         /// <param name="processArgs"> The process' arguments </param>
         /// <returns></returns>
         [DllImport(DLL, CharSet = CharSet.Unicode)]
-        public static extern ulong RunProcess(string processName, string processArgs, bool visibleOnStartup);
+        public static extern ulong RunProcess(string processName, string processArgs, Action processClosedCallback, bool visibleOnStartup);
 
         /// <summary>
         /// Closes a single process
