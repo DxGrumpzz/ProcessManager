@@ -16,6 +16,7 @@
 # User defined process list to run
 ProcessManager/Processes.txt
 *Processes.txt
+*ProcessList.json
 
 # Build results
 [Dd]ebug/
