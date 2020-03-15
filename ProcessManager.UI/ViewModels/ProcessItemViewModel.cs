@@ -75,8 +75,14 @@ namespace ProcessManager.UI
         #endregion
 
 
-        public ProcessItemViewModel()
+        public ProcessItemViewModel(ProcessModel process)
         {
+            Process = process;
+
+            // Bind the process closed event
+            Process.ProcessClosedEvent += () => ProcessRunning = false;
+
+
             RunProcessCommand = new RelayCommand(ExecuteRunProcessCommand);
             CloseProcessCommand = new RelayCommand(ExecuteCloseProcessCommand);
 

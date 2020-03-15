@@ -25,14 +25,7 @@ namespace ProcessManager.UI
             // "Convert" the list of ProcessModels to ProcessItemViewModel
             Processes = new List<ProcessItemViewModel>(processes.Select(process =>
             {
-                var vm = new ProcessItemViewModel()
-                {
-                    Process = process,
-                };
-                
-                vm.Process.ProcessClosedEvent += () => vm.ProcessRunning = false;
-
-                return vm;
+                return new ProcessItemViewModel(process);
             }));
 
             RunProcessesCommnad = new RelayCommand(ExecuteRunProcessesCommnad);
