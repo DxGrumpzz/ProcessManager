@@ -12,18 +12,19 @@
         Width="600"
         
         MinHeight="125"
-        MinWidth="195">
+        MinWidth="265"
+        
+        d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">
 
-    
+
     <Grid Margin="10">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="AUTO"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
-        
+
+
         <StackPanel HorizontalAlignment="Left">
 
             <!-- Run all processes button -->
@@ -53,7 +54,7 @@
                 <DataTemplate>
 
                     <local:ProcessItemView DataContext="{Binding}"/>
-                    
+
                 </DataTemplate>
 
             </ItemsControl.ItemTemplate>
