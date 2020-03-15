@@ -6,7 +6,7 @@
 
 
     /// <summary>
-    /// Applies a single uniform margin to every control of a panel
+    /// Applies a uniform margin to every control inside of a panel
     /// </summary>
     public static class UniformMargin
     {
@@ -35,7 +35,7 @@
             if (!(d is Panel panel))
                 return;
 
-            // Unironically using a local function instead of a variable
+            // Unironically using a local function instead of an event variable
             void eventHandler(object sender, EventArgs evnt)
             {
                 // Apply a uniform margin for every control in panel
