@@ -4,7 +4,7 @@
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// 
+    /// A base class that all ViewModels which have a Runtime-changing value should inherit from
     /// </summary>
     public class BaseViewModel : INotifyPropertyChanged
     {
@@ -14,5 +14,18 @@
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    };
+
+    /// <summary>
+    /// An "overload" of <see cref="BaseViewModel"/> which takes a class, and implements a design-time singelton
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class BaseViewModel<T> : BaseViewModel
+        where T: class
+    {
+        /// <summary>
+        /// A WPF design time singelton
+        /// </summary>
+        public static T DesignInstance { get; }
     };
 };
