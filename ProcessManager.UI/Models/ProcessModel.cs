@@ -32,6 +32,11 @@
         /// </summary>
         public bool IsRunning => ProcessID != 0;
 
+        /// <summary>
+        /// User defined info about the process
+        /// </summary>
+        public string ProcessLabel { get; set; }
+
 
         public event Action ProcessClosedEvent;
 
