@@ -18,6 +18,9 @@ namespace ProcessManager.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _processVisible;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _processLabelVisible;
+
         #endregion
 
 
@@ -60,6 +63,19 @@ namespace ProcessManager.UI
         }
 
 
+        /// <summary>
+        /// A boolean flag that indicates if the process label should be visible, or not
+        /// </summary>
+        public bool ProcessLabelVisible
+        {
+            get => _processLabelVisible;
+            set
+            {
+                _processLabelVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
 
@@ -71,6 +87,9 @@ namespace ProcessManager.UI
 
         public ICommand ShowProcessCommand { get; }
         public ICommand HideProcessCommand { get; }
+
+        public ICommand MouseEnterCommand { get; }
+        public ICommand MouseLeaveCommand { get; }
 
         #endregion
 
@@ -88,6 +107,22 @@ namespace ProcessManager.UI
 
             ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
             HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
+
+
+
+            // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
+            if (string.IsNullOrWhiteSpace(Process.ProcessLabel) == false)
+            {
+                MouseEnterCommand = new RelayCommand(() =>
+                {
+                    ProcessLabelVisible = true;
+                });
+
+                MouseLeaveCommand = new RelayCommand(() =>
+                {
+                    ProcessLabelVisible = false;
+                });
+            };
         }
 
 
@@ -107,7 +142,7 @@ namespace ProcessManager.UI
         {
             if (Process.RunProcess() == true)
             {
-                if(Process.VisibleOnStartup == false)
+                if (Process.VisibleOnStartup == false)
                     ProcessVisible = false;
                 else
                     ProcessVisible = true;

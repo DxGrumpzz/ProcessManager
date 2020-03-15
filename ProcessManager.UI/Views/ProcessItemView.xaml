@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
              
              d:DesignHeight="25" 
-             d:DesignWidth="250">
+             d:DesignWidth="300"
+             
+             d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
 
 
     <Grid Margin="0,1">
@@ -17,14 +19,37 @@
             <ColumnDefinition Width="AUTO"/>
         </Grid.ColumnDefinitions>
 
+        
+        <Grid local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}" 
+              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
 
-        <!-- The name of this process -->
-        <TextBlock Text="{Binding Process.ProcessPath}"
-                   
-                   TextTrimming="CharacterEllipsis"
-                   TextAlignment="Center"
-                   
-                   Margin="0,0,10,0"/>
+            <!-- The name of this process -->
+            <TextBlock Text="{Binding ProcessPath}"
+                       
+                       Visibility="{Binding ProcessLabelVisible,
+                       Converter={local:BooleanToVisibilityValueConverter}, 
+                       ConverterParameter='True'}"
+                       
+                       TextTrimming="CharacterEllipsis"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       
+                       Margin="5,0,2.5,0"/>
+
+
+            <!-- The process label -->
+            <TextBlock Text="{Binding Process.ProcessLabel}"
+                       
+                       Visibility="{Binding ProcessLabelVisible,
+                       Converter={local:BooleanToVisibilityValueConverter}}"
+                       
+                       TextTrimming="CharacterEllipsis"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       
+                       Margin="5,0,2.5,0"/>
+
+        </Grid>
 
 
         <!-- Run and close buttons container -->
@@ -52,25 +77,25 @@
                     Command="{Binding CloseProcessCommand}"/>
 
 
-            
+
             <!-- Show a process buttons -->
             <Button Content="Show"
                     
                     Command="{Binding ShowProcessCommand}">
 
                 <Button.Style>
-                    
+
                     <Style TargetType="{x:Type Button}">
 
                         <Style.Triggers>
-                       
+
                             <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
 
                                 <Setter Property="IsEnabled" Value="False"/>
 
                             </DataTrigger>
 
-                            
+
                             <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
 
                                 <Setter Property="IsEnabled" Value="False"/>
@@ -84,7 +109,7 @@
                 </Button.Style>
 
             </Button>
-            
+
 
             <!-- Hide a process buttons -->
             <Button Content="Hide" 
@@ -96,14 +121,14 @@
                     <Style TargetType="{x:Type Button}">
 
                         <Style.Triggers>
-                            
+
                             <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
 
                                 <Setter Property="IsEnabled" Value="False"/>
 
                             </DataTrigger>
 
-                            
+
                             <DataTrigger Binding="{Binding ProcessVisible, 
                                          Converter={local:InvertBooleanValueConverter}}" 
                                          
