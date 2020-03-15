@@ -8,7 +8,7 @@
     /// <summary>
     /// An attached property that will execute an <see cref="ICommand"/> when a control fires a <see cref="UIElement.MouseEnter"/> event
     /// </summary>
-    public static class MouseAttachedProperty
+    public static class MouseEnterAttachedProperty
     {
         public static ICommand GetCommand(DependencyObject obj)
         {
@@ -25,7 +25,7 @@
             DependencyProperty.RegisterAttached(
                 "Command",
                 typeof(ICommand),
-                typeof(MouseAttachedProperty),
+                typeof(MouseEnterAttachedProperty),
                 new PropertyMetadata(default(ICommand), CommandChangedCallback));
 
 
