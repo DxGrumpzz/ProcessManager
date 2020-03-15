@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Diagnostics;
@@ -28,6 +28,10 @@
         /// </summary>
         public ProcessModel Process { get; set; }
 
+        /// <summary>
+        /// The process path, Formatted
+        /// </summary>
+        public string ProcessPath => Path.GetFullPath(Process.ProcessPath);
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
