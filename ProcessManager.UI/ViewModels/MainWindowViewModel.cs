@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -30,7 +30,7 @@
                     Process = process,
                 };
                 
-                vm.BindProcessClosedCallback();
+                vm.Process.ProcessClosedEvent += () => vm.ProcessRunning = false;
 
                 return vm;
             }));

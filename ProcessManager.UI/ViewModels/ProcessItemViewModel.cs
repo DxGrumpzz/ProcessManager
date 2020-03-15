@@ -78,12 +78,6 @@
 
             ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
             HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
-
-        }
-
-        public void BindProcessClosedCallback()
-        {
-            Process.ProcessClosedEvent += ProcessClosedCallback;
         }
 
 
@@ -121,12 +115,6 @@
             };
         }
 
-
-
-        private void ProcessClosedCallback()
-        {
-            ProcessRunning = false;
-        }
 
     };
 };
