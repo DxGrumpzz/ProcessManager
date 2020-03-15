@@ -36,9 +36,19 @@
         public static extern void CloseProcess(ulong processID);
 
 
+        /// <summary>
+        /// Hides a process' main wwindow, nothing sketcy
+        /// </summary>
+        /// <param name="processID"> The process' PID </param>
+        /// <returns> Returns true if WinCall (ShowWindow) was successful </returns>
         [DllImport(DLL)]
         public static extern bool HideProcess(ulong processID);
 
+        /// <summary>
+        /// Shows a process
+        /// </summary>
+        /// <param name="processID"> The process' PID </param>
+        /// <returns> Returns true if WinCall (ShowWindow) was successful </returns>
         [DllImport(DLL)]
         public static extern bool ShowProcess(ulong processID);
 
