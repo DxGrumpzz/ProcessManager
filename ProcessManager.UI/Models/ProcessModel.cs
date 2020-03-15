@@ -36,6 +36,14 @@
         public event Action ProcessClosedEvent;
 
 
+        public ProcessModel()
+        {
+            
+            // Ensure process is closed
+            ProcessClosedEvent += () => CloseProcess();
+        }
+
+
         /// <summary>
         /// Run the current process
         /// </summary>
@@ -72,6 +80,6 @@
 
             return true;
         }
-    };
 
+    };
 };
