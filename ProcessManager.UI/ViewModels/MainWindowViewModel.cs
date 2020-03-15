@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -10,10 +10,27 @@ namespace ProcessManager.UI
     /// </summary>
     public class MainWindowViewModel
     {
+        public static MainWindowViewModel DesignInstance => new MainWindowViewModel(new ProcessModel[]
+        {
+            new ProcessModel()
+            {
+                ProcessPath = @"C:\Programs\App.exe",
+            },
+            new ProcessModel()
+            {
+                ProcessPath = @"D:\Software\Process.exe",
+            },
+            new ProcessModel()
+            {
+                ProcessPath = @"A:\asdf\fdas\Prog.bat",
+            },
+        });
+
+        
         /// <summary>
         /// The current list of processes as ProcessItemViewModel
         /// </summary>
-        public List<ProcessItemViewModel> Processes { get; }
+        public List<ProcessItemViewModel> Processes { get; private set;}
 
 
         public ICommand RunProcessesCommnad { get; }

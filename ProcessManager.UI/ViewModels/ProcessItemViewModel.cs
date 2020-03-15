@@ -1,14 +1,21 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
+    using System.IO;
     using System.Windows.Input;
 
     /// <summary>
     /// The ViewModel for ProcessItemView
     /// </summary>
-    public class ProcessItemViewModel : BaseViewModel
+    public class ProcessItemViewModel : BaseViewModel<ProcessItemViewModel>
     {
+        public new static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(
+            new ProcessModel()
+            {
+                ProcessPath = Path.GetRandomFileName(),
+            });
+
+
 
         #region Private fields
 
@@ -147,7 +154,7 @@ namespace ProcessManager.UI
                 else
                     ProcessVisible = true;
 
-                
+
                 ProcessRunning = true;
             };
         }
