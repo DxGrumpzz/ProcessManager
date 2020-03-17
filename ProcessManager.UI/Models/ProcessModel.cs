@@ -99,5 +99,32 @@ namespace ProcessManager.UI
             return true;
         }
 
+
+        public bool ShowProcess()
+        {
+            bool result = CoreDLL.ShowProcess(ProcessID);
+
+            if (result == true)
+            {
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Visible);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool HideProcess()
+        {
+            bool result = CoreDLL.HideProcess(ProcessID);
+
+            if (result == true)
+            {
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Hidden);
+                return true;
+            }
+            else
+                return false;
+        }
+
     };
 };
