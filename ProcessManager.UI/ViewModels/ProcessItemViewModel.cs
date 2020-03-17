@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
@@ -14,7 +14,6 @@
             {
                 ProcessPath = Path.GetRandomFileName(),
             });
-
 
 
         #region Private fields
@@ -139,34 +138,21 @@
                 ProcessVisible = false;
         }
 
-        private void ExecuteShowProcessCommand()
-        {
-            if (CoreDLL.ShowProcess(Process.ProcessID) == true)
-                ProcessVisible = true;
-        }
 
-        private void ExecuteRunProcessCommand()
-        {
-            if (Process.RunProcess() == true)
+            RunProcessCommand = new RelayCommand(() => Process.RunProcess());
+            CloseProcessCommand = new RelayCommand(() => Process.CloseProcess());
+
+            ShowProcessCommand = new RelayCommand(() => Process.ShowProcess());
+            HideProcessCommand = new RelayCommand(() => Process.HideProcess());
+
+
+            // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
+            if (ProcessHasLabel == false)
             {
-                if (Process.VisibleOnStartup == false)
-                    ProcessVisible = false;
-                else
-                    ProcessVisible = true;
+                MouseEnterCommand = new RelayCommand(() => ProcessLabelVisible = true);
 
-
-                ProcessRunning = true;
+                MouseLeaveCommand = new RelayCommand(() => ProcessLabelVisible = false);
             };
         }
-
-        private void ExecuteCloseProcessCommand()
-        {
-            if (Process.CloseProcess() == true)
-            {
-                ProcessRunning = false;
-            };
-        }
-
-
     };
 };
