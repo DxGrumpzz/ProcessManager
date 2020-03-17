@@ -12,7 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Processes.txt">
+    <Compile Remove="ProcessLoader\ProcessLoader.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Processes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ProcessList.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
