@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -30,7 +30,7 @@
         /// <summary>
         /// The current list of processes as ProcessItemViewModel
         /// </summary>
-        public List<ProcessItemViewModel> Processes { get; private set;}
+        public IEnumerable<ProcessItemViewModel> Processes { get; private set; }
 
 
         public ICommand RunProcessesCommnad { get; }
@@ -40,10 +40,10 @@
         public MainWindowViewModel(IEnumerable<ProcessModel> processes)
         {
             // "Convert" the list of ProcessModels to ProcessItemViewModel
-            Processes = new List<ProcessItemViewModel>(processes.Select(process =>
+            Processes = processes.Select(process =>
             {
                 return new ProcessItemViewModel(process);
-            }));
+            });
 
             RunProcessesCommnad = new RelayCommand(ExecuteRunProcessesCommnad);
             CloseProcessesCommnad = new RelayCommand(ExecuteCloseProcessesCommnad);
@@ -53,25 +53,19 @@
         private void ExecuteRunProcessesCommnad()
         {
             // Run every process
-            Processes.ForEach(processVM =>
+            foreach(var processVM in Processes)
             {
-                ProcessModel process = processVM.Process;
-
-                if (process.RunProcess() == true)
-                    processVM.ProcessRunning = true;
-            });
+                processVM.Process.RunProcess();
+            };
         }
 
         private void ExecuteCloseProcessesCommnad()
         {
             // Close every process
-            Processes.ForEach(processVM =>
+            foreach(var processVM in Processes)
             {
-                ProcessModel process = processVM.Process;
-
-                if (process.CloseProcess() == true)
-                    processVM.ProcessRunning = false;
-            });
+                processVM.Process.CloseProcess();
+            };
         }
     };
 };
