@@ -82,6 +82,11 @@ namespace ProcessManager.UI
             }
         }
 
+        /// <summary>
+        /// A boolean flag that indicates if the associated process has a label
+        /// </summary>
+        public bool ProcessHasLabel => string.IsNullOrWhiteSpace(Process.ProcessLabel);
+
         #endregion
 
 
