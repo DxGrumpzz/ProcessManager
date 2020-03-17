@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
 
@@ -42,10 +42,20 @@ namespace ProcessManager.UI
 
         #endregion
 
+
+        /// <summary>
+        /// An event that will be fired when this process is closed
+        /// </summary>
         public event Action ProcessClosedEvent;
 
+        /// <summary>
+        /// An event that will be fired when the process is started successfully
+        /// </summary>
         public event Action ProcessInitializedEvent;
 
+        /// <summary>
+        /// An event that will be fired when the process visibility has changed
+        /// </summary>
         public event Action<ProcessVisibilityState> ProcessVisibilityStateChanged;
 
 
@@ -100,12 +110,18 @@ namespace ProcessManager.UI
         }
 
 
+        /// <summary>
+        /// Shows a process to the user
+        /// </summary>
+        /// <returns></returns>
         public bool ShowProcess()
         {
             bool result = CoreDLL.ShowProcess(ProcessID);
 
+            // If ShowWindow function was called succesfuly
             if (result == true)
             {
+                // Invoke event
                 ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Visible);
                 return true;
             }
@@ -113,12 +129,18 @@ namespace ProcessManager.UI
                 return false;
         }
 
+        /// <summary>
+        /// Hides a process from the user
+        /// </summary>
+        /// <returns></returns>
         public bool HideProcess()
         {
             bool result = CoreDLL.HideProcess(ProcessID);
 
+            // If ShowWindow function was called succesfuly
             if (result == true)
             {
+                // Invoke event
                 ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Hidden);
                 return true;
             }
