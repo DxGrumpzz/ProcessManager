@@ -100,6 +100,7 @@ namespace ProcessManager.UI
         #endregion
 
 
+
         public ProcessItemViewModel(ProcessModel process)
         {
             Process = process;
@@ -116,23 +117,17 @@ namespace ProcessManager.UI
 
                 ProcessRunning = true;
             };
+            Process.ProcessVisibilityStateChanged += (ProcessVisibilityState visibilityState) =>
                 {
-                    ProcessLabelVisible = true;
-                });
-
-                MouseLeaveCommand = new RelayCommand(() =>
+                if (visibilityState == ProcessVisibilityState.Visible)
                 {
-                    ProcessLabelVisible = false;
-                });
-            };
+                    ProcessVisible = true;
         }
-
-
-        private void ExecuteHideProcessCommand()
+                else if (visibilityState == ProcessVisibilityState.Hidden)
         {
-            if (CoreDLL.HideProcess(Process.ProcessID) == true)
                 ProcessVisible = false;
-        }
+                };
+            };
 
 
             RunProcessCommand = new RelayCommand(() => Process.RunProcess());
