@@ -65,11 +65,17 @@ namespace ProcessManager.UI
                 return false;
 
             // Call WinApi function to create the process and set the process ID
-            ulong result = CoreDLL.RunProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
-            ProcessID = result;
+            ulong processID = CoreDLL.RunProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
+            ProcessID = processID;
 
             // If process ID returned as 0 it means process creation failed
-            return ProcessID != 0 ? true : false;
+            if (ProcessID != 0 ? true : false)
+            {
+                ProcessInitializedEvent?.Invoke();
+                return true;
+            }
+            else
+                return false;
         }
 
         /// <summary>
