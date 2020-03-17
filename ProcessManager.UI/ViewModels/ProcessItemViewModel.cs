@@ -106,20 +106,16 @@ namespace ProcessManager.UI
 
             // Bind the process closed event
             Process.ProcessClosedEvent += () => ProcessRunning = false;
-
-
-            RunProcessCommand = new RelayCommand(ExecuteRunProcessCommand);
-            CloseProcessCommand = new RelayCommand(ExecuteCloseProcessCommand);
-
-            ShowProcessCommand = new RelayCommand(ExecuteShowProcessCommand);
-            HideProcessCommand = new RelayCommand(ExecuteHideProcessCommand);
-
-
-
-            // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
-            if (string.IsNullOrWhiteSpace(Process.ProcessLabel) == false)
+            Process.ProcessInitializedEvent += () =>
             {
-                MouseEnterCommand = new RelayCommand(() =>
+                if (Process.VisibleOnStartup == false)
+                    ProcessVisible = false;
+                else
+                    ProcessVisible = true;
+
+
+                ProcessRunning = true;
+            };
                 {
                     ProcessLabelVisible = true;
                 });
