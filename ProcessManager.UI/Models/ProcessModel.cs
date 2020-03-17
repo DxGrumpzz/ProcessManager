@@ -46,9 +46,11 @@ namespace ProcessManager.UI
 
         public event Action ProcessInitializedEvent;
 
+        public event Action<ProcessVisibilityState> ProcessVisibilityStateChanged;
+
+
         public ProcessModel()
         {
-            
             // Ensure process is closed
             ProcessClosedEvent += () => CloseProcess();
         }
