@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
 
@@ -7,6 +7,9 @@
     /// </summary>
     public class ProcessModel
     {
+
+        #region Public properties
+
         /// <summary>
         /// The path/name of the process 
         /// </summary>
@@ -37,9 +40,11 @@
         /// </summary>
         public string ProcessLabel { get; set; }
 
+        #endregion
 
         public event Action ProcessClosedEvent;
 
+        public event Action ProcessInitializedEvent;
 
         public ProcessModel()
         {
