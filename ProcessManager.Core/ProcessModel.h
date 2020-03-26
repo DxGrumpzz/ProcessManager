@@ -23,7 +23,7 @@ public:
     PROCESS_INFORMATION ProcessInfo = { 0 };
 
     // A set of arguments that can be passed to CreateProcessW
-    STARTUPINFOW info = { 0 };
+    STARTUPINFOW StartupInfo = { 0 };
 
 
     HWND MainWindowHandle;
@@ -47,9 +47,9 @@ public:
         ProcessName(processName),
         ProcessArgs(processArgs)
     {
-        info.cb = sizeof(STARTUPINFOW);
-        info.dwFlags = STARTF_USESHOWWINDOW;
-        info.wShowWindow = SW_SHOWMINNOACTIVE;
+        StartupInfo.cb = sizeof(STARTUPINFOW);
+        StartupInfo.dwFlags = STARTF_USESHOWWINDOW;
+        StartupInfo.wShowWindow = SW_SHOWMINNOACTIVE;
     };
 
     ProcessModel(const wchar_t* processName, const wchar_t* processArgs) :

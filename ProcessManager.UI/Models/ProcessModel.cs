@@ -1,12 +1,25 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
+    using System.IO;
+    using System.Linq;
 
     /// <summary>
     /// A class that contains data and functionality of a process
     /// </summary>
     public class ProcessModel
     {
+
+        #region Private fields
+
+        private string[] _cmdExtensions = new string[]
+        {
+            ".cmd",
+            ".bat",
+        };
+
+        #endregion
+
 
         #region Public properties
 
@@ -39,6 +52,8 @@
         /// User defined info about the process
         /// </summary>
         public string ProcessLabel { get; set; }
+
+        public bool IsProcessConsole => _cmdExtensions.Contains(Path.GetExtension(ProcessPath));
 
         #endregion
 
@@ -76,9 +91,18 @@
             if (IsRunning == true)
                 return false;
 
-            // Call WinApi function to create the process and set the process ID
-            ulong processID = CoreDLL.RunProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
-            ProcessID = processID;
+            if (IsProcessConsole)
+            {
+                // Call WinApi function to create the process and set the process ID
+                ulong processID = CoreDLL.RunConsoleProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
+                ProcessID = processID;
+            }
+            else
+            {
+                // Call WinApi function to create the process and set the process ID
+                ulong processID = CoreDLL.RunProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
+                ProcessID = processID;
+            };
 
             // If process ID returned as 0 it means process creation failed
             if (ProcessID != 0 ? true : false)

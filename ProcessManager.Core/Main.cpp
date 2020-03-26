@@ -27,7 +27,7 @@ std::wstring GetErrorStringW(DWORD error)
 
 
 
-DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback,bool visibleOnStartup)
+DLL_CALL unsigned long RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
 {
     DWORD processID = ProcessManager::RunProcess(processName, processArgs, processClosedCallback, visibleOnStartup);
 
@@ -74,6 +74,12 @@ DLL_CALL bool HideProcess(DWORD processID)
     return true;
 };
 
+
+
+DLL_CALL DWORD RunConsoleProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
+{
+    return ProcessManager::RunConsoleProcess(processName, processArgs, processClosedCallback, visibleOnStartup);
+}
 
 /*
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)

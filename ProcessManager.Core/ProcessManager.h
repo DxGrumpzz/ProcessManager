@@ -24,7 +24,6 @@ private:
     };
 
 
-
 public:
 
     // The list of processes that will be ran
@@ -146,7 +145,7 @@ public:
             NULL,
             NULL,
             NULL,
-            &process.info,
+            &process.StartupInfo,
             &process.ProcessInfo))
         {
             // If process creation failed.
@@ -199,6 +198,50 @@ public:
             return process.ProcessInfo.dwProcessId;
         };
     };
+
+    // An overload that runs a console process
+    static DWORD RunConsoleProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
+    {
+        // Create the process 
+        ProcessModel process(processName, processArgs);
+
+        // Normalize the process arguments
+        NormalizeArgs(process);
+
+        // Combine the process path and arguments into a single string 
+        std::wstring cmdLet = std::wstring(process.ProcessName) + std::wstring(process.ProcessArgs);
+        
+        // Convert the arguments to a non-const string
+        wchar_t* cmdlines = const_cast<wchar_t*>(cmdLet.c_str());
+
+        // Run the process
+        if (!CreateProcessW(NULL, cmdlines,
+            NULL, NULL,
+            FALSE,
+            NULL,
+            FALSE,
+            FALSE,
+            &process.StartupInfo,
+            &process.ProcessInfo))
+        {
+            CloseHandle(process.ProcessInfo.hThread);
+            CloseHandle(process.ProcessInfo.hProcess);
+
+            return 0;
+        };
+
+        HWND hwnd = GetProcessHWND(process.GetPID());
+
+        process.MainWindowHandle = hwnd;
+        process.ProcessClosedCallback = processClosedCallback;
+
+        HANDLE hNewHandle;
+        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, WaitOrTimerCallback, reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId), INFINITE, WT_EXECUTEONLYONCE);
+
+        ProcessList.push_back(process);
+
+        return process.GetPID();
+    }
 
 
     // Closes a single process

@@ -52,5 +52,10 @@
         [DllImport(DLL)]
         public static extern bool ShowProcess(ulong processID);
 
+
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        public static extern ulong RunConsoleProcess(string processName, string processArgs, Action processClosedCallback, bool visibleOnStartup);
+
+
     };
 };
