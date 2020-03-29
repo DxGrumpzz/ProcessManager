@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <vector>
 #include <msxml.h>
 #include <fstream>
@@ -13,16 +14,7 @@ class ProcessManager
 
 private:
 
-    // A struct that stores information about a process in-between WNDENUMPROC calls
-    struct WndEnumProcParam
-    {
-        // The process' PID
-        DWORD ProcessID;
-
-        // An "out" variable that will contain the process' main window HWND
-        HWND HwndOut;
-    };
-
+ 
 
 public:
 
@@ -32,13 +24,35 @@ public:
 
 public:
 
+    // A struct that stores information about a process in-between WNDENUMPROC calls
+    struct EnumProcParam
+    {
+        // The process' PID
+        DWORD ProcessID;
+
+        // An "out" variable that will contain the process' main window HWND
+        HWND HwndOut;
+
+        // A timing varialbe used to keep track of when the process HWND search has started
+        std::chrono::steady_clock::time_point StartTime;
+
+        // How long to keep searching for 
+        int TimeoutMS;
+
+        // A boolean flag that indicates if the search has timed out
+        bool TimedOut;
+    };
+    
     // Returns a process' MainWindow handle
-    static HWND GetProcessHWND(DWORD processID)
+    static HWND GetProcessHWND(DWORD processID, int msTimeout = 3000)
     {
         // Create a WndEnumProcParam struct to hold the data
-        WndEnumProcParam wndEnumProcParam;
+        EnumProcParam wndEnumProcParam;
         wndEnumProcParam.ProcessID = processID;
         wndEnumProcParam.HwndOut = NULL;
+        wndEnumProcParam.StartTime = std::chrono::steady_clock::now();
+        wndEnumProcParam.TimeoutMS = msTimeout;
+
 
         // Continue iteration while the out HWND variable is null
         while (wndEnumProcParam.HwndOut == NULL)
@@ -50,7 +64,20 @@ public:
                 if (IsWindowVisible(handle) == TRUE)
                 {
                     // Convert the LPARAM to WndEnumProcParam
-                    WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
+                    EnumProcParam& enumProcParam = *reinterpret_cast<EnumProcParam*>(lParam);
+
+                    // Get the current time 
+                    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+
+                    // Get elapsed time 
+                    auto elapsedTimeInMS = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - enumProcParam.StartTime).count();
+
+                    // Check if we didn't timeout
+                    if (elapsedTimeInMS >= enumProcParam.TimeoutMS)
+                    {
+                        enumProcParam.TimedOut = true;
+                        return FALSE;
+                    };
 
                     // Get the process PID
                     DWORD currentProcess = 0;
@@ -58,10 +85,10 @@ public:
 
                     // Compare the id's, 
                     // if they match
-                    if (param_data.ProcessID == currentProcess)
+                    if (enumProcParam.ProcessID == currentProcess)
                     {
                         // Set the HWND out variable 
-                        param_data.HwndOut = handle;
+                        enumProcParam.HwndOut = handle;
 
                         // Return false(0) to stop the window iteration 
                         return FALSE;
@@ -69,8 +96,12 @@ public:
                 };
 
                 return TRUE;
-            },
-                        reinterpret_cast<LPARAM>(&wndEnumProcParam));
+            }, reinterpret_cast<LPARAM>(&wndEnumProcParam));
+
+            if (wndEnumProcParam.TimedOut == true)
+            {
+                return NULL;
+            };
         };
 
         return wndEnumProcParam.HwndOut;
@@ -100,19 +131,20 @@ public:
     }
 
 
-
-    static void CALLBACK WaitOrTimerCallback(
-        _In_  PVOID lpParameter,
-        _In_  BOOLEAN TimerOrWaitFired
-    )
-    { 
+    // A callback function that is invoke when a process is terminated
+    static void CALLBACK ProcessTerminatedCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+    {
+        // Convert lpParam to the process ID
         DWORD processID = reinterpret_cast<DWORD>(lpParameter);
 
+        // Find the closed process 
         ProcessModel* process = ProcessManager::GetProcess(processID);
-        
+
+        // Call the actuall callback
         process->ProcessClosedCallback();
 
 
+        // Remove the process from the list
         if (ProcessManager::ProcessList.size() == 1)
         {
             ProcessManager::ProcessList.clear();
@@ -128,25 +160,25 @@ public:
         };
     }
 
-
     // Runs a single process
     static BOOL RunProcess(ProcessModel& process)
     {
         // Fix process arguments string if needed
         NormalizeArgs(process);
 
+        auto result = CreateProcessW(process.ProcessName.c_str(),
+                                     // Because the argument string will be appended to the default path argument 
+                                     // a const cast must be used to convert the LPCWSTR to a LPWSTR
+                                     const_cast<wchar_t*>(process.ProcessArgs.c_str()),
+                                     NULL, NULL,
+                                     TRUE,
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     &process.StartupInfo,
+                                     &process.ProcessInfo);
         // Create/run the process
-        if (!CreateProcessW(process.ProcessName.c_str(),
-            // Because the argument string will be appended to the default path argument 
-            // a const cast must be used to convert the LPCWSTR to a LPWSTR
-            const_cast<wchar_t*>(process.ProcessArgs.c_str()),
-            NULL, NULL,
-            FALSE,
-            NULL,
-            NULL,
-            NULL,
-            &process.StartupInfo,
-            &process.ProcessInfo))
+        if (!result)
         {
             // If process creation failed.
 
@@ -159,28 +191,35 @@ public:
         // If prcess creation was successful, 
 
         // Get the hanlde for the process' main window
-        process.MainWindowHandle = GetProcessHWND(process.GetPID());
+        HWND hwnd = GetProcessHWND(process.GetPID());
+
+        if (hwnd == NULL)
+        {
+            return FALSE;
+        };
+
+        process.MainWindowHandle = hwnd;
 
         // Get the rest of the handles
         process.handles = GetProcessHWNDs(process.GetPID());
 
 
-        auto s = reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId);
+        auto processIDPointer = reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId);
 
         HANDLE hNewHandle;
-        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, WaitOrTimerCallback, s, INFINITE, WT_EXECUTEONLYONCE);
+        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, ProcessTerminatedCallback, processIDPointer, INFINITE, WT_EXECUTEONLYONCE);
 
         return TRUE;
     };
 
-    
+
 
     // Runs a single process
     static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
     {
         ProcessModel process(processName, processArgs);
         BOOL result = ProcessManager::RunProcess(process);
-        
+
 
         if (result == FALSE)
         {
@@ -210,7 +249,7 @@ public:
 
         // Combine the process path and arguments into a single string 
         std::wstring cmdLet = std::wstring(process.ProcessName) + std::wstring(process.ProcessArgs);
-        
+
         // Convert the arguments to a non-const string
         wchar_t* cmdlines = const_cast<wchar_t*>(cmdLet.c_str());
 
@@ -230,13 +269,13 @@ public:
             return 0;
         };
 
-        HWND hwnd = GetProcessHWND(process.GetPID());
+        HWND hwnd = GetProcessHWND(process.GetPID(), 3000);
 
         process.MainWindowHandle = hwnd;
         process.ProcessClosedCallback = processClosedCallback;
 
         HANDLE hNewHandle;
-        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, WaitOrTimerCallback, reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId), INFINITE, WT_EXECUTEONLYONCE);
+        RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, ProcessTerminatedCallback, reinterpret_cast<PVOID>(process.ProcessInfo.dwProcessId), INFINITE, WT_EXECUTEONLYONCE);
 
         ProcessList.push_back(process);
 
@@ -257,7 +296,7 @@ public:
             // Unhook the WinEvent from the process
             //UnhookWinEvent(process.Hook);
 
-            // Close the process
+                // Close the process
             if (!TerminateProcess(process.ProcessInfo.hProcess, 0))
                 return FALSE;
 
@@ -265,7 +304,7 @@ public:
                 return FALSE;
 
 
-            //ProcessManager::ProcessList.erase(process);
+
         }
         // Don't do anything if the process is closed
         else
@@ -318,164 +357,3 @@ private:
     }
 
 };
-
-
-/*
-
-
-    // A WinEventHook function used to get a process HWND's
-    static void CALLBACK WinEventHookCallback(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
-    {
-        // Get the current process ID
-        DWORD processId;
-        DWORD threadID = GetWindowThreadProcessId(hwnd, &processId);
-
-        for (ProcessModel& process : ProcessList)
-        {
-            // Match the ID with the created process
-            if (process.ProcessInfo.dwProcessId == processId)
-            {
-                int titleLength = GetWindowTextLengthW(hwnd) + 1;
-
-                std::vector<wchar_t> buf(titleLength);
-                GetWindowTextW(hwnd, &buf[0], titleLength);
-                std::wstring title = &buf[0];
-
-                if (title.empty() == true)
-                    return;
-
-                // Add the process HWND to the process handles list
-                process.handles.push_back(hwnd);
-
-                // Set creating flag
-                process.Creating = true;
-            };
-        };
-    };
-
-
-
-    // Hides a process (Only the visible window, nothing sketchy)
-    static void HideProcess(ProcessModel& process)
-    {
-        // If the process is in "creation" mode
-        if (process.Creating == true)
-        {
-            // Go through every handle, and run ShowWindow with SW_HIDE
-            for (const HWND& hwnd : process.handles)
-            {
-                ShowWindowAsync(hwnd, SW_HIDE);
-            };
-
-            // Set creating flag
-            process.Creating = false;
-        };
-    };
-
-
-    // Returns a list of ProcessModel which contain name and arguments of a process
-    static void GetProcessListFromFile(const wchar_t* filename = L"Processes.txt")
-    {
-        // The processes file
-        std::wifstream file(filename);
-
-        // If file is invalid
-        if (!file)
-        {
-            std::wstring error = L"File error. \nCould not open: ";
-            error.append(filename);
-
-            size_t outputSize = error.size() + 1;
-
-            char* outputString = new char[outputSize];
-
-            size_t charsConverted = 0;
-
-            const wchar_t* inputW = error.c_str();
-
-            wcstombs_s(&charsConverted, outputString, outputSize, inputW, error.size());
-
-            throw std::exception(outputString);
-            delete[] outputString;
-        };
-
-
-        // This is absolute aids.
-        // This will improve
-
-
-        // Iterate through the file line by line
-        // Store current read line
-        std::wstring line;
-        while (std::getline(file, line))
-        {
-            // If current line is the process name
-            if (line == L"[Process]")
-            {
-                // Read process name into current line
-                std::getline(file, line);
-
-                // Add the process to the list
-                ProcessManager::ProcessList.emplace_back(line, L"");
-            }
-            // If current line is the process' arguments
-            else if (line == L"[Args]")
-            {
-                // Read next line
-                std::getline(file, line);
-
-                // Because of the way command arguments are interpreted a space must be inserted in the beggining of the string
-                line.insert(line.begin(), ' ');
-
-                // Set the process' arguments
-                auto process = (ProcessManager::ProcessList.end() - 1);
-                process->ProcessArgs = line;
-            };
-        };
-    };
-
-
-    // Returns a reference to a running process
-    static ProcessModel* GetProcess(const wchar_t* processName)
-    {
-        for (ProcessModel& process : ProcessManager::ProcessList)
-        {
-            if (process.ProcessName.c_str() == processName)
-            {
-                return &process;
-            };
-        };
-
-        return nullptr;
-    };
-
-
-
-
-static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
-{
-    // Only if the current window is visible to the user
-    if (IsWindowVisible(handle) == TRUE)
-    {
-        // Convert the LPARAM to WndEnumProcParam
-        WndEnumProcParam& param_data = *reinterpret_cast<WndEnumProcParam*>(lParam);
-
-        // Get the process PID
-        DWORD currentProcess = 0;
-        GetWindowThreadProcessId(handle, &currentProcess);
-
-        // Compare the id's,
-        // if they match
-        if (param_data.ProcessID == currentProcess)
-        {
-            // Set the HWND out variable
-            param_data.HwndOut = handle;
-
-            // Return false(0) to stop the window iteration
-            return FALSE;
-        };
-    };
-
-    return TRUE;
-}
-*/
