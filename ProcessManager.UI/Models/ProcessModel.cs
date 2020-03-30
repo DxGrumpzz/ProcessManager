@@ -53,6 +53,11 @@
         /// </summary>
         public string ProcessLabel { get; set; }
 
+        /// <summary>
+        /// The visibility state of this process
+        /// </summary>
+        public ProcessVisibilityState ProcessVisibleState { get; set; }
+
         public bool IsProcessConsole => _cmdExtensions.Contains(Path.GetExtension(ProcessPath));
 
         #endregion
@@ -145,8 +150,10 @@
             // If ShowWindow function was called succesfuly
             if (result == true)
             {
+                ProcessVisibleState = ProcessVisibilityState.Visible;
+             
                 // Invoke event
-                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Visible);
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibleState);
                 return true;
             }
             else
@@ -164,8 +171,10 @@
             // If ShowWindow function was called succesfuly
             if (result == true)
             {
+                ProcessVisibleState = ProcessVisibilityState.Hidden;
+               
                 // Invoke event
-                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState.Hidden);
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibleState);
                 return true;
             }
             else
