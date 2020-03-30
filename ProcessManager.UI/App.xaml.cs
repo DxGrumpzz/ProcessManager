@@ -28,8 +28,9 @@ namespace ProcessManager.UI
 
             LoadProjectProcesses(DI.Projects);
 
-            (Current.MainWindow = new MainWindow(
-                new MainWindowViewModel(DI.Projects)))
+            DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
+
+            (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
                 .Show();
 
             //// Check if the processes file exists
@@ -94,7 +95,7 @@ namespace ProcessManager.UI
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
-
+            return;
             // Close the processes when app exists
             DI.ProcessList.ForEach(process =>
             {

@@ -17,8 +17,9 @@
         /// </summary>
         public static IProcessLoader ProcessLoader { get; set; }
 
-
         public static IEnumerable<Project> Projects { get; set; }
+
+        public static MainWindowViewModel MainWindowViewModel { get; set; }
 
     };
 };
