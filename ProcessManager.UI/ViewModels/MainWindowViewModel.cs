@@ -1,6 +1,7 @@
 namespace ProcessManager.UI
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Windows.Input;
 
@@ -26,13 +27,32 @@ namespace ProcessManager.UI
             },
         });
 
-        
+        public static MainWindowViewModel DesignInstance2 => new MainWindowViewModel(new Project[]
+        {
+           new Project()
+           {
+               ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+           },
+
+           new Project()
+           {
+               ProjectPath = $@"D:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+           },
+
+           new Project()
+           {
+               ProjectPath = $@"A:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+           },
+
+        });
+
+
         /// <summary>
         /// The current list of processes as ProcessItemViewModel
         /// </summary>
         public IEnumerable<ProcessItemViewModel> Processes { get; private set; }
 
-        public IEnumerable<Project> Projects { get; set; }
+        public IEnumerable<ProjectItemViewModel> Projects { get; set; }
 
 
         public ICommand RunProcessesCommnad { get; }
@@ -41,7 +61,10 @@ namespace ProcessManager.UI
 
         public MainWindowViewModel(IEnumerable<Project> projects)
         {
-            Projects = projects;
+            Projects = projects.Select(project =>
+            {
+                return new ProjectItemViewModel(project);
+            });
         }
 
         public MainWindowViewModel(IEnumerable<ProcessModel> processes)
@@ -60,7 +83,7 @@ namespace ProcessManager.UI
         private void ExecuteRunProcessesCommnad()
         {
             // Run every process
-            foreach(var processVM in Processes)
+            foreach (var processVM in Processes)
             {
                 processVM.Process.RunProcess();
             };
@@ -69,7 +92,7 @@ namespace ProcessManager.UI
         private void ExecuteCloseProcessesCommnad()
         {
             // Close every process
-            foreach(var processVM in Processes)
+            foreach (var processVM in Processes)
             {
                 processVM.Process.CloseProcess();
             };

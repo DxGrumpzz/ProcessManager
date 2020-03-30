@@ -14,7 +14,7 @@
         MinHeight="125"
         MinWidth="265"
         
-        d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">
+        d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance2}">
 
 
     <Grid Margin="10">
@@ -47,13 +47,32 @@
                       
                       Grid.Column="1"
                       
-                      ItemsSource="{Binding Processes}">
+                      ItemsSource="{Binding Projects}">
 
             <ItemsControl.ItemTemplate>
 
                 <DataTemplate>
 
-                    <local:ProcessItemView DataContext="{Binding}"/>
+                    <Grid Margin="0,5">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="1"
+                                
+                                Cursor="Hand">
+
+                            <TextBlock Text="{Binding Project.ProjectPath}"
+                        
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                        </Border>
+
+                    </Grid>
+
+                    <!--<local:ProcessItemView DataContext="{Binding}"/>-->
 
                 </DataTemplate>
 
