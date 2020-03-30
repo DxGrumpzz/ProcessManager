@@ -1,7 +1,8 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Windows.Input;
 
 
@@ -17,6 +18,9 @@
 
 
         public Project Project { get; }
+
+        public IEnumerable<ProcessItemViewModel> ProcessList => Project.ProcessList
+            .Select(process => new ProcessItemViewModel(process));
 
         public ICommand GotoProjectViewCommnad { get; }
         public ICommand GotoMainPageCommnad { get; }

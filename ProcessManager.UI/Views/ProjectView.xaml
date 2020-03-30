@@ -11,7 +11,7 @@
              
              d:DataContext="{x:Static local:ProjectItemViewModel.DesignInstance}">
 
-    <StackPanel>
+    <StackPanel Margin="10">
 
         <Button Content="Back to main page"
                 
@@ -20,7 +20,24 @@
                 
                 Command="{Binding GotoMainPageCommnad}"/>
 
-        <TextBlock Text="{Binding Project.ProjectPath}"/>
+        <TextBlock Margin="0,10" 
+                   Text="{Binding Project.ProjectPath}"/>
+
+
+        <ItemsControl ItemsSource="{Binding ProcessList}">
+
+            <ItemsControl.ItemTemplate>
+
+                <DataTemplate>
+
+                    <local:ProcessItemView DataContext="{Binding}"/>
+
+                </DataTemplate>
+
+            </ItemsControl.ItemTemplate>
+
+        </ItemsControl>
 
     </StackPanel>
+
 </UserControl>
