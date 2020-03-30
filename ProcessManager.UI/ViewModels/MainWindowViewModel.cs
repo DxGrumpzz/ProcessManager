@@ -32,10 +32,17 @@ namespace ProcessManager.UI
         /// </summary>
         public IEnumerable<ProcessItemViewModel> Processes { get; private set; }
 
+        public IEnumerable<Project> Projects { get; set; }
+
 
         public ICommand RunProcessesCommnad { get; }
         public ICommand CloseProcessesCommnad { get; }
 
+
+        public MainWindowViewModel(IEnumerable<Project> projects)
+        {
+            Projects = projects;
+        }
 
         public MainWindowViewModel(IEnumerable<ProcessModel> processes)
         {
