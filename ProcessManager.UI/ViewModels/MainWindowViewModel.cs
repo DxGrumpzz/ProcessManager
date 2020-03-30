@@ -3,13 +3,14 @@ namespace ProcessManager.UI
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Windows.Controls;
     using System.Windows.Input;
 
 
     /// <summary>
     /// The ViewModel for MainWindow
     /// </summary>
-    public class MainWindowViewModel
+    public class MainWindowViewModel : BaseViewModel
     {
         public static MainWindowViewModel DesignInstance => new MainWindowViewModel(new ProcessModel[]
         {
@@ -47,6 +48,9 @@ namespace ProcessManager.UI
         });
 
 
+        private ContentControl _currentView = new MainView();
+
+
         /// <summary>
         /// The current list of processes as ProcessItemViewModel
         /// </summary>
@@ -55,8 +59,21 @@ namespace ProcessManager.UI
         public IEnumerable<ProjectItemViewModel> Projects { get; set; }
 
 
+        public ContentControl CurrentView 
+        {
+            get => _currentView;
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+
         public ICommand RunProcessesCommnad { get; }
         public ICommand CloseProcessesCommnad { get; }
+        public ICommand GotoProjectViewCommnad { get; }
 
 
         public MainWindowViewModel(IEnumerable<Project> projects)
@@ -65,6 +82,8 @@ namespace ProcessManager.UI
             {
                 return new ProjectItemViewModel(project);
             });
+
+            GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
         }
 
         public MainWindowViewModel(IEnumerable<ProcessModel> processes)
@@ -77,6 +96,13 @@ namespace ProcessManager.UI
 
             RunProcessesCommnad = new RelayCommand(ExecuteRunProcessesCommnad);
             CloseProcessesCommnad = new RelayCommand(ExecuteCloseProcessesCommnad);
+        }
+
+
+
+        private void ExecuteGotoProjectViewCommnad()
+        {
+            
         }
 
 

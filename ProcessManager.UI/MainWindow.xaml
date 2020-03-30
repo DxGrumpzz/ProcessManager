@@ -17,78 +17,9 @@
         d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance2}">
 
 
-    <Grid Margin="10">
+    <Grid>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="AUTO"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-
-        <StackPanel HorizontalAlignment="Left">
-
-            <!-- Run all processes button -->
-            <Button Content="Run processes" 
-                    
-                    Command="{Binding RunProcessesCommnad}"
-                    
-                    Margin="0,0,0,10"/>
-
-            <!-- Close all processes button -->
-            <Button Content="Close processes"
-                  
-                    Command="{Binding CloseProcessesCommnad}"/>
-
-        </StackPanel>
-
-
-        <!-- The list of processes that will be ran -->
-        <ItemsControl HorizontalAlignment="Right"
-                      
-                      Grid.Column="1"
-                      
-                      ItemsSource="{Binding Projects}">
-
-            <ItemsControl.ItemTemplate>
-
-                <DataTemplate>
-
-                    <Grid Margin="0,5">
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="1"
-                                
-                                Cursor="Hand">
-
-                            <TextBlock Text="{Binding Project.ProjectPath}"
-                        
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                    </Grid>
-
-                    <!--<local:ProcessItemView DataContext="{Binding}"/>-->
-
-                </DataTemplate>
-
-            </ItemsControl.ItemTemplate>
-
-            <ItemsControl.ItemsPanel>
-
-                <ItemsPanelTemplate>
-
-                    <StackPanel />
-
-                </ItemsPanelTemplate>
-
-            </ItemsControl.ItemsPanel>
-
-        </ItemsControl>
+        <ContentControl Content="{Binding CurrentView}"/>
 
     </Grid>
 
