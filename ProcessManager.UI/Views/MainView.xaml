@@ -9,8 +9,9 @@
              d:DesignHeight="450" 
              d:DesignWidth="800"
              
-              d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance2}">
+             d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance2}">
 
+    
     <Grid Margin="10">
 
         <Grid.ColumnDefinitions>
@@ -25,12 +26,12 @@
             <Button Content="Run processes" 
                     
                     Command="{Binding RunProcessesCommnad}"
-                    
+                    IsEnabled="False"
                     Margin="0,0,0,10"/>
 
             <!-- Close all processes button -->
             <Button Content="Close processes"
-                  
+                    IsEnabled="False"
                     Command="{Binding CloseProcessesCommnad}"/>
 
         </StackPanel>
@@ -40,49 +41,48 @@
         <ItemsControl HorizontalAlignment="Right"
                       
                       Grid.Column="1"
-                      
                       ItemsSource="{Binding Projects}">
 
             <ItemsControl.ItemTemplate>
 
                 <DataTemplate>
 
-                    <Grid Margin="0,5">
-
-                        <Grid.InputBindings>
-                            <MouseBinding MouseAction="LeftClick"
-                                          Command="{Binding GotoProjectViewCommnad}"/>
-                        </Grid.InputBindings>
-                        
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="1"
+                    <StackPanel Margin="0,5"
                                 
+                                Orientation="Horizontal"
                                 Cursor="Hand">
 
-                            <TextBlock Text="{Binding Project.ProjectPath}"
+                        <StackPanel.InputBindings>
+                       
+                            <MouseBinding MouseAction="LeftClick" 
+                                          Command="{Binding GotoProjectViewCommnad}"/>
                         
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"/>
-                        </Border>
+                        </StackPanel.InputBindings>
 
-                    </Grid>
+                        
+                        <StackPanel>
+                        
+                            <Button Content="Run project"
+                                    
+                                    Command="{Binding RunProjectCommand}"/>
+
+                            <Button Content="Close project"
+                                    
+                                    Command="{Binding CloseProjectCommand}"/>
+                        
+                        </StackPanel>
+
+                        
+                        <TextBlock Text="{Binding Project.ProjectPath}"
+                        
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+
+                    </StackPanel>
+
                 </DataTemplate>
 
             </ItemsControl.ItemTemplate>
-
-            <ItemsControl.ItemsPanel>
-
-                <ItemsPanelTemplate>
-
-                    <StackPanel />
-
-                </ItemsPanelTemplate>
-
-            </ItemsControl.ItemsPanel>
 
         </ItemsControl>
 
