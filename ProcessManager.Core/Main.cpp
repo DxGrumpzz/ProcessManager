@@ -47,6 +47,17 @@ DLL_CALL void CloseProcess(DWORD processID)
 };
 
 
+DLL_CALL void CloseProcessTree(DWORD processID)
+{
+    for (ProcessModel& process : ProcessManager::ProcessList)
+    {
+        if (process.ProcessInfo.dwProcessId == processID)
+        {
+            ProcessManager::CloseProcessTree(process);
+        };
+    };
+};
+
 
 DLL_CALL bool ShowProcess(DWORD processID)
 {

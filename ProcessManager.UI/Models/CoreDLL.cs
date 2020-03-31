@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Runtime.InteropServices;
@@ -56,6 +56,7 @@
         [DllImport(DLL, CharSet = CharSet.Unicode)]
         public static extern ulong RunConsoleProcess(string processName, string processArgs, Action processClosedCallback, bool visibleOnStartup);
 
-
+        [DllImport(DLL)]
+        public static extern void CloseProcessTree(ulong processID);
     };
 };

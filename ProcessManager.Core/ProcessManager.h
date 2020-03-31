@@ -4,6 +4,7 @@
 #include <msxml.h>
 #include <fstream>
 #include <algorithm>
+#include <tlhelp32.h>
 
 #include "ProcessModel.h"
 
@@ -303,8 +304,6 @@ public:
             if (!CleanupProcessHandles(process))
                 return FALSE;
 
-
-
         }
         // Don't do anything if the process is closed
         else
@@ -314,6 +313,40 @@ public:
 
         return TRUE;
     }
+
+    static void CloseProcessTree(ProcessModel& process)
+    {
+        PROCESSENTRY32W processEntry = { 0 };
+        processEntry.dwSize = sizeof(processEntry);
+
+        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+        if (Process32FirstW(hSnap, &processEntry))
+        {
+            BOOL bContinue = TRUE;
+
+            while (bContinue)
+            {
+                if (processEntry.th32ParentProcessID == process.GetPID())
+                {
+                    HANDLE hChildProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID);
+
+                    if (hChildProc)
+                    {
+                        BOOL termResult = TerminateProcess(hChildProc, 0);
+                        
+                        CloseHandle(hChildProc);
+                    };
+                };
+
+                bContinue = Process32NextW(hSnap, &processEntry);
+            };
+
+            CloseProcess(process);
+        };
+
+        CloseHandle(hSnap);
+    };
 
 
     // Returns a reference to a running process
