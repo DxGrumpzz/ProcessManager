@@ -92,6 +92,12 @@ DLL_CALL DWORD RunConsoleProcess(const wchar_t* processName, const wchar_t* proc
     return ProcessManager::RunConsoleProcess(processName, processArgs, processClosedCallback, visibleOnStartup);
 }
 
+
+DLL_CALL BOOL IsProcessRunning(DWORD processID)
+{
+    return ProcessManager::IsProcessRunning(processID);
+}
+
 /*
 #define RBG_UNIFORM(uniformColour) RGB(uniformColour, uniformColour, uniformColour)
 

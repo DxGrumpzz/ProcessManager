@@ -297,7 +297,7 @@ public:
 
             if (!CleanupProcessHandles(process))
                 return FALSE;
-                
+
         }
         // Don't do anything if the process is closed
         else
@@ -307,7 +307,7 @@ public:
 
         return TRUE;
     }
-    
+
 
     // Closes a single process along with it's children
     static void CloseProcessTree(ProcessModel& process)
@@ -362,6 +362,29 @@ public:
         };
 
         return nullptr;
+    };
+
+    // Checks if a process is currently running
+    static BOOL IsProcessRunning(DWORD processID)
+    {
+        // Find the process
+        ProcessModel* process = GetProcess(processID);
+
+        // If the process doesn't exist in the list
+        if (process == nullptr)
+            return FALSE;
+
+        // Get process exit code
+        DWORD exitCode;
+        GetExitCodeProcess(process->ProcessInfo.hProcess, &exitCode);
+
+        // If the process is running
+        if (exitCode == STILL_ACTIVE)
+        {
+            return TRUE;
+        }
+        else
+            return FALSE;
     };
 
 

@@ -46,7 +46,7 @@
         /// <summary>
         /// A boolean flag that determines if a process is running
         /// </summary>
-        public bool IsRunning => ProcessID != 0;
+        public bool IsRunning => CoreDLL.IsProcessRunning(ProcessID);
 
         /// <summary>
         /// User defined info about the process

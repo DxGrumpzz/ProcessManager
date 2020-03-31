@@ -72,5 +72,14 @@
         /// <param name="processID"></param>
         [DllImport(DLL)]
         public static extern void CloseProcessTree(ulong processID);
+
+        /// <summary>
+        /// Checks if a process is running
+        /// </summary>
+        /// <param name="processID"> The process ID </param>
+        /// <returns> Returns a boolean value indicating if the process is running </returns>
+        [DllImport(DLL)]
+        public static extern bool IsProcessRunning(ulong processID);
+
     };
 };
