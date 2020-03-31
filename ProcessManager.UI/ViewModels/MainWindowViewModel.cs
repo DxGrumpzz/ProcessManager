@@ -12,23 +12,8 @@ namespace ProcessManager.UI
     /// </summary>
     public class MainWindowViewModel : BaseViewModel
     {
-        public static MainWindowViewModel DesignInstance => new MainWindowViewModel(new ProcessModel[]
-        {
-            new ProcessModel()
-            {
-                ProcessPath = @"C:\Programs\App.exe",
-            },
-            new ProcessModel()
-            {
-                ProcessPath = @"D:\Software\Process.exe",
-            },
-            new ProcessModel()
-            {
-                ProcessPath = @"A:\asdf\fdas\Prog.bat",
-            },
-        });
-
-        public static MainWindowViewModel DesignInstance2 => new MainWindowViewModel(new Project[]
+        
+        public static MainWindowViewModel DesignInstance => new MainWindowViewModel(new Project[]
         {
            new Project()
            {
@@ -84,18 +69,6 @@ namespace ProcessManager.UI
             });
 
             GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
-        }
-
-        public MainWindowViewModel(IEnumerable<ProcessModel> processes)
-        {
-            // "Convert" the list of ProcessModels to ProcessItemViewModel
-            Processes = processes.Select(process =>
-            {
-                return new ProcessItemViewModel(process);
-            });
-
-            RunProcessesCommnad = new RelayCommand(ExecuteRunProcessesCommnad);
-            CloseProcessesCommnad = new RelayCommand(ExecuteCloseProcessesCommnad);
         }
 
 

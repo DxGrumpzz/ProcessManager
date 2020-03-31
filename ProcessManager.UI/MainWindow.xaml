@@ -14,7 +14,7 @@
         MinHeight="125"
         MinWidth="265"
         
-        d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance2}">
+        d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">
 
 
     <Grid>

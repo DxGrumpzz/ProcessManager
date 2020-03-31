@@ -12,9 +12,31 @@
     /// </summary>
     public class ProjectItemViewModel
     {
-        public static ProjectItemViewModel DesignInstance => new ProjectItemViewModel(new Project()
+        public static ProjectItemViewModel DesignInstance => 
+            new ProjectItemViewModel(new Project()
         {
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+            
+            ProcessList = new ProcessModel[]
+            { 
+                new ProcessModel()
+                {
+                    ProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.exe",
+                },
+
+                new ProcessModel()
+                {
+                    ProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat",
+                    ProcessID = 1,
+                },
+
+                new ProcessModel()
+                {
+                    ProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.exe",
+                    ProcessID = 1,
+                    ProcessVisibilityState = ProcessVisibilityState.Hidden
+                },
+            },
         });
 
 
@@ -36,6 +58,7 @@
 
             ProcessList = Project.ProcessList
             .Select(process => new ProcessItemViewModel(process)).ToArray();
+
 
             GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
