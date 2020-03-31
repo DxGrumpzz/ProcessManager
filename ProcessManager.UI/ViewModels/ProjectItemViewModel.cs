@@ -35,7 +35,7 @@
             Project = project;
 
             ProcessList = Project.ProcessList
-            .Select(process => new ProcessItemViewModel(process));
+            .Select(process => new ProcessItemViewModel(process)).ToArray();
 
             GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
