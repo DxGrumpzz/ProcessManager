@@ -78,6 +78,8 @@
             <!-- Show a process buttons -->
             <Button Content="Show"
                     
+                    Margin="10,0,0,0"
+                    
                     Command="{Binding ShowProcessCommand}">
 
                 <Button.Style>

@@ -38,10 +38,23 @@
             // Unironically using a local function instead of an event variable
             void eventHandler(object sender, EventArgs evnt)
             {
+                // Store the margin that will be added to the controls
+                var newMargin = (Thickness)e.NewValue;
+
                 // Apply a uniform margin for every control in panel
                 foreach (Control control in panel.Children)
                 {
-                    control.Margin = (Thickness)e.NewValue;
+                    // Get the control's current margin
+                    var currentContorlMargin = control.Margin;
+                    
+                    // Add the new margin to the current margin
+                    currentContorlMargin.Top += newMargin.Top;
+                    currentContorlMargin.Left += newMargin.Left;
+                    currentContorlMargin.Bottom += newMargin.Bottom;
+                    currentContorlMargin.Right += newMargin.Right;
+
+                    // Apply the new margin values
+                    control.Margin = currentContorlMargin;
                 };
 
                 // Unhook the event after finishing
