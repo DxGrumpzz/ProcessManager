@@ -141,7 +141,7 @@ namespace ProcessManager.UI
 
 
             RunProcessCommand = new RelayCommand(() => Process.RunProcess());
-            CloseProcessCommand = new RelayCommand(() => Process.CloseProcess());
+            CloseProcessCommand = new RelayCommand(() => Process.CloseProcessTree());
 
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcess());
             HideProcessCommand = new RelayCommand(() => Process.HideProcess());

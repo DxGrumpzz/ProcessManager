@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.IO;
@@ -79,12 +79,6 @@ namespace ProcessManager.UI
         public event Action<ProcessVisibilityState> ProcessVisibilityStateChanged;
 
 
-        public ProcessModel()
-        {
-            // Ensure process is closed
-            ProcessClosedEvent += () => CloseProcess();
-        }
-
 
         /// <summary>
         /// Run the current process
@@ -138,6 +132,21 @@ namespace ProcessManager.UI
             return true;
         }
 
+        public bool CloseProcessTree()
+        {
+            // Check to see if the process is already closed
+            if (IsRunning == false)
+                return false;
+
+            CoreDLL.CloseProcessTree(ProcessID);
+
+            // Set process PID back to 0
+            ProcessID = 0;
+
+            return true;
+        }
+
+        
 
         /// <summary>
         /// Shows a process to the user

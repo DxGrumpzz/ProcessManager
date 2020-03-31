@@ -93,7 +93,7 @@ namespace ProcessManager.UI
             // Close every process
             foreach (var processVM in Processes)
             {
-                processVM.Process.CloseProcess();
+                processVM.Process.CloseProcessTree();
             };
         }
     };

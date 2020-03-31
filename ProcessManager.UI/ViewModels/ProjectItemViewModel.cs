@@ -79,7 +79,7 @@
         {
             foreach (var process in Project.ProcessList)
             {
-                process.CloseProcess();
+                process.CloseProcessTree();
             };
         }
 
