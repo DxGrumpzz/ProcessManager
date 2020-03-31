@@ -40,7 +40,7 @@ public:
         // A boolean flag that indicates if the search has timed out
         bool TimedOut;
     };
-    
+
     // Returns a process' MainWindow handle
     static HWND GetProcessHWND(DWORD processID, int msTimeout = 3000)
     {
@@ -297,7 +297,7 @@ public:
 
             if (!CleanupProcessHandles(process))
                 return FALSE;
-
+                
         }
         // Don't do anything if the process is closed
         else
