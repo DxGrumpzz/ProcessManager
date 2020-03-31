@@ -95,12 +95,14 @@ namespace ProcessManager.UI
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
-            return;
             // Close the processes when app exists
-            DI.ProcessList.ForEach(process =>
+            foreach(var project in DI.Projects)
             {
-                process.CloseProcess();
-            });
+                foreach(var process in project.ProcessList)
+                {
+                    process.CloseProcessTree();
+                };
+            };
         }
 
 
