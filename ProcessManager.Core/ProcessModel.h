@@ -69,4 +69,12 @@ public:
         return ProcessInfo.dwProcessId;
     };
 
+
+public:
+
+    bool operator == (const ProcessModel& rhs) const
+    {
+        return this->GetPID() == rhs.GetPID();
+    }
+
 };

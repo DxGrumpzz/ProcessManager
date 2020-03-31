@@ -13,9 +13,6 @@
 class ProcessManager
 {
 
-private:
-
- 
 
 public:
 
@@ -153,12 +150,9 @@ public:
         else
         {
             ProcessManager::ProcessList.erase(
-                std::remove_if(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(),
-                [&](const ProcessModel& currentProcess)
-            {
-                return process->ProcessInfo.dwProcessId == currentProcess.ProcessInfo.dwProcessId;
-            }));
+                std::remove(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(), *process));
         };
+
     }
 
     // Runs a single process
