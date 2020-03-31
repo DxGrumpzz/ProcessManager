@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.IO;
@@ -56,7 +56,7 @@
         /// <summary>
         /// The visibility state of this process
         /// </summary>
-        public ProcessVisibilityState ProcessVisibleState { get; set; }
+        public ProcessVisibilityState ProcessVisibilityState { get; set; }
 
         public bool IsProcessConsole => _cmdExtensions.Contains(Path.GetExtension(ProcessPath));
 
@@ -150,10 +150,10 @@
             // If ShowWindow function was called succesfuly
             if (result == true)
             {
-                ProcessVisibleState = ProcessVisibilityState.Visible;
+                ProcessVisibilityState = ProcessVisibilityState.Visible;
              
                 // Invoke event
-                ProcessVisibilityStateChanged?.Invoke(ProcessVisibleState);
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState);
                 return true;
             }
             else
@@ -171,10 +171,10 @@
             // If ShowWindow function was called succesfuly
             if (result == true)
             {
-                ProcessVisibleState = ProcessVisibilityState.Hidden;
+                ProcessVisibilityState = ProcessVisibilityState.Hidden;
                
                 // Invoke event
-                ProcessVisibilityStateChanged?.Invoke(ProcessVisibleState);
+                ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState);
                 return true;
             }
             else

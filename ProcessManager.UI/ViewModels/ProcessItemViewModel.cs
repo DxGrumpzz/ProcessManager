@@ -111,11 +111,12 @@ namespace ProcessManager.UI
             Process = process;
 
             _processRunning = process.IsRunning;
-            _processVisible = process.ProcessVisibleState > 0 ? true : false;
+            _processVisible = process.ProcessVisibilityState > 0 ? true : false;
 
 
             // Bind the process closed event
             Process.ProcessClosedEvent += () => ProcessRunning = false;
+
             Process.ProcessInitializedEvent += () =>
             {
                 if (Process.VisibleOnStartup == false)
