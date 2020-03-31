@@ -52,10 +52,24 @@
         [DllImport(DLL)]
         public static extern bool ShowProcess(ulong processID);
 
-
+        /// <summary>
+        /// Runs a single process as a console.
+        /// </summary>
+        /// <param name="processName"></param>
+        /// <param name="processArgs"></param>
+        /// <param name="processClosedCallback"></param>
+        /// <param name="visibleOnStartup"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Special process initiation is used to create processes of type *.bat, *.cmd, etc 
+        /// </remarks>
         [DllImport(DLL, CharSet = CharSet.Unicode)]
         public static extern ulong RunConsoleProcess(string processName, string processArgs, Action processClosedCallback, bool visibleOnStartup);
 
+        /// <summary>
+        /// Closes a process and it's children
+        /// </summary>
+        /// <param name="processID"></param>
         [DllImport(DLL)]
         public static extern void CloseProcessTree(ulong processID);
     };

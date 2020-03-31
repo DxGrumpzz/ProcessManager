@@ -72,6 +72,7 @@ public:
 
 public:
 
+    // Compares process ID's 
     bool operator == (const ProcessModel& rhs) const
     {
         return this->GetPID() == rhs.GetPID();

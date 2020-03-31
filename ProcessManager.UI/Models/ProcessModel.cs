@@ -132,6 +132,10 @@
             return true;
         }
 
+        /// <summary>
+        /// Closes a process tree
+        /// </summary>
+        /// <returns></returns>
         public bool CloseProcessTree()
         {
             // Check to see if the process is already closed

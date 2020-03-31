@@ -307,35 +307,42 @@ public:
 
         return TRUE;
     }
+    
 
+    // Closes a single process along with it's children
     static void CloseProcessTree(ProcessModel& process)
     {
+        // Get a "snapshot" of every running process
+        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+        // a struct contains info a about a process running while the snapshot was taken
         PROCESSENTRY32W processEntry = { 0 };
         processEntry.dwSize = sizeof(processEntry);
 
-        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
+        // Get the first process
         if (Process32FirstW(hSnap, &processEntry))
         {
-            BOOL bContinue = TRUE;
-
-            while (bContinue)
+            // Iterate through every process in the snapshot
+            do
             {
+                // Check if current process matches the process to close
                 if (processEntry.th32ParentProcessID == process.GetPID())
                 {
+                    // Get a hanlde to the process
                     HANDLE hChildProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID);
 
+                    // If the handle is open
                     if (hChildProc)
                     {
+                        // Close the process
                         BOOL termResult = TerminateProcess(hChildProc, 0);
-                        
                         CloseHandle(hChildProc);
                     };
                 };
+            }
+            while (Process32NextW(hSnap, &processEntry));
 
-                bContinue = Process32NextW(hSnap, &processEntry);
-            };
-
+            // Close the actuall process
             CloseProcess(process);
         };
 

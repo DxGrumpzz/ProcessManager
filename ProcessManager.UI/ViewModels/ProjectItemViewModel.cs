@@ -39,9 +39,14 @@
             },
         });
 
-
+        /// <summary>
+        /// The project associated with this viewmodel
+        /// </summary>
         public Project Project { get; }
 
+        /// <summary>
+        /// The project's processes as a "list" of ProcessItemViewModel
+        /// </summary>
         public IEnumerable<ProcessItemViewModel> ProcessList { get; }
         
 
@@ -56,6 +61,7 @@
         {
             Project = project;
 
+            // Convert the list of processes inside the project to a list of ProcessItemViewModel
             ProcessList = Project.ProcessList
             .Select(process => new ProcessItemViewModel(process)).ToArray();
 

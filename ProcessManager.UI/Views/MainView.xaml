@@ -36,7 +36,7 @@
 
         </StackPanel>
 
-
+        
         <!-- The list of processes that will be ran -->
         <ItemsControl HorizontalAlignment="Right"
                       
@@ -49,8 +49,7 @@
 
                     <StackPanel Margin="0,5"
                                 
-                                Orientation="Horizontal"
-                                Cursor="Hand">
+                                Orientation="Horizontal">
 
                         <StackPanel.InputBindings>
                        
@@ -60,8 +59,9 @@
                         </StackPanel.InputBindings>
 
                         
+                        <!-- Run and close project buttons -->
                         <StackPanel>
-                        
+
                             <Button Content="Run project"
                                     
                                     Command="{Binding RunProjectCommand}"/>
@@ -72,9 +72,11 @@
                         
                         </StackPanel>
 
-                        
+                        <!-- A label containing the project's path -->
                         <TextBlock Text="{Binding Project.ProjectPath}"
                         
+                                   Cursor="Hand"
+                                   
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Center"/>
 
@@ -87,4 +89,5 @@
         </ItemsControl>
 
     </Grid>
+    
 </UserControl>
