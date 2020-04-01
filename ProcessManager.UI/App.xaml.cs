@@ -2,9 +2,12 @@ namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Text.Json;
     using System.Windows;
+    using System.Windows.Interop;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -15,10 +18,17 @@ namespace ProcessManager.UI
         private const string PROJECT_CONFIG_FILE_NAME = "ProcessManger.Config.Json";
         private const string PROCESS_MANAGER_PROJCES_FILE_NAME = "Projects.json";
 
+        [DllImport("ProcessManager.Core.Dll")]
+        private extern static IntPtr CreateSystemTrayIcon(IntPtr mainWindowHandle);
+        [DllImport("ProcessManager.Core.Dll")]
+        private extern static void RemoveSystemTrayIcon(IntPtr iconPointer);
+
+        IntPtr _iconPointer;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
 
             // Setup file process loader
 
@@ -30,8 +40,13 @@ namespace ProcessManager.UI
 
             DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
 
-            (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
-                .Show();
+            Current.MainWindow = new MainWindow(DI.MainWindowViewModel);
+            Current.MainWindow.Show();
+
+            _iconPointer = CreateSystemTrayIcon(new WindowInteropHelper(Current.MainWindow).Handle);
+
+            //Debugger.Break();
+            //RemoveSystemTrayIcon(iconPointer);
 
             //// Check if the processes file exists
             //if (File.Exists("ProcessList.json") == false)
@@ -95,8 +110,10 @@ namespace ProcessManager.UI
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+            RemoveSystemTrayIcon(_iconPointer);
+
             // Close the processes when app exists
-            foreach(var project in DI.Projects)
+            foreach (var project in DI.Projects)
             {
                 foreach(var process in project.ProcessList)
                 {

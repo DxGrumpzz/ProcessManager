@@ -1,7 +1,8 @@
 #include "ProcessManager.h"
 #include "ProcessModel.h"
+#include <commctrl.h>
 
-
+#pragma comment(lib, "comctl32.lib")
 
 #define DLL_CALL extern "C" __declspec(dllexport) 
 
@@ -94,4 +95,92 @@ DLL_CALL bool HideProcess(DWORD processID)
 DLL_CALL bool IsProcessRunning(DWORD processID)
 {
     return ProcessManager::IsProcessRunning(processID);
+}
+
+#define WM_ICON_CALLBACK 42069
+
+
+LRESULT Subclassproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+    switch (uMsg)
+    {
+        case WM_MOUSEMOVE:
+        {
+            int s = 0;
+            break;
+        };
+
+        case WM_ICON_CALLBACK:
+        {
+            int s = 0;
+        };
+
+        default:
+            break;
+    }
+
+    return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+};
+
+#include <shellapi.h>
+
+DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle)
+{
+    // Add a Subclass to the main window so we can handle NotifyIcon events
+    SetWindowSubclass(mainWindowHandle, Subclassproc, 42071, NULL);
+
+
+    NOTIFYICONDATAW* notifyIconData = new NOTIFYICONDATAW();
+    HANDLE icon = LoadImageW(NULL, L"C:\\Users\\yosi1\\Desktop\\New folder\\Icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+
+    if (!icon)
+    {
+        std::wstring errorString = GetErrorStringW(GetLastError());
+        DebugBreak();
+
+        return nullptr;
+    };
+
+
+    notifyIconData->cbSize = sizeof(notifyIconData);
+    notifyIconData->hWnd = mainWindowHandle;
+    notifyIconData->uID = 100;
+    notifyIconData->uCallbackMessage = WM_ICON_CALLBACK;
+    notifyIconData->uVersion = NOTIFYICON_VERSION_4;
+    notifyIconData->dwState = NIS_SHAREDICON;
+
+    wcscpy_s(notifyIconData->szTip, 128, L"ProcessManager.UI");
+    wcscpy_s(notifyIconData->szInfo, 200, L"ProcessManager.UI");
+    wcscpy_s(notifyIconData->szInfoTitle, 64, L"szInfoTitle");
+
+    notifyIconData->uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    notifyIconData->dwInfoFlags = NIIF_INFO;
+    notifyIconData->hIcon = (HICON)icon;
+
+    BOOL notifyIcon = Shell_NotifyIconW(NIM_ADD, notifyIconData);
+
+    if (notifyIcon == FALSE)
+    {
+        std::wstring errorString = GetErrorStringW(GetLastError());
+        DebugBreak();
+
+        return nullptr;
+    };
+    
+    return notifyIconData;
+};
+
+
+DLL_CALL void RemoveSystemTrayIcon(NOTIFYICONDATAW* icon)
+{
+    BOOL notifyIcon = Shell_NotifyIconW(NIM_DELETE, icon);
+
+
+    if (notifyIcon == FALSE)
+    {
+        std::wstring errorString = GetErrorStringW(GetLastError());
+        DebugBreak();
+    };
+
+    delete icon;
 }
