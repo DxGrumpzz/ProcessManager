@@ -8,8 +8,6 @@
     /// </summary>
     public interface IProjectLoader
     {
-        public bool ProjectsFileExists();
-
         void LoadProjectsDirectories();
 
         public void ValidateLoadedProjects();

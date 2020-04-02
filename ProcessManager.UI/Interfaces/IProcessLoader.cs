@@ -11,6 +11,6 @@
         /// Retrieves an <see cref="IEnumerable{T}"/> of ProcessModel from a file
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ProcessModel> GetProcessListFromFile();
+        public IEnumerable<ProcessModel> GetProcessListFromFile(string processListFile);
     };
 };
