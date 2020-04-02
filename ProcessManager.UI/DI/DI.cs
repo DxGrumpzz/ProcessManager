@@ -19,6 +19,8 @@
 
         public static IEnumerable<Project> Projects { get; set; }
 
+        public static IProjectLoader ProjectLoader { get; set; }
+
         public static MainWindowViewModel MainWindowViewModel { get; set; }
 
     };
