@@ -30,95 +30,26 @@ namespace ProcessManager.UI
             base.OnStartup(e);
 
 
-            // Setup file process loader
+            // Check if the processes file exists
+            if (File.Exists(PROJCES_FILE_NAME) == false)
+            {
+                MessageBox.Show($"Unable to find {PROJCES_FILE_NAME}");
 
-            IProjectLoader projectLoader = new ProjectLoader(
-                filename: PROJCES_FILE_NAME, 
-                projectConfigFilename: PROJECT_CONFIG_FILE_NAME);
+                // Exit application
+                Environment.Exit(1);
+                return;
+            };
 
+            // Setup DI stuff
+            SetupDI();
 
-            projectLoader.ProjectsFileExists();
-
-            projectLoader.LoadProjectsDirectories();
-
-            projectLoader.ValidateLoadedProjects();
-
-            projectLoader.LoadProjectProcesses();
-            
-            DI.Projects = projectLoader.GetProjectsList();
-
-
-            LoadProjectProcesses(DI.Projects);
 
             DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
-
-
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
             _iconPointer = CreateSystemTrayIcon(new WindowInteropHelper(Current.MainWindow).Handle);
-
-            // Debugger.Break();
-            //RemoveSystemTrayIcon(iconPointer);
-
-            //// Check if the processes file exists
-            //if (File.Exists("ProcessList.json") == false)
-            //{
-            //    MessageBox.Show("Unable to find ProcessList.json");
-
-            //    // Exit application if it isn't
-            //    Environment.Exit(1);
-            //    return;
-            //};
-
-            //// Setup DI stuff
-            //SetupDI();
-
-
-            //// Create the main window
-            //(Current.MainWindow = new MainWindow(
-            //    new MainWindowViewModel(DI.ProcessList)))
-            //    .Show();
         }
-
-
-        private IEnumerable<Project> LoadProjectsDirectories(string filename)
-        {
-            return JsonSerializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(filename));
-        }
-
-        private void ValidateLoadedProjects(IEnumerable<Project> loadedProjects)
-        {
-            foreach (var project in loadedProjects)
-            {
-                if (Directory.Exists(project.ProjectPath) == false)
-                {
-                    throw new Exception($"{project.ProjectPath} is not a valid directory or it doesn't exist");
-                };
-
-                if (File.Exists(Path.Combine(project.ProjectPath, PROJECT_CONFIG_FILE_NAME)) == false)
-                {
-                    throw new Exception($"{project.ProjectPath} doesn't contain a \"ProcessManger.Config.Json\" file");
-                };
-
-            };
-        }
-
-        private void LoadProjectProcesses(IEnumerable<Project> projects)
-        {
-            foreach (var project in projects)
-            {
-                try
-                {
-                    project.ProcessList = JsonSerializer.Deserialize<IEnumerable<ProcessModel>>(File.ReadAllBytes(project.ProjectPathWithConfig));
-                }
-                catch (JsonException jsonException)
-                {
-                    throw new Exception($"Failed to read {project.ProjectPathWithConfig}, File doesn't contain valid json data");
-                };
-            };
-        }
-
 
         protected override void OnExit(ExitEventArgs e)
         {
@@ -138,22 +69,23 @@ namespace ProcessManager.UI
 
         private static void SetupDI()
         {
-            // Setup file process loader
-            DI.ProcessLoader = new JsonProcessLoader("ProcessList.json");
+            // Create a process loader
+            DI.ProcessLoader = new JsonProcessLoader();
 
-            // Check if process list file is valid
-            var processList = DI.ProcessLoader.GetProcessListFromFile();
-            if (processList == null)
-            {
-                MessageBox.Show("ProcessList.json contains invalid data", "Error");
+            // Setup project loader
+            DI.ProjectLoader = new ProjectLoader(
+                processLoader: DI.ProcessLoader,
+                filename: PROJCES_FILE_NAME,
+                projectConfigFilename: PROJECT_CONFIG_FILE_NAME);
 
-                // Exit application if it isn't
-                Environment.Exit(1);
-                return;
-            };
+            // Load the projects
+            DI.ProjectLoader.LoadProjectsDirectories();
+            DI.ProjectLoader.ValidateLoadedProjects();
+            DI.ProjectLoader.LoadProjectProcesses();
+            
 
-            // Setup process list
-            DI.ProcessList = new List<ProcessModel>(processList);
+            // Load the projects list into DI
+            DI.Projects = DI.ProjectLoader.GetProjectsList();
         }
 
     };
