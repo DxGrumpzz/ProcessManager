@@ -16,7 +16,7 @@ namespace ProcessManager.UI
     {
 
         private const string PROJECT_CONFIG_FILE_NAME = "ProcessManger.Config.Json";
-        private const string PROCESS_MANAGER_PROJCES_FILE_NAME = "Projects.json";
+         private const string PROJCES_FILE_NAME = "Projects.json";
 
         [DllImport("ProcessManager.Core.Dll")]
         private extern static IntPtr CreateSystemTrayIcon(IntPtr mainWindowHandle);
@@ -32,20 +32,33 @@ namespace ProcessManager.UI
 
             // Setup file process loader
 
-            DI.Projects = LoadProjectsDirectories(PROCESS_MANAGER_PROJCES_FILE_NAME);
+            IProjectLoader projectLoader = new ProjectLoader(
+                filename: PROJCES_FILE_NAME, 
+                projectConfigFilename: PROJECT_CONFIG_FILE_NAME);
 
-            ValidateLoadedProjects(DI.Projects);
+
+            projectLoader.ProjectsFileExists();
+
+            projectLoader.LoadProjectsDirectories();
+
+            projectLoader.ValidateLoadedProjects();
+
+            projectLoader.LoadProjectProcesses();
+            
+            DI.Projects = projectLoader.GetProjectsList();
+
 
             LoadProjectProcesses(DI.Projects);
 
             DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
 
-            Current.MainWindow = new MainWindow(DI.MainWindowViewModel);
-            Current.MainWindow.Show();
+
+            (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
+            .Show();
 
             _iconPointer = CreateSystemTrayIcon(new WindowInteropHelper(Current.MainWindow).Handle);
 
-            //Debugger.Break();
+            // Debugger.Break();
             //RemoveSystemTrayIcon(iconPointer);
 
             //// Check if the processes file exists
