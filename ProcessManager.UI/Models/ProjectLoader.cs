@@ -11,13 +11,16 @@
     /// </summary>
     public class ProjectLoader : IProjectLoader
     {
+        private readonly IProcessLoader _processLoader;
+
         private readonly string _filename;
         private readonly string _projectConfigFilename;
 
         private IEnumerable<Project> _projects;
 
-        public ProjectLoader(string filename, string projectConfigFilename)
+        public ProjectLoader(IProcessLoader processLoader, string filename, string projectConfigFilename)
         {
+            _processLoader = processLoader;
             _filename = filename;
             _projectConfigFilename = projectConfigFilename;
         }
@@ -72,14 +75,7 @@
         {
             foreach (var project in _projects)
             {
-                try
-                {
-                    project.ProcessList = JsonSerializer.Deserialize<IEnumerable<ProcessModel>>(File.ReadAllBytes(project.ProjectPathWithConfig));
-                }
-                catch (JsonException jsonException)
-                {
-                    throw new Exception($"Failed to read {project.ProjectPathWithConfig}, File doesn't contain valid json data");
-                };
+                project.ProcessList = _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig);
             };
         }
 
