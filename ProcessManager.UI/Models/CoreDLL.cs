@@ -81,5 +81,17 @@
         [DllImport(DLL)]
         public static extern bool IsProcessRunning(ulong processID);
 
+
+
+        [DllImport(DLL, CharSet = CharSet.Unicode)]
+        public extern static IntPtr CreateSystemTrayIcon(IntPtr mainWindowHandle, string iconPath, SystemTrayIconData[] systemTrayIconData, int numberOfProjects);
+
+        [DllImport(DLL)]
+        public extern static void RemoveSystemTrayIcon(IntPtr iconPointer);
+
+        [DllImport(DLL)]
+        public extern static void ShowSystemTrayIcon(IntPtr icon);
+
+
     };
 };

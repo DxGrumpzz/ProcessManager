@@ -55,7 +55,7 @@ std::string GetLastErrorAsStringA()
 
 struct SystemTrayIconData
 {
-    const wchar_t* ProjectName;
+    wchar_t* ProjectName;
     void* Data;
     void (*Callback)(void* data);
 };
@@ -88,7 +88,7 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
                     POINT cursorPoint;
                     GetCursorPos(&cursorPoint);
 
-                    std::vector<const wchar_t*>& systemTrayIconData = *reinterpret_cast<std::vector<const wchar_t*>*>(dwRefData);
+                    std::vector<SystemTrayIconData*>& systemTrayIconData = *reinterpret_cast<std::vector<SystemTrayIconData*>*>(dwRefData);
 
 
                     HMENU menu = CreatePopupMenu();
@@ -96,9 +96,9 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
                     SetForegroundWindow(hwnd);
 
                     int index = 0;
-                    for (const wchar_t* project : systemTrayIconData)
+                    for (SystemTrayIconData* project : systemTrayIconData)
                     {
-                        int stringLength = wcslen(project) + 1;
+                        int stringLength = wcslen(project->ProjectName) + 1;
 
                         MENUITEMINFOW menuItem;
                         menuItem.cbSize = sizeof(menuItem);
@@ -106,7 +106,7 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
                         menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
                         menuItem.fType = MFT_STRING;
                         menuItem.wID = MENUITEMID + index;
-                        menuItem.dwTypeData = const_cast<wchar_t*>(project);
+                        menuItem.dwTypeData = const_cast<wchar_t*>(project->ProjectName);
                         menuItem.cch = stringLength;
                         menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
 
@@ -136,7 +136,9 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
                         GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
                         
-                        const wchar_t* project = reinterpret_cast<const wchar_t*>(menuItem.dwItemData);
+                        SystemTrayIconData* project = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
+                        
+                        project->Callback(project->Data);
                     };
 
                     break;
@@ -155,18 +157,24 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
 
 
-DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wchar_t* iconPath, const wchar_t** systemTrayIconData, int numberOfProjects)
+DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wchar_t* iconPath, SystemTrayIconData* systemTrayIconData, int numberOfProjects)
 {
-    std::vector<wchar_t*>* heapData = new std::vector<wchar_t*>();
-    heapData->reserve(numberOfProjects);
+    std::vector<SystemTrayIconData*>* heapData = new std::vector<SystemTrayIconData*>();
+    heapData->resize(numberOfProjects, new SystemTrayIconData());
 
     for (size_t a = 0; a < numberOfProjects; a++)
     {
-        size_t length = wcslen(systemTrayIconData[a]) + 1;
+        SystemTrayIconData* current = heapData->at(a);
 
-        heapData->emplace_back(new wchar_t[length]);
+        size_t projectNameLength = wcslen(systemTrayIconData[a].ProjectName) + 1;
 
-        wcscpy_s((*heapData)[a], length, systemTrayIconData[a]);
+        current->Callback = systemTrayIconData[a].Callback;
+        current->Data = systemTrayIconData[a].Data;
+        current->ProjectName = new wchar_t[projectNameLength];
+
+        wcscpy_s(current->ProjectName, projectNameLength,systemTrayIconData[a].ProjectName);
+
+        //memcpy_s(&heapData->at(a), sizeof(heapData->at(a)), &systemTrayIconData[a], sizeof(systemTrayIconData[a]));
     };
 
     // Add a Subclass to the main window so we can handle NotifyIcon events
