@@ -57,11 +57,19 @@ struct SystemTrayIconData
 {
     wchar_t* ProjectName;
     void* Data;
-    void (*Callback)(void* data);
+
+    void (*CloseProjectCallBack)(void* data);
+    void (*RunProjectCallBack)(void* data);
 };
 
+
 #define MENUID  7186
+
 #define MENUITEMID  120
+
+#define MENUITEM_RUN_PROJECT   MENUITEMID + 1
+#define MENUITEM_CLOSE_PROJECT MENUITEMID 
+
 
 LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
@@ -100,15 +108,63 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
                     {
                         int stringLength = wcslen(project->ProjectName) + 1;
 
+                        HMENU innerMenu = CreatePopupMenu();
+
+                        // Close project menu item
+                        {
+                            wchar_t closeProjectText[] = L"Close project";
+                            size_t closeProjectTextLength = wcslen(closeProjectText) + 1;
+
+                            MENUITEMINFOW menuItem;
+                            menuItem.cbSize = sizeof(menuItem);
+
+                            menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+                            menuItem.fType = MFT_STRING;
+
+                            menuItem.wID = MENUITEM_CLOSE_PROJECT;
+
+                            menuItem.dwTypeData = closeProjectText;
+                            menuItem.cch = closeProjectTextLength;
+
+                            menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+
+                            WINCALL(InsertMenuItemW(innerMenu, menuItem.wID, MENUITEMID, &menuItem));
+                        };
+
+
+                        // Run project menu item
+                        {
+                            wchar_t runProjectText[] = L"Run project";
+                            size_t runProjectTextLength = wcslen(runProjectText) + 1;
+
+                            MENUITEMINFOW menuItem;
+                            menuItem.cbSize = sizeof(menuItem);
+
+                            menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+                            menuItem.fType = MFT_STRING;
+
+                            menuItem.wID = MENUITEM_RUN_PROJECT;
+
+                            menuItem.dwTypeData = runProjectText;
+                            menuItem.cch = runProjectTextLength;
+
+                            menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+
+
+                            WINCALL(InsertMenuItemW(innerMenu, menuItem.wID, MENUITEMID, &menuItem));
+                        };
+
+
                         MENUITEMINFOW menuItem;
                         menuItem.cbSize = sizeof(menuItem);
 
-                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA | MIIM_SUBMENU;
                         menuItem.fType = MFT_STRING;
                         menuItem.wID = MENUITEMID + index;
                         menuItem.dwTypeData = const_cast<wchar_t*>(project->ProjectName);
                         menuItem.cch = stringLength;
                         menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+                        menuItem.hSubMenu = innerMenu;
 
                         WINCALL(InsertMenuItemW(menu, menuItem.wID, MENUITEMID, &menuItem));
 
@@ -127,18 +183,30 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
 
                     BOOL menuItemIndex = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x - 5, cursorPoint.y + 5, NULL, hwnd, NULL);
-                 
+
                     if (menuItemIndex != NULL)
                     {
                         MENUITEMINFOW menuItem = { 0 };
                         menuItem.cbSize = sizeof(menuItem);
-                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+                        menuItem.fMask = MIIM_ID | MIIM_DATA;
 
-                        GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
-                        
-                        SystemTrayIconData* project = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
-                        
-                        project->Callback(project->Data);
+
+                        if (menuItemIndex == MENUITEM_RUN_PROJECT)
+                        {
+                            GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
+
+                            SystemTrayIconData* project = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
+
+                            project->RunProjectCallBack(project->Data);
+                        }
+                        else if (menuItemIndex == MENUITEM_CLOSE_PROJECT)
+                        {
+                            GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
+
+                            SystemTrayIconData* project = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
+
+                            project->CloseProjectCallBack(project->Data);
+                        };
                     };
 
                     break;
@@ -162,19 +230,20 @@ DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wcha
     std::vector<SystemTrayIconData*>* heapData = new std::vector<SystemTrayIconData*>();
     heapData->resize(numberOfProjects, new SystemTrayIconData());
 
+    // Copy the systemTrayIconData data to the Heap so it won't be lost when we call SubclassprocS
     for (size_t a = 0; a < numberOfProjects; a++)
     {
         SystemTrayIconData* current = heapData->at(a);
 
         size_t projectNameLength = wcslen(systemTrayIconData[a].ProjectName) + 1;
 
-        current->Callback = systemTrayIconData[a].Callback;
+        current->CloseProjectCallBack = systemTrayIconData[a].CloseProjectCallBack;
+        current->RunProjectCallBack = systemTrayIconData[a].RunProjectCallBack;
+
         current->Data = systemTrayIconData[a].Data;
         current->ProjectName = new wchar_t[projectNameLength];
 
-        wcscpy_s(current->ProjectName, projectNameLength,systemTrayIconData[a].ProjectName);
-
-        //memcpy_s(&heapData->at(a), sizeof(heapData->at(a)), &systemTrayIconData[a], sizeof(systemTrayIconData[a]));
+        wcscpy_s(current->ProjectName, projectNameLength, systemTrayIconData[a].ProjectName);
     };
 
     // Add a Subclass to the main window so we can handle NotifyIcon events

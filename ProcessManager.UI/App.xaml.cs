@@ -18,7 +18,8 @@ namespace ProcessManager.UI
 
         public IntPtr Data { get; set; }
 
-        public CallbackFunc CallBack { get; set; }
+        public CallbackFunc CloseProjectCallBack { get; set; }
+        public CallbackFunc RunProjectCallBack { get; set; }
     };
 
 
@@ -96,15 +97,34 @@ namespace ProcessManager.UI
                     {
                         ProjectName = new DirectoryInfo(project.ProjectPath).Name,
 
-                        CallBack = (data) =>
+                        CloseProjectCallBack = (data) =>
                         {
-                            if(!(GCHandle.FromIntPtr(data).Target is Project project))
+                            if (!(GCHandle.FromIntPtr(data).Target is Project project))
                             {
                                 Debugger.Break();
                                 return;
                             };
 
-                            Debugger.Break();
+
+                            foreach (var process in project.ProcessList)
+                            {
+                                process.CloseProcessTree();
+                            };
+                        },
+
+                        RunProjectCallBack = (data) =>
+                        {
+                            if (!(GCHandle.FromIntPtr(data).Target is Project project))
+                            {
+                                Debugger.Break();
+                                return;
+                            };
+
+
+                            foreach (var process in project.ProcessList)
+                            {
+                                process.RunProcess();
+                            };
                         },
 
                         Data = GCHandle.ToIntPtr(dataHandle),
