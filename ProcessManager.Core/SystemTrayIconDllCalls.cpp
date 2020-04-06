@@ -50,9 +50,7 @@ std::string GetLastErrorAsStringA()
     return message;
 }
 
-
 #define WINCALL(wincall) if(!wincall) { auto error = GetLastErrorAsStringA(); MessageBoxA(NULL, error.c_str(), "Error", NULL); throw std::exception(error.c_str()); }
-
 
 
 struct SystemTrayIconData
@@ -61,6 +59,9 @@ struct SystemTrayIconData
     void* Data;
     void (*Callback)(void* data);
 };
+
+#define MENUID  7186
+#define MENUITEMID  120
 
 LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
@@ -72,9 +73,18 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
             int menuItemIndex = (int)wParam;
 
             MENUITEMINFOW menuItem = { 0 };
-            menuItem.cbSize = sizeof(menuItem);
+            menuItem.cbSize = sizeof(MENUITEMINFOW);
 
-            GetMenuItemInfoW(menu, menuItemIndex, TRUE, &menuItem);
+            DWORD menuID = GetMenuContextHelpId(menu);
+
+
+            if (menuID == MENUID)
+            {
+                UINT menuItemID = GetMenuItemID(menu, menuItemIndex);
+
+                WINCALL(GetMenuItemInfoW(menu, menuItemID, FALSE, &menuItem));
+                WINCALL(GetMenuItemInfoW(menu, menuItemID, TRUE, &menuItem));
+            };
 
             return DefSubclassProc(hwnd, uMsg, wParam, lParam);
         };
@@ -105,53 +115,51 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
                     HMENU menu = CreatePopupMenu();
 
-                    int index = 2;
+                    SetForegroundWindow(hwnd);
+
+                    int index = 0;
                     for (const wchar_t* project : systemTrayIconData)
                     {
                         int stringLength = wcslen(project) + 1;
 
-                        MENUITEMINFOW menuItem = { 0 };
-                        menuItem.cbSize = sizeof(MENUITEMINFO);
-                        wchar_t s[] = L"asdf";
+                        MENUITEMINFOW menuItem;
+                        menuItem.cbSize = sizeof(menuItem);
 
-                       /* 
-                        menuItem.fMask = MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_TYPE;
+                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
                         menuItem.fType = MFT_STRING;
-                        menuItem.wID = index + 1;
-                        menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+                        menuItem.wID = MENUITEMID + index;
                         menuItem.dwTypeData = const_cast<wchar_t*>(project);
-                        menuItem.cch = stringLength;*/
-                        menuItem.fMask = MIIM_STRING | MIIM_ID;
-                        menuItem.fType = MFT_STRING;
-                        menuItem.wID = 0;
-                        menuItem.dwTypeData = s;
-                        menuItem.cch = 5;
+                        menuItem.cch = stringLength;
+                        menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
 
-
-                        WINCALL(InsertMenuItemW(menu, 0, TRUE, &menuItem));
+                        WINCALL(InsertMenuItemW(menu, menuItem.wID, MENUITEMID, &menuItem));
 
                         index++;
                     };
 
-                    //int index = 0;
-                    //for (const wchar_t* project : systemTrayIconData)
-                    //{
-                    //    InsertMenuW(menu, index, MF_BYPOSITION, index + 1, project);
-                    //    index++;
-                    //};
-
 
                     MENUINFO menuInfo = { 0 };
                     menuInfo.cbSize = sizeof(menuInfo);
-                    menuInfo.fMask = MIM_MAXHEIGHT | MIM_BACKGROUND | MIM_HELPID | MIM_MENUDATA | MIM_STYLE | MIM_APPLYTOSUBMENUS;
-                    menuInfo.dwStyle = MNS_NOTIFYBYPOS;
+                    menuInfo.fMask = MIM_HELPID | MIM_MENUDATA | MIM_STYLE;
+                    //menuInfo.dwStyle = MNS_NOTIFYBYPOS;
+                    menuInfo.dwContextHelpID = MENUID;
+                    menuInfo.dwMenuData = reinterpret_cast<ULONG_PTR>(&systemTrayIconData);
+
+                    SetMenuInfo(menu, &menuInfo);
 
 
-                    //SetMenuInfo(menu, &menuInfo);
 
-                    SetForegroundWindow(hwnd);
+                    BOOL menuItemIndex = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x - 5, cursorPoint.y + 5, NULL, hwnd, NULL);
+                 
+                    if (menuItemIndex != NULL)
+                    {
+                        MENUITEMINFOW menuItem = { 0 };
+                        menuItem.cbSize = sizeof(menuItem);
+                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
 
-                    WINCALL(TrackPopupMenu(menu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x - 5, cursorPoint.y + 5, NULL, hwnd, NULL));
+                        GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
+                        
+                    };
 
                     break;
                 };
