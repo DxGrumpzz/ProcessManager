@@ -67,28 +67,6 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 {
     switch (uMsg)
     {
-        case WM_MENUCOMMAND:
-        {
-            HMENU menu = (HMENU)lParam;
-            int menuItemIndex = (int)wParam;
-
-            MENUITEMINFOW menuItem = { 0 };
-            menuItem.cbSize = sizeof(MENUITEMINFOW);
-
-            DWORD menuID = GetMenuContextHelpId(menu);
-
-
-            if (menuID == MENUID)
-            {
-                UINT menuItemID = GetMenuItemID(menu, menuItemIndex);
-
-                WINCALL(GetMenuItemInfoW(menu, menuItemID, FALSE, &menuItem));
-                WINCALL(GetMenuItemInfoW(menu, menuItemID, TRUE, &menuItem));
-            };
-
-            return DefSubclassProc(hwnd, uMsg, wParam, lParam);
-        };
-
         case WM_ICON_CALLBACK:
         {
             WORD loWord = LOWORD(lParam);
@@ -141,7 +119,6 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
                     MENUINFO menuInfo = { 0 };
                     menuInfo.cbSize = sizeof(menuInfo);
                     menuInfo.fMask = MIM_HELPID | MIM_MENUDATA | MIM_STYLE;
-                    //menuInfo.dwStyle = MNS_NOTIFYBYPOS;
                     menuInfo.dwContextHelpID = MENUID;
                     menuInfo.dwMenuData = reinterpret_cast<ULONG_PTR>(&systemTrayIconData);
 
@@ -159,6 +136,7 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
                         GetMenuItemInfoW(menu, menuItemIndex, FALSE, &menuItem);
                         
+                        const wchar_t* project = reinterpret_cast<const wchar_t*>(menuItem.dwItemData);
                     };
 
                     break;
@@ -193,6 +171,7 @@ DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wcha
 
     // Add a Subclass to the main window so we can handle NotifyIcon events
     SetWindowSubclass(mainWindowHandle, Subclassproc, 42071, reinterpret_cast<DWORD_PTR>(heapData));
+
 
     NOTIFYICONDATAW* notifyIconData = new NOTIFYICONDATAW();
     HANDLE icon = LoadImageW(GetModuleHandle(NULL), iconPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
