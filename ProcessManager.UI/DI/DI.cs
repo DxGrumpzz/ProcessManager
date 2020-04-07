@@ -23,5 +23,7 @@
 
         public static MainWindowViewModel MainWindowViewModel { get; set; }
 
+        public static SystemTrayIcon SystemTrayIcon { get; set; }
+
     };
 };

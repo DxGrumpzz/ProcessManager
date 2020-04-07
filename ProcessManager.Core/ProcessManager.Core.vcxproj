@@ -167,10 +167,14 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ProcessManager.cpp" />
+    <ClCompile Include="SystemTrayIconDllCalls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProcessManager.h" />
     <ClInclude Include="ProcessModel.h" />
+    <ClInclude Include="SystemTrayIconData.h" />
+    <ClInclude Include="TrayIconMenuHelpers.h" />
+    <ClInclude Include="WindowsHelpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

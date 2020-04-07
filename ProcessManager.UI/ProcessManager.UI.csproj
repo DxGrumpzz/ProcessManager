@@ -17,13 +17,14 @@
 
   <ItemGroup>
     <None Remove="Processes.txt" />
+    <None Remove="ProcessList.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ProcessList.json">
+    <None Update="Projects.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Projects.json">
+    <None Update="Resources\Icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -8,8 +8,8 @@ namespace ProcessManager.UI
     using System.Windows;
     using System.Windows.Interop;
 
-    public delegate void CallbackFunc(IntPtr Data);
 
+    public delegate void CallbackFunc(IntPtr Data);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct SystemTrayIconData
@@ -18,47 +18,29 @@ namespace ProcessManager.UI
 
         public IntPtr Data { get; set; }
 
-        public CallbackFunc CloseProjectCallBack { get; set; }
-        public CallbackFunc RunProjectCallBack { get; set; }
-    };
+        public event CallbackFunc CloseProjectCallBack;
+        public event CallbackFunc RunProjectCallBack;
 
-
-    public class SystemTrayIcon
-    {
-        private readonly string _icon;
-        private readonly IntPtr _mainWindowHandle;
-        private IntPtr _iconPointer;
-
-        public SystemTrayIcon(string icon, IntPtr mainWindowHandle)
+        public SystemTrayIconData(Project p)
         {
-            _icon = icon;
-            _mainWindowHandle = mainWindowHandle;
-        }
+            Data = GCHandle.ToIntPtr(GCHandle.Alloc(p));
 
-        public void CreateIcon(SystemTrayIconData[] systemTrayIconData)
-        {
-            _iconPointer = CoreDLL.CreateSystemTrayIcon(_mainWindowHandle, _icon, systemTrayIconData, systemTrayIconData.Length);
-        }
+            ProjectName = p.ProjectName;
 
-        public void ShowIcon()
-        {
-            CoreDLL.ShowSystemTrayIcon(_iconPointer);
-        }
-
-        public void RemoveIcon()
-        {
-            CoreDLL.RemoveSystemTrayIcon(_iconPointer);
+            CloseProjectCallBack = null;
+            RunProjectCallBack = null;
         }
     };
+
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-
         private const string PROJECT_CONFIG_FILE_NAME = "ProcessManger.Config.Json";
         private const string PROJCES_FILE_NAME = "Projects.json";
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -78,63 +60,12 @@ namespace ProcessManager.UI
             // Setup DI stuff
             SetupDI();
 
-            DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
+
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
 
-            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
-            // Create the SystemTrayIcon class
-            DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon.ico", new WindowInteropHelper(Current.MainWindow).Handle);
-
-
-            DI.SystemTrayIcon.CreateIcon(DI.Projects
-                .Select(project =>
-                {
-                    GCHandle dataHandle = GCHandle.Alloc(project);
-
-                    var s = new SystemTrayIconData()
-                    {
-                        ProjectName = new DirectoryInfo(project.ProjectPath).Name,
-
-                        CloseProjectCallBack = (data) =>
-                        {
-                            if (!(GCHandle.FromIntPtr(data).Target is Project project))
-                            {
-                                Debugger.Break();
-                                return;
-                            };
-
-
-                            foreach (var process in project.ProcessList)
-                            {
-                                process.CloseProcessTree();
-                            };
-                        },
-
-                        RunProjectCallBack = (data) =>
-                        {
-                            if (!(GCHandle.FromIntPtr(data).Target is Project project))
-                            {
-                                Debugger.Break();
-                                return;
-                            };
-
-
-                            foreach (var process in project.ProcessList)
-                            {
-                                process.RunProcess();
-                            };
-                        },
-
-                        Data = GCHandle.ToIntPtr(dataHandle),
-                    };
-
-                    return s;
-
-                }).ToArray());
-
-            DI.SystemTrayIcon.ShowIcon();
+            SetupTrayIcon();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -146,10 +77,7 @@ namespace ProcessManager.UI
             // Close the processes when app exists
             foreach (var project in DI.Projects)
             {
-                foreach (var process in project.ProcessList)
-                {
-                    process.CloseProcessTree();
-                };
+                project.CloseProjectTree();
             };
         }
 
@@ -160,20 +88,73 @@ namespace ProcessManager.UI
             DI.ProcessLoader = new JsonProcessLoader();
 
             // Setup project loader
-            DI.ProjectLoader = new ProjectLoader(
+            var projectLoader = DI.ProjectLoader = new ProjectLoader(
                 processLoader: DI.ProcessLoader,
                 filename: PROJCES_FILE_NAME,
                 projectConfigFilename: PROJECT_CONFIG_FILE_NAME);
 
             // Load the projects
-            DI.ProjectLoader.LoadProjectsDirectories();
-            DI.ProjectLoader.ValidateLoadedProjects();
-            DI.ProjectLoader.LoadProjectProcesses();
+            projectLoader.LoadProjectsDirectories();
+            projectLoader.ValidateLoadedProjects();
+            projectLoader.LoadProjectProcesses();
 
 
             // Load the projects list into DI
-            DI.Projects = DI.ProjectLoader.GetProjectsList();
+            DI.Projects = projectLoader.GetProjectsList();
 
+            DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
+        }
+
+        private void SetupTrayIcon()
+        {
+
+            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
+            // Create the SystemTrayIcon class
+            DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon.ico", new WindowInteropHelper(Current.MainWindow).Handle);
+
+            // Initialize the tray icon and give it the neccessary project data
+            DI.SystemTrayIcon.CreateIcon(DI.Projects
+            .Select(project =>
+            {
+                    // The data which will be passed to the tray icon
+                    var trayIconData = new SystemTrayIconData(project);
+
+                    // A local function that will take a handle and "convert" it to a usable object
+                    static T HandleToObj<T>(IntPtr handle)
+                {
+                        // Take the handle and convert it to a *safe handle
+                        if (GCHandle.FromIntPtr(handle).Target is T obj)
+                        return obj;
+                    else
+                    {
+                        Debugger.Break();
+                        throw new Exception("Critical error occured. Unable to read returned TrayIcon data");
+                    };
+                };
+
+                    // A callback that will be called when the user decided to close the project
+                    trayIconData.CloseProjectCallBack += (data) =>
+                    {
+                        Project project = HandleToObj<Project>(data);
+                        project.CloseProjectTree();
+                    };
+
+                    // A callback that will be called when the user decided to run the project
+                    trayIconData.RunProjectCallBack += (data) =>
+                    {
+                        Project project = HandleToObj<Project>(data);
+                        project.RunProject();
+                    };
+
+                return trayIconData;
+
+            })
+            // Convert to an array Because
+            .ToArray());
+
+
+            // Actually show the icon
+            DI.SystemTrayIcon.ShowIcon();
         }
 
     };
