@@ -12,8 +12,37 @@
     {
         public string ProjectPath { get; set; }
 
+        public string ProjectName => new DirectoryInfo(ProjectPath).Name;
+
         public string ProjectPathWithConfig => Path.Combine(ProjectPath, "ProcessManger.Config.Json");
 
-        public IEnumerable<ProcessModel> ProcessList { get; set; }
-    }
+        public IList<ProcessModel> ProcessList { get; set; }
+
+
+
+        public void RunProject()
+        {
+            foreach (var process in ProcessList)
+            {
+                process.RunProcess();
+            };
+        }
+
+        public void CloseProject()
+        {
+            foreach (var process in ProcessList)
+            {
+                process.CloseProcess();
+            };
+        }
+
+        public void CloseProjectTree()
+        {
+            foreach (var process in ProcessList)
+            {
+                process.CloseProcessTree();
+            };
+        }
+
+    };
 };

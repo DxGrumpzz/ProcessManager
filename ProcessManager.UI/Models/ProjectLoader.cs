@@ -62,11 +62,11 @@
             }
             catch (JsonException jsonException)
             {
-                throw new Exception($"Failed to read {_filename}, File doesn't contain valid json data");
+                throw new Exception($"Failed to read {_filename}, File doesn't contain valid json data. \nError: {jsonException}");
             }
             catch (Exception exception)
             {
-                throw new Exception($"Failed to read {_filename}. Uknown error has occured");
+                throw new Exception($"Failed to read {_filename}. Uknown error has occured. \nError: {exception}");
             };
         }
 
@@ -75,7 +75,7 @@
         {
             foreach (var project in _projects)
             {
-                project.ProcessList = _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig);
+                project.ProcessList = new List<ProcessModel>(_processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
             };
         }
 
