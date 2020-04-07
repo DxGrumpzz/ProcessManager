@@ -9,30 +9,6 @@ namespace ProcessManager.UI
     using System.Windows.Interop;
 
 
-    public delegate void CallbackFunc(IntPtr Data);
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct SystemTrayIconData
-    {
-        public string ProjectName { get; set; }
-
-        public IntPtr Data { get; set; }
-
-        public event CallbackFunc CloseProjectCallBack;
-        public event CallbackFunc RunProjectCallBack;
-
-        public SystemTrayIconData(Project p)
-        {
-            Data = GCHandle.ToIntPtr(GCHandle.Alloc(p));
-
-            ProjectName = p.ProjectName;
-
-            CloseProjectCallBack = null;
-            RunProjectCallBack = null;
-        }
-    };
-
-
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -41,11 +17,9 @@ namespace ProcessManager.UI
         private const string PROJECT_CONFIG_FILE_NAME = "ProcessManger.Config.Json";
         private const string PROJCES_FILE_NAME = "Projects.json";
 
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
 
             // Check if the processes file exists
             if (File.Exists(PROJCES_FILE_NAME) == false)
@@ -60,11 +34,11 @@ namespace ProcessManager.UI
             // Setup DI stuff
             SetupDI();
 
-
+            // Create and show window
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
-
+            // Setup TrayIcon stuff
             SetupTrayIcon();
         }
 
@@ -80,7 +54,6 @@ namespace ProcessManager.UI
                 project.CloseProjectTree();
             };
         }
-
 
         private static void SetupDI()
         {
@@ -107,7 +80,6 @@ namespace ProcessManager.UI
 
         private void SetupTrayIcon()
         {
-
             // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
             // Create the SystemTrayIcon class
             DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon.ico", new WindowInteropHelper(Current.MainWindow).Handle);
@@ -116,14 +88,14 @@ namespace ProcessManager.UI
             DI.SystemTrayIcon.CreateIcon(DI.Projects
             .Select(project =>
             {
-                    // The data which will be passed to the tray icon
-                    var trayIconData = new SystemTrayIconData(project);
+                // The data which will be passed to the tray icon
+                var trayIconData = new SystemTrayIconData(project);
 
-                    // A local function that will take a handle and "convert" it to a usable object
-                    static T HandleToObj<T>(IntPtr handle)
+                // A local function that will take a handle and "convert" it to a usable object
+                static T HandleToObj<T>(IntPtr handle)
                 {
-                        // Take the handle and convert it to a *safe handle
-                        if (GCHandle.FromIntPtr(handle).Target is T obj)
+                    // Take the handle and convert it to a *safe handle
+                    if (GCHandle.FromIntPtr(handle).Target is T obj)
                         return obj;
                     else
                     {
@@ -132,19 +104,19 @@ namespace ProcessManager.UI
                     };
                 };
 
-                    // A callback that will be called when the user decided to close the project
-                    trayIconData.CloseProjectCallBack += (data) =>
-                    {
-                        Project project = HandleToObj<Project>(data);
-                        project.CloseProjectTree();
-                    };
+                // A callback that will be called when the user decided to close the project
+                trayIconData.CloseProjectCallBack += (data) =>
+                {
+                    Project project = HandleToObj<Project>(data);
+                    project.CloseProjectTree();
+                };
 
-                    // A callback that will be called when the user decided to run the project
-                    trayIconData.RunProjectCallBack += (data) =>
-                    {
-                        Project project = HandleToObj<Project>(data);
-                        project.RunProject();
-                    };
+                // A callback that will be called when the user decided to run the project
+                trayIconData.RunProjectCallBack += (data) =>
+                {
+                    Project project = HandleToObj<Project>(data);
+                    project.RunProject();
+                };
 
                 return trayIconData;
 
