@@ -24,7 +24,7 @@
     <None Update="Projects.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Icon.ico">
+    <None Update="Resources\Icon\Kiwi_White.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

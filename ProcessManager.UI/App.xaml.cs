@@ -82,7 +82,7 @@ namespace ProcessManager.UI
         {
             // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
             // Create the SystemTrayIcon class
-            DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon.ico", new WindowInteropHelper(Current.MainWindow).Handle);
+            DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon\\Kiwi_White.ico", new WindowInteropHelper(Current.MainWindow).Handle);
 
             // Initialize the tray icon and give it the neccessary project data
             DI.SystemTrayIcon.CreateIcon(DI.Projects
