@@ -8,6 +8,7 @@
 
 #include "SystemTrayIconData.h"
 #include "WindowsHelpers.h"
+
 #define MENUID  7186
 
 #define MENUITEMID  120
@@ -20,17 +21,18 @@ enum class TrayIconMenuResult : UINT
     MenuClosed = 0,
 
     // The user decided to close the current project
-    CloseProject = MENUITEMID,
+    CloseProject = 70,
 
     // The user decided to run the current project
-    RunProject = MENUITEMID + 1,
+    RunProject = 71,
 };
+
 
 // Adds a Menu item to a menu
 MENUITEMINFOW AddMenuItem(HMENU menu, UINT menuItemID, const std::wstring& menuItemText, const SystemTrayIconData* data, bool insertMenuItem = true)
 {
     // Create the menu
-    MENUITEMINFOW menuItem;
+    MENUITEMINFOW menuItem = { 0 };
     menuItem.cbSize = sizeof(menuItem);
 
     // Create the menu item..
@@ -61,6 +63,7 @@ MENUITEMINFOW AddMenuItem(HMENU menu, UINT menuItemID, const std::wstring& menuI
     return menuItem;
 }
 
+
 // Adds a sub-menu to an existing menu
 MENUITEMINFOW AddMenuItemSub(HMENU menu, HMENU subMenu, UINT menuItemID, const std::wstring& menuItemText, const SystemTrayIconData* data)
 {
@@ -74,10 +77,30 @@ MENUITEMINFOW AddMenuItemSub(HMENU menu, HMENU subMenu, UINT menuItemID, const s
     menuItem.hSubMenu = subMenu;
 
     // Insert the menuitem into the parent menu
-    WINCALL(InsertMenuItemW(menu, menuItem.wID, FALSE, &menuItem));
+    WINCALL(InsertMenuItemW(menu, menuItem.wID, TRUE, &menuItem));
 
     return menuItem;
-}
+};
+
+
+MENUITEMINFOW CreateProjectMenuItem(HMENU menu, HMENU subMenu, UINT menuItemID, const std::wstring& menuItemText)
+{
+
+    MENUITEMINFOW projectMenuItem = { 0 };
+    projectMenuItem.cbSize = sizeof(projectMenuItem);
+
+    projectMenuItem.fMask = MIIM_STRING | MIIM_SUBMENU | MIIM_ID;
+    projectMenuItem.hSubMenu = subMenu;
+    projectMenuItem.wID = menuItemID;
+
+    projectMenuItem.dwTypeData = const_cast<wchar_t*>(menuItemText.c_str());
+    projectMenuItem.cch = static_cast<UINT>(menuItemText.size());
+
+    WINCALL(InsertMenuItemW(menu, projectMenuItem.wID, TRUE, &projectMenuItem));
+
+    return projectMenuItem;
+};
+
 
 
 // Create the TrayIcon menu along with it's sub menus
@@ -92,14 +115,59 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
     {
         HMENU innerMenu = CreatePopupMenu();
 
-        // Close project menu item
-        AddMenuItem(innerMenu, static_cast<UINT>(TrayIconMenuResult::CloseProject), L"Close project", project);
+        {
+            MENUITEMINFOW menuItem = { 0 };
+            menuItem.cbSize = sizeof(menuItem);
 
-        // Run project menu item
-        AddMenuItem(innerMenu, static_cast<UINT>(TrayIconMenuResult::RunProject), L"Run project", project);
+            menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
 
-        // Create the main menu
-        AddMenuItemSub(menu, innerMenu, MENUITEMID + index, project->ProjectName, project);
+            menuItem.fType = MFT_STRING;
+
+            menuItem.wID = index;
+
+            menuItem.dwTypeData = const_cast<wchar_t*>(L"Close");
+            menuItem.cch = static_cast<UINT>(6);
+
+            menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+
+            WINCALL(InsertMenuItemW(innerMenu, static_cast<UINT>(TrayIconMenuResult::CloseProject), FALSE, &menuItem));
+        };
+
+        {
+            MENUITEMINFOW menuItem = { 0 };
+            menuItem.cbSize = sizeof(menuItem);
+
+            menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+
+            menuItem.fType = MFT_STRING;
+
+            menuItem.wID = index+1;
+
+            menuItem.dwTypeData = const_cast<wchar_t*>(L"Run");
+            menuItem.cch = static_cast<UINT>(4);
+
+            menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
+
+            WINCALL(InsertMenuItemW(innerMenu, static_cast<UINT>(TrayIconMenuResult::RunProject), FALSE, &menuItem));
+        };
+
+        {
+            MENUITEMINFOW menuItem = { 0 };
+            menuItem.cbSize = sizeof(menuItem);
+
+            menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_SUBMENU;
+
+            menuItem.fType = MFT_STRING;
+
+            menuItem.hSubMenu = innerMenu;
+
+            menuItem.wID = static_cast<UINT>(MENUITEMID + index);
+
+            menuItem.dwTypeData = const_cast<wchar_t*>(project->ProjectName);
+            menuItem.cch = static_cast<UINT>(wcslen(project->ProjectName) + 1);
+
+            WINCALL(InsertMenuItemW(menu, menuItem.wID, FALSE, &menuItem));
+        };
 
         index++;
     };
@@ -123,6 +191,7 @@ TrayIconMenuResult ShowTrayIconMenu(HWND hwnd, HMENU menu)
     return static_cast<TrayIconMenuResult>(TrackPopupMenu(menu, TPM_RETURNCMD | TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL));
 };
 
+
 // Retrieves a menu items dwItemData as some type
 template<class T>
 T* GetMenuItemData(HMENU menu, UINT menuItemID)
@@ -140,6 +209,7 @@ T* GetMenuItemData(HMENU menu, UINT menuItemID)
 
     return data;
 }
+
 
 // Hanldes a returned result from TrackPopupMenu function
 void HanldeMenuResult(HMENU menu, TrayIconMenuResult result)
@@ -169,5 +239,3 @@ void HanldeMenuResult(HMENU menu, TrayIconMenuResult result)
         };
     };
 };
-
-

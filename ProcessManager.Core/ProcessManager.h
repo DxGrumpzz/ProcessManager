@@ -26,19 +26,19 @@ public:
     struct EnumProcParam
     {
         // The process' PID
-        DWORD ProcessID;
+        DWORD ProcessID = NULL;
 
         // An "out" variable that will contain the process' main window HWND
-        HWND HwndOut;
+        HWND HwndOut = NULL;
 
         // A timing varialbe used to keep track of when the process HWND search has started
-        std::chrono::steady_clock::time_point StartTime;
+        std::chrono::steady_clock::time_point StartTime = std::chrono::steady_clock::now();
 
         // How long to keep searching for 
-        int TimeoutMS;
+        int TimeoutMS = 0;
 
         // A boolean flag that indicates if the search has timed out
-        bool TimedOut;
+        bool TimedOut = false;
     };
 
     // Returns a process' MainWindow handle

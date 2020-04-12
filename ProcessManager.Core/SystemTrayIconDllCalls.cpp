@@ -18,7 +18,8 @@
 #define WM_ICON_CALLBACK 42069
 
 
-LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+
+LRESULT CALLBACK Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
     switch (uMsg)
     {
@@ -47,12 +48,59 @@ LRESULT Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PT
 
                     // Create the main context menu
                     HMENU menu = CreateTrayIconMenu(systemTrayIconData);
-                    
-                    // Show menu and get result
-                    TrayIconMenuResult menuItemIndex = ShowTrayIconMenu(hwnd, menu);
 
+                    // Show menu and get result
+                    //TrayIconMenuResult menuItemIndex = ShowTrayIconMenu(hwnd, menu);
+
+                    SetForegroundWindow(hwnd);
+
+                    // Get cursor position
+                    POINT cursorPoint;
+                    GetCursorPos(&cursorPoint);
+
+                    // Show the menu
+                    BOOL result = TrackPopupMenu(menu, TPM_RETURNCMD, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL);
+
+
+                    HMENU sub = GetSubMenu(menu, result);
+
+                    UINT menuItemID1 = GetMenuItemID(sub, 0);
+                    UINT menuItemID2 = GetMenuItemID(sub, 1);
+
+                    {
+                        MENUITEMINFOW menuItem = { 0 };
+                        menuItem.cbSize = sizeof(menuItem);
+
+                        menuItem.fMask = MIIM_ID | MIIM_DATA;
+                        GetMenuItemInfoW(sub, 0, TRUE, &menuItem);
+
+                        SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(sub, menuItem.wID);
+
+                        int s = 0;
+                    };
+
+                    {
+                        MENUITEMINFOW menuItem = { 0 };
+                        menuItem.cbSize = sizeof(menuItem);
+
+                        menuItem.fMask = MIIM_ID | MIIM_DATA;
+                        GetMenuItemInfoW(sub, 1, TRUE, &menuItem);
+
+                        SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(sub, menuItem.wID);
+
+                    int s = 0;
+                    };
+
+
+
+                    SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(menu, result);
+
+                    int r1 = result - ((int)TrayIconMenuResult::CloseProject);
+                    int r2 = result - ((int)TrayIconMenuResult::RunProject);
+
+                    int s = 0;
                     // Hanlde result from menu
-                    HanldeMenuResult(menu, menuItemIndex);
+                    //HanldeMenuResult(menu, menuItemIndex);
 
                     break;
                 };
@@ -73,7 +121,7 @@ std::vector<SystemTrayIconData*>* CopyTrayIconDataToHeap(SystemTrayIconData* sys
     heapData->reserve(count);
 
     // Copy the systemTrayIconData data to the Heap so it won't be lost when we call SubclassprocS
-    for (size_t a = 0; a < count; a++)
+    for (int a = 0; a < count; a++)
     {
         SystemTrayIconData* current = new SystemTrayIconData();
         heapData->push_back(current);
@@ -127,7 +175,7 @@ DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wcha
     notifyIconData->uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     notifyIconData->dwInfoFlags = NIIF_INFO;
     notifyIconData->hIcon = (HICON)icon;
-    
+
     return notifyIconData;
 };
 

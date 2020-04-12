@@ -41,10 +41,7 @@
                        Converter={local:BooleanToVisibilityValueConverter}}"
                        
                        TextTrimming="CharacterEllipsis"
-                       TextAlignment="Center"
-                       VerticalAlignment="Center"
-                       
-                       Margin="5,0,2.5,0"/>
+                       VerticalAlignment="Center"/>
 
         </Grid>
 

@@ -8,8 +8,8 @@
        
         Title="Process Manager" 
       
-        Height="200" 
-        Width="600"
+        Height="250" 
+        Width="700"
         
         MinHeight="125"
         MinWidth="265"
