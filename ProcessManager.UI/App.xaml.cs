@@ -14,17 +14,15 @@ namespace ProcessManager.UI
     /// </summary>
     public partial class App : Application
     {
-        private const string PROJECT_CONFIG_FILE_NAME = "ProcessManger.Config.Json";
-        private const string PROJCES_FILE_NAME = "Projects.json";
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             // Check if the processes file exists
-            if (File.Exists(PROJCES_FILE_NAME) == false)
+            if (File.Exists(Localization.PROJECTS_FILE_NAME) == false)
             {
-                MessageBox.Show($"Unable to find {PROJCES_FILE_NAME}");
+                MessageBox.Show($"Unable to find {Localization.PROJECTS_FILE_NAME}");
 
                 // Exit application
                 Environment.Exit(1);
@@ -63,8 +61,8 @@ namespace ProcessManager.UI
             // Setup project loader
             var projectLoader = DI.ProjectLoader = new ProjectLoader(
                 processLoader: DI.ProcessLoader,
-                filename: PROJCES_FILE_NAME,
-                projectConfigFilename: PROJECT_CONFIG_FILE_NAME);
+                filename: Localization.PROJECTS_FILE_NAME,
+                projectConfigFilename: Localization.PROJECT_CONFIG_FILE_NAME);
 
             // Load the projects
             projectLoader.LoadProjectsDirectories();
@@ -82,7 +80,7 @@ namespace ProcessManager.UI
         {
             // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
             // Create the SystemTrayIcon class
-            DI.SystemTrayIcon = new SystemTrayIcon("Resources\\Icon\\Kiwi_White.ico", new WindowInteropHelper(Current.MainWindow).Handle);
+            DI.SystemTrayIcon = new SystemTrayIcon(Localization.APP_ICON_LOCATION, new WindowInteropHelper(Current.MainWindow).Handle);
 
             // Initialize the tray icon and give it the neccessary project data
             DI.SystemTrayIcon.CreateIcon(DI.Projects
