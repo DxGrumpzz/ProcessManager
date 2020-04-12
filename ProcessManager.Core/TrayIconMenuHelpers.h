@@ -110,7 +110,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
     HMENU menu = CreatePopupMenu();
 
     // For every project create a menu item and a sub menu option(s)
-    int index = 0;
+    int index = 1;
     for (SystemTrayIconData* project : *menuData)
     {
         HMENU innerMenu = CreatePopupMenu();
@@ -125,13 +125,15 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
             menuItem.wID = index;
 
+            
             menuItem.dwTypeData = const_cast<wchar_t*>(L"Close");
             menuItem.cch = static_cast<UINT>(6);
 
             menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
 
-            WINCALL(InsertMenuItemW(innerMenu, static_cast<UINT>(TrayIconMenuResult::CloseProject), FALSE, &menuItem));
+            WINCALL(InsertMenuItemW(innerMenu, 68, FALSE, &menuItem));
         };
+
 
         {
             MENUITEMINFOW menuItem = { 0 };
@@ -141,15 +143,16 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
             menuItem.fType = MFT_STRING;
 
-            menuItem.wID = index+1;
+            menuItem.wID = ++index;
 
             menuItem.dwTypeData = const_cast<wchar_t*>(L"Run");
             menuItem.cch = static_cast<UINT>(4);
 
             menuItem.dwItemData = reinterpret_cast<ULONG_PTR>(project);
 
-            WINCALL(InsertMenuItemW(innerMenu, static_cast<UINT>(TrayIconMenuResult::RunProject), FALSE, &menuItem));
+            WINCALL(InsertMenuItemW(innerMenu, 69, FALSE, &menuItem));
         };
+
 
         {
             MENUITEMINFOW menuItem = { 0 };
@@ -161,7 +164,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
             menuItem.hSubMenu = innerMenu;
 
-            menuItem.wID = static_cast<UINT>(MENUITEMID + index);
+            menuItem.wID = static_cast<UINT>(MENUITEMID + (index - 1));
 
             menuItem.dwTypeData = const_cast<wchar_t*>(project->ProjectName);
             menuItem.cch = static_cast<UINT>(wcslen(project->ProjectName) + 1);

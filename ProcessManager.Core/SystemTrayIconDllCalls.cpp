@@ -61,44 +61,41 @@ LRESULT CALLBACK Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
                     // Show the menu
                     BOOL result = TrackPopupMenu(menu, TPM_RETURNCMD, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL);
 
-
-                    HMENU sub = GetSubMenu(menu, result);
-
-                    UINT menuItemID1 = GetMenuItemID(sub, 0);
-                    UINT menuItemID2 = GetMenuItemID(sub, 1);
-
+                    if (result == 0)
+                        break;
+                    
+                    for (int a = 0; a < result; a++)
                     {
+                        // Get inner menu
+                        HMENU sub = GetSubMenu(menu, a);
+              
+                        // Get current item
                         MENUITEMINFOW menuItem = { 0 };
                         menuItem.cbSize = sizeof(menuItem);
 
-                        menuItem.fMask = MIIM_ID | MIIM_DATA;
-                        GetMenuItemInfoW(sub, 0, TRUE, &menuItem);
+                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
 
-                        SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(sub, menuItem.wID);
+                        GetMenuItemInfoW(sub, result, FALSE, &menuItem);
 
-                        int s = 0;
+                        if (menuItem.wID == result)
+                        {
+                            SystemTrayIconData* data = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
+                                
+                            // Run project
+                            if (result % 2 == 0)
+                            {
+                                data->RunProjectCallBack(data->Data);
+                            }
+                            // Close project
+                            else
+                            {
+                                data->CloseProjectCallBack(data->Data);
+                            };
+                        };
                     };
 
-                    {
-                        MENUITEMINFOW menuItem = { 0 };
-                        menuItem.cbSize = sizeof(menuItem);
-
-                        menuItem.fMask = MIIM_ID | MIIM_DATA;
-                        GetMenuItemInfoW(sub, 1, TRUE, &menuItem);
-
-                        SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(sub, menuItem.wID);
-
-                    int s = 0;
-                    };
 
 
-
-                    SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(menu, result);
-
-                    int r1 = result - ((int)TrayIconMenuResult::CloseProject);
-                    int r2 = result - ((int)TrayIconMenuResult::RunProject);
-
-                    int s = 0;
                     // Hanlde result from menu
                     //HanldeMenuResult(menu, menuItemIndex);
 
