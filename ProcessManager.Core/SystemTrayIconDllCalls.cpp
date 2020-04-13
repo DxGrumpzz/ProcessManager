@@ -50,54 +50,10 @@ LRESULT CALLBACK Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
                     HMENU menu = CreateTrayIconMenu(systemTrayIconData);
 
                     // Show menu and get result
-                    //TrayIconMenuResult menuItemIndex = ShowTrayIconMenu(hwnd, menu);
-
-                    SetForegroundWindow(hwnd);
-
-                    // Get cursor position
-                    POINT cursorPoint;
-                    GetCursorPos(&cursorPoint);
-
-                    // Show the menu
-                    BOOL result = TrackPopupMenu(menu, TPM_RETURNCMD, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL);
-
-                    if (result == 0)
-                        break;
-                    
-                    for (int a = 0; a < result; a++)
-                    {
-                        // Get inner menu
-                        HMENU sub = GetSubMenu(menu, a);
-              
-                        // Get current item
-                        MENUITEMINFOW menuItem = { 0 };
-                        menuItem.cbSize = sizeof(menuItem);
-
-                        menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
-
-                        GetMenuItemInfoW(sub, result, FALSE, &menuItem);
-
-                        if (menuItem.wID == result)
-                        {
-                            SystemTrayIconData* data = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
-                                
-                            // Run project
-                            if (result % 2 == 0)
-                            {
-                                data->RunProjectCallBack(data->Data);
-                            }
-                            // Close project
-                            else
-                            {
-                                data->CloseProjectCallBack(data->Data);
-                            };
-                        };
-                    };
-
-
+                    int menuItemIndex = ShowTrayIconMenu(hwnd, menu);
 
                     // Hanlde result from menu
-                    //HanldeMenuResult(menu, menuItemIndex);
+                    HanldeMenuResult(menu, menuItemIndex);
 
                     break;
                 };
@@ -140,6 +96,39 @@ std::vector<SystemTrayIconData*>* CopyTrayIconDataToHeap(SystemTrayIconData* sys
 
 DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wchar_t* iconPath, SystemTrayIconData* systemTrayIconData, int numberOfProjects)
 {
+    /*int n = 1234;
+    
+    int ones = n % 10;
+    int tens = (n / 10) % 10;
+    int hundreds = (n / 100) % 10;
+    int thousands = (n / 1000);*/
+
+    //int n = 691;
+    //
+    //int tens = (n / 10) % 10;
+    //int hundreds = (n / 100) % 10;
+
+    //int times = 1;
+    //while (times <= tens)
+    //    times *= 10;
+    //
+    //int n2 = hundreds * times + tens;
+
+
+    //int menuItemProjectIndex = n % 100;
+    //bool closeOrOpen = (n / 100) % 10;
+
+    //int n = 1165;
+
+    //int index = n % 100;
+    //bool closeOrOpen = (n / 100) % 10;
+    
+    int n = 102300;
+
+    int index = (n / 100) % 100;
+    bool runProject = (n / 10000) % 10;
+
+
     auto heapData = CopyTrayIconDataToHeap(systemTrayIconData, numberOfProjects);
 
     // Add a Subclass to the main window so we can handle NotifyIcon events

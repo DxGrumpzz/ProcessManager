@@ -14,20 +14,6 @@
 #define MENUITEMID  120
 
 
-// A result that is returned from a user's interaction with the Tray icon menu
-enum class TrayIconMenuResult : UINT
-{
-    // The user exited the menu
-    MenuClosed = 0,
-
-    // The user decided to close the current project
-    CloseProject = 70,
-
-    // The user decided to run the current project
-    RunProject = 71,
-};
-
-
 // Adds a Menu item to a menu
 MENUITEMINFOW AddMenuItem(HMENU menu, UINT menuItemID, const std::wstring& menuItemText, const SystemTrayIconData* data, bool insertMenuItem = true)
 {
@@ -110,7 +96,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
     HMENU menu = CreatePopupMenu();
 
     // For every project create a menu item and a sub menu option(s)
-    int index = 1;
+    int index = 100000;
     for (SystemTrayIconData* project : *menuData)
     {
         HMENU innerMenu = CreatePopupMenu();
@@ -123,8 +109,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
             menuItem.fType = MFT_STRING;
 
-            menuItem.wID = index;
-
+            menuItem.wID = ++index;
             
             menuItem.dwTypeData = const_cast<wchar_t*>(L"Close");
             menuItem.cch = static_cast<UINT>(6);
@@ -143,7 +128,9 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
             menuItem.fType = MFT_STRING;
 
-            menuItem.wID = ++index;
+            // Increment the index by 1 and turn the number in the hundred's to a 1 
+            menuItem.wID = ++(index += 10000);
+            index -= 10000;
 
             menuItem.dwTypeData = const_cast<wchar_t*>(L"Run");
             menuItem.cch = static_cast<UINT>(4);
@@ -172,7 +159,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
             WINCALL(InsertMenuItemW(menu, menuItem.wID, FALSE, &menuItem));
         };
 
-        index++;
+        index += 100;
     };
 
     return menu;
@@ -180,7 +167,7 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
 
 
 // Show the menu "under" where the user's cursor is
-TrayIconMenuResult ShowTrayIconMenu(HWND hwnd, HMENU menu)
+int ShowTrayIconMenu(HWND hwnd, HMENU menu)
 {
     // Windows being windows.
     // This function is a must if we want to close the menu when we click outside of it
@@ -191,7 +178,7 @@ TrayIconMenuResult ShowTrayIconMenu(HWND hwnd, HMENU menu)
     GetCursorPos(&cursorPoint);
 
     // Show the menu
-    return static_cast<TrayIconMenuResult>(TrackPopupMenu(menu, TPM_RETURNCMD | TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL));
+    return TrackPopupMenu(menu, TPM_RETURNCMD | TPM_BOTTOMALIGN | TPM_LEFTALIGN, cursorPoint.x, cursorPoint.y, NULL, hwnd, NULL);
 };
 
 
@@ -215,30 +202,33 @@ T* GetMenuItemData(HMENU menu, UINT menuItemID)
 
 
 // Hanldes a returned result from TrackPopupMenu function
-void HanldeMenuResult(HMENU menu, TrayIconMenuResult result)
+void HanldeMenuResult(HMENU menu, int result)
 {
-    // Don't do anything if user closed the menu
-    if (result != TrayIconMenuResult::MenuClosed)
+    if (result == 0)
+        return;
+
+    int index = (result / 100) % 100;
+    bool runProject = (result / 10000) % 10;
+
+    HMENU sub = GetSubMenu(menu, index);
+
+    MENUITEMINFOW menuItem = { 0 };
+    menuItem.cbSize = sizeof(menuItem);
+
+    menuItem.fMask = MIIM_STRING | MIIM_ID | MIIM_DATA;
+    GetMenuItemInfoW(sub, result, FALSE, &menuItem);
+
+    SystemTrayIconData* data = reinterpret_cast<SystemTrayIconData*>(menuItem.dwItemData);
+
+    // Run project
+    if (runProject == true)
     {
-        // The clicked menu item's ID
-        UINT menuItemID = static_cast<UINT>(result);
-
-        // If user chose to run the project
-        if (result == TrayIconMenuResult::RunProject)
-        {
-            // Get project data from menu item
-            SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(menu, menuItemID);
-
-            // Run the project
-            project->RunProjectCallBack(project->Data);
-        }
-        else if (result == TrayIconMenuResult::CloseProject)
-        {
-            // Get project data from menu item
-            SystemTrayIconData* project = GetMenuItemData<SystemTrayIconData>(menu, menuItemID);// menuItem.dwItemData);
-
-            // Close the project
-            project->CloseProjectCallBack(project->Data);
-        };
+        data->RunProjectCallBack(data->Data);
+    }
+    // Close project
+    else
+    {
+        data->CloseProjectCallBack(data->Data);
     };
+
 };
