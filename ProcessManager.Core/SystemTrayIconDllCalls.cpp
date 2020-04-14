@@ -45,7 +45,6 @@ LRESULT CALLBACK Subclassproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
                 {
                     std::vector<SystemTrayIconData*>* systemTrayIconData = reinterpret_cast<std::vector<SystemTrayIconData*>*>(dwRefData);
 
-
                     // Create the main context menu
                     HMENU menu = CreateTrayIconMenu(systemTrayIconData);
 
@@ -104,7 +103,6 @@ DLL_CALL NOTIFYICONDATAW* CreateSystemTrayIcon(HWND mainWindowHandle, const wcha
 
     NOTIFYICONDATAW* notifyIconData = new NOTIFYICONDATAW();
     HANDLE icon = LoadImageW(GetModuleHandle(NULL), iconPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-
 
     if (!icon)
     {

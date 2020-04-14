@@ -1,30 +1,7 @@
-#include <windowsx.h>
-
 #include "ProcessManager.h"
 #include "ProcessModel.h"
 
 #define DLL_CALL extern "C" __declspec(dllexport) 
-
-
-// Takes a DWORD error code and returns its string message 
-std::wstring GetLastErrorAsStringW(DWORD error)
-{
-    // Stores the error message as a string in memory
-    LPWSTR buffer = nullptr;
-
-    // Format DWORD error ID to a string 
-    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL,
-                   error,
-                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPWSTR)&buffer, 0, NULL);
-
-    // Create std string from buffer
-    std::wstring message(buffer);
-
-    return message;
-};
-
 
 
 DLL_CALL DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
