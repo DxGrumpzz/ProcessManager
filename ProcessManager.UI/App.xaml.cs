@@ -75,11 +75,13 @@ namespace ProcessManager.UI
             DI.Projects = new List<Project>(projectLoader.GetProjectsList());
 
             DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
+
+            DI.FolderDialog = new WindowsFolderDialog();
         }
 
         private void SetupTrayIcon()
         {
-            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter so we need a valid window to initialize this class
+            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter, so we need a valid window to initialize this class
             // Create the SystemTrayIcon class
             DI.SystemTrayIcon = new SystemTrayIcon(Localization.APP_ICON_LOCATION, new WindowInteropHelper(Current.MainWindow).Handle);
 

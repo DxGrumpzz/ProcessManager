@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
 
@@ -24,6 +24,8 @@ namespace ProcessManager.UI
         public static MainWindowViewModel MainWindowViewModel { get; set; }
 
         public static SystemTrayIcon SystemTrayIcon { get; set; }
+        
+        public static IFolderDialog FolderDialog { get; set; }
 
     };
 };
