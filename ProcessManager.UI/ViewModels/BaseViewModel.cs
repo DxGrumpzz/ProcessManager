@@ -15,17 +15,4 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     };
-
-    /// <summary>
-    /// An "overload" of <see cref="BaseViewModel"/> which takes a class, and implements a design-time singelton
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class BaseViewModel<T> : BaseViewModel
-        where T: class
-    {
-        /// <summary>
-        /// A WPF design time singelton
-        /// </summary>
-        public static T DesignInstance { get; }
-    };
 };

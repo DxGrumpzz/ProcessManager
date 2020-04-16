@@ -7,9 +7,9 @@ namespace ProcessManager.UI
     /// <summary>
     /// The ViewModel for ProcessItemView
     /// </summary>
-    public class ProcessItemViewModel : BaseViewModel<ProcessItemViewModel>
+    public class ProcessItemViewModel : BaseViewModel
     {
-        public new static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(
+        public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(
             new ProcessModel()
             {
                 ProcessPath = Path.GetRandomFileName(),
