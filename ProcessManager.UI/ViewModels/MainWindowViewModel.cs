@@ -11,13 +11,13 @@ namespace ProcessManager.UI
     {
         public static MainWindowViewModel DesignInstance => new MainWindowViewModel()
         {
-            CurrentView = new ProjectsView(ProjectsListViewModel.DesignInstance),
+            CurrentView = new ProjectListView(ProjectsListViewModel.DesignInstance),
         };
 
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ContentControl _currentView = new ProjectsView();
+        private ContentControl _currentView = new ProjectListView();
 
         #endregion
 

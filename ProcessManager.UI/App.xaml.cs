@@ -77,7 +77,7 @@ namespace ProcessManager.UI
 
             DI.MainWindowViewModel = new MainWindowViewModel()
             {
-                CurrentView = new ProjectsView(
+                CurrentView = new ProjectListView(
                     new ProjectsListViewModel(DI.Projects))
             };
 

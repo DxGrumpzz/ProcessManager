@@ -90,7 +90,7 @@
 
         private void ExecuteGotoMainPageommnad()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectsView(new ProjectsListViewModel(DI.Projects));
+            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
         }
 
         private void ExecuteGotoProjectViewCommnad()
