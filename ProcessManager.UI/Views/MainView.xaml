@@ -16,67 +16,82 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="AUTO"/>
-            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="Projects: "/>
 
-        <!-- The list of processes that will be ran -->
-        <ItemsControl ItemsSource="{Binding Projects}"
+
+        <ScrollViewer Grid.Row="1">
+
+            <StackPanel>
+
+                <!-- The list of processes that will be ran -->
+                <ItemsControl ItemsSource="{Binding Projects}"
                       
-                      Grid.IsSharedSizeScope="True"
-                      
-                      Grid.Row="1">
+                      Grid.IsSharedSizeScope="True">
 
-            <ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemTemplate>
 
-                <DataTemplate>
+                        <DataTemplate> 
 
-                    <Grid Margin="0,5">
+                            <Grid Margin="0,5">
 
-                        <Grid.InputBindings>
+                                <Grid.InputBindings>
 
-                            <MouseBinding MouseAction="LeftClick" 
+                                    <MouseBinding MouseAction="LeftClick" 
                                           Command="{Binding GotoProjectViewCommnad}"/>
 
-                        </Grid.InputBindings>
+                                </Grid.InputBindings>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="AUTO" SharedSizeGroup="UniformWidth"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="AUTO" SharedSizeGroup="UniformWidth"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
 
 
-                        <!-- A label containing the project's path -->
-                        <TextBlock Text="{Binding Project.ProjectPath}"
+                                <!-- A label containing the project's path -->
+                                <TextBlock Text="{Binding Project.ProjectPath}"
                         
-                                   Cursor="Hand"/>
+                                           Cursor="Hand"/>
 
-                        <!-- Run and close project buttons -->
-                        <StackPanel Orientation="Horizontal"
+                                <!-- Run and close project buttons -->
+                                <StackPanel Orientation="Horizontal"
                                     
-                                    Grid.Column="1"
+                                            Grid.Column="1"
+                                            
+                                            local:UniformMargin.Margin="10,0,0,0">
+
+                                    <Button Content="Run project"
                                     
-                                    local:UniformMargin.Margin="10,0,1,0">
+                                            Command="{Binding RunProjectCommand}"/>
 
-                            <Button Content="Run project"
+                                    <Button Content="Close project"
                                     
-                                    Command="{Binding RunProjectCommand}"/>
+                                            Command="{Binding CloseProjectCommand}"/>
 
-                            <Button Content="Close project"
-                                    
-                                    Command="{Binding CloseProjectCommand}"/>
+                                </StackPanel>
 
-                        </StackPanel>
+                            </Grid>
 
-                    </Grid>
+                        </DataTemplate>
 
-                </DataTemplate>
+                    </ItemsControl.ItemTemplate>
 
-            </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-        </ItemsControl>
+                <!--Add new project button--> 
+                <Button Content="Add new project"
+                        
+                        HorizontalAlignment="Left"
+                        
+                        Command="{Binding AddNewProjectCommnad}"
+                        
+                        Margin="0,5,0,0"/>
+                
+            </StackPanel>
 
+        </ScrollViewer>
     </Grid>
 
 </UserControl>
