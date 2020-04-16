@@ -61,12 +61,13 @@ extern "C" _declspec(dllexport) void OpenDirectoryDialog(wchar_t*& path)
     // The "title" 
     browseInfo.lpszTitle = L"Select project folder";
 
-    //browseInfo.ulFlags = BIF_DONTGOBELOWDOMAIN | BIF_USENEWUI | BIF_STATUSTEXT | BIF_UAHINT;
     browseInfo.ulFlags = BIF_USENEWUI | BIF_STATUSTEXT | BIF_UAHINT;
 
     // Open the dialog
     LPITEMIDLIST pidl = SHBrowseForFolderW(&browseInfo);
-    WINCALL(pidl);
+    
+    if (pidl == 0)
+        return;
 
     // get the name of the folder and put it in path
     SHGetPathFromIDListW(pidl, path);
