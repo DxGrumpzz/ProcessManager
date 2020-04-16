@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
 
@@ -17,7 +17,7 @@
         /// </summary>
         public static IProcessLoader ProcessLoader { get; set; }
 
-        public static IEnumerable<Project> Projects { get; set; }
+        public static IList<Project> Projects { get; set; }
 
         public static IProjectLoader ProjectLoader { get; set; }
 

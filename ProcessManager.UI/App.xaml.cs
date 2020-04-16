@@ -1,6 +1,7 @@
 namespace ProcessManager.UI
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -71,7 +72,7 @@ namespace ProcessManager.UI
 
 
             // Load the projects list into DI
-            DI.Projects = projectLoader.GetProjectsList();
+            DI.Projects = new List<Project>(projectLoader.GetProjectsList());
 
             DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
         }
