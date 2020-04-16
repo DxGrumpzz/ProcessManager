@@ -5,17 +5,17 @@
     /// <summary>
     /// Interaction logic for MainView.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class ProjectsView : UserControl
     {
-        public MainView()
+        public ProjectsView()
         {
             InitializeComponent();
         }
 
-        public MainView(MainWindowViewModel mainWindowViewModel) :
+        public ProjectsView(ProjectsListViewModel viewModel) :
             this()
         {
-            DataContext = mainWindowViewModel;
+            DataContext = viewModel;
         }
     }
 }

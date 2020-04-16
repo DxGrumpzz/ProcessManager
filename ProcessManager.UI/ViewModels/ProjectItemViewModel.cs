@@ -1,19 +1,16 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Windows.Input;
-
 
     /// <summary>
     /// 
     /// </summary>
     public class ProjectItemViewModel
     {
-        public static ProjectItemViewModel DesignInstance => 
-            new ProjectItemViewModel(new Project()
+        public static ProjectItemViewModel DesignInstance => new ProjectItemViewModel(new Project()
         {
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
             
@@ -73,6 +70,7 @@
             RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand);
         }
 
+
         private void ExecuteRunProjectCommand()
         {
             foreach (var process in Project.ProcessList)
@@ -89,9 +87,10 @@
             };
         }
 
+
         private void ExecuteGotoMainPageommnad()
         {
-            DI.MainWindowViewModel.CurrentView = new MainView(DI.MainWindowViewModel);
+            DI.MainWindowViewModel.CurrentView = new ProjectsView(new ProjectsListViewModel(DI.Projects));
         }
 
         private void ExecuteGotoProjectViewCommnad()

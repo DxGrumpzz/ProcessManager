@@ -74,7 +74,12 @@ namespace ProcessManager.UI
             // Load the projects list into DI
             DI.Projects = new List<Project>(projectLoader.GetProjectsList());
 
-            DI.MainWindowViewModel = new MainWindowViewModel(DI.Projects);
+
+            DI.MainWindowViewModel = new MainWindowViewModel()
+            {
+                CurrentView = new ProjectsView(
+                    new ProjectsListViewModel(DI.Projects))
+            };
 
             DI.FolderDialog = new WindowsFolderDialog();
         }
