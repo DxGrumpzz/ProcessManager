@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.IO;
@@ -47,30 +47,37 @@
         public IEnumerable<ProcessItemViewModel> ProcessList { get; }
         
 
+        #region Public commands
+
         public ICommand GotoProjectViewCommnad { get; }
         public ICommand GotoMainPageCommnad { get; }
         public ICommand CloseProjectCommand { get; }
         public ICommand RunProjectCommand { get; }
+        public ICommand AddNewProcessCommand { get; }
 
+        #endregion
 
 
         public ProjectItemViewModel(Project project)
         {
             Project = project;
 
-            // Convert the list of processes inside the project to a list of ProcessItemViewModel
-            ProcessList = Project.ProcessList
-            .Select(process => new ProcessItemViewModel(process)).ToArray();
-
-
             GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
 
             CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand);
             RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand);
+
+            AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
         }
 
 
+        private void ExecuteAddNewProcessCommand()
+        {
+            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(this));
+        }
+
+        
         private void ExecuteRunProjectCommand()
         {
             foreach (var process in Project.ProcessList)
