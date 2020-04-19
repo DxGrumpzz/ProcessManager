@@ -3,6 +3,8 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
+    using System.Text.Json;
     using System.Windows.Input;
 
     /// <summary>
@@ -94,7 +96,9 @@
 
         private void ExecuteAddProcessCommand()
         {
-            ProjectVM.Project.ProcessList.Add(new ProcessModel()
+            var project = ProjectVM.Project;
+
+            project.ProcessList.Add(new ProcessModel()
             {
                 ProcessPath = SelectedProcessPath,
                 VisibleOnStartup = ProcessVisibleOnStartup,
@@ -102,6 +106,25 @@
                 ProcessLabel = ProcessLabel,
             });
 
+            // Convert the process list inside the project to json
+            string jsonString = JsonSerializer.Serialize(
+                project.ProcessList
+                .Select(process => new
+                {
+                    ProcessPath = process.ProcessPath,
+                    ProcessArgs = process.ProcessArgs,
+                    ProcessLabel = process.ProcessLabel,
+                    VisibleOnStartup = process.VisibleOnStartup,
+                }),
+                new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                });
+
+            // Write the json to the project's config file
+            File.WriteAllText(project.ProjectPathWithConfig, jsonString);
+
+            // Return back to the Project's view
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
         }
 
