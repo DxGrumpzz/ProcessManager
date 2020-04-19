@@ -73,7 +73,10 @@ extern "C" _declspec(dllexport) void OpenDirectoryDialog(wchar_t*& path)
     SHGetPathFromIDListW(pidl, path);
 };
 
+// Frees memory of an unhandled string
 extern "C" _declspec(dllexport) void DeallocPathPointer(wchar_t* path)
 {
+    // Because we create a string that hold a path in OpenDirectoryDialog function
+    // we must de-allocate it from within C++ because C# doesn't handle "those" kinds of strings
     delete[] path;
 };
