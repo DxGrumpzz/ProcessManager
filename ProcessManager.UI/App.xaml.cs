@@ -2,10 +2,7 @@ namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Interop;
 
@@ -15,7 +12,6 @@ namespace ProcessManager.UI
     /// </summary>
     public partial class App : Application
     {
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -33,13 +29,13 @@ namespace ProcessManager.UI
             // Setup DI stuff
             SetupDI();
 
-
+            
             // Create and show window
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
             // Setup TrayIcon stuff
-            SetupTrayIcon();
+            DI.SetupTrayIcon(new WindowInteropHelper(Current.MainWindow).Handle);
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -78,63 +74,11 @@ namespace ProcessManager.UI
 
             DI.MainWindowViewModel = new MainWindowViewModel()
             {
-               CurrentView = new ProjectListView(
+                CurrentView = new ProjectListView(
                    new ProjectsListViewModel(DI.Projects)),
             };
 
             DI.FolderDialog = new WindowsFolderDialog();
         }
-
-        private void SetupTrayIcon()
-        {
-            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter, so we need a valid window to initialize this class
-            // Create the SystemTrayIcon class
-            DI.SystemTrayIcon = new SystemTrayIcon(Localization.APP_ICON_LOCATION, new WindowInteropHelper(Current.MainWindow).Handle);
-
-            // Initialize the tray icon and give it the neccessary project data
-            DI.SystemTrayIcon.CreateIcon(DI.Projects
-            .Select(project =>
-            {
-            // The data which will be passed to the tray icon
-            var trayIconData = new SystemTrayIconData(project);
-
-            // A local function that will take a handle and "convert" it to a usable object
-            static T HandleToObj<T>(IntPtr handle)
-                {
-                // Take the handle and convert it to a *safe handle
-                if (GCHandle.FromIntPtr(handle).Target is T obj)
-                        return obj;
-                    else
-                    {
-                        Debugger.Break();
-                        throw new Exception("Critical error occured. Unable to read returned TrayIcon data");
-                    };
-                };
-
-            // A callback that will be called when the user decided to close the project
-            trayIconData.CloseProjectCallBack += (data) =>
-        {
-                    Project project = HandleToObj<Project>(data);
-                    project.CloseProjectTree();
-                };
-
-            // A callback that will be called when the user decided to run the project
-            trayIconData.RunProjectCallBack += (data) =>
-        {
-                    Project project = HandleToObj<Project>(data);
-                    project.RunProject();
-                };
-
-                return trayIconData;
-
-            })
-            // Convert to an array Because
-            .ToArray());
-
-
-            // Actually show the icon
-            DI.SystemTrayIcon.ShowIcon();
-        }
-
     };
 };
