@@ -42,10 +42,10 @@
                 var newMargin = (Thickness)e.NewValue;
 
                 // Apply a uniform margin for every control in panel
-                foreach (Control control in panel.Children)
+                foreach (FrameworkElement frameworkElement in panel.Children)
                 {
                     // Get the control's current margin
-                    var currentContorlMargin = control.Margin;
+                    var currentContorlMargin = frameworkElement.Margin;
                     
                     // Add the new margin to the current margin
                     currentContorlMargin.Top += newMargin.Top;
@@ -54,7 +54,7 @@
                     currentContorlMargin.Right += newMargin.Right;
 
                     // Apply the new margin values
-                    control.Margin = currentContorlMargin;
+                    frameworkElement.Margin = currentContorlMargin;
                 };
 
                 // Unhook the event after finishing
