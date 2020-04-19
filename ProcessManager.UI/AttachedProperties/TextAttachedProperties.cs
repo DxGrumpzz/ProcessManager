@@ -5,8 +5,6 @@
     using System.Windows;
     using System.Windows.Controls;
 
-
-
     /// <summary>
     /// An attached property that displays a placeholder text when a textbox is "empty" of user text
     /// </summary>
@@ -69,7 +67,7 @@
             textBox.Initialized += (object sender, EventArgs evnt) =>
             {
                 // Try to set the placeholder value
-                SetplaceHolderValue(textBox, (string)e.NewValue);
+                SetPlaceHolderValue(textBox, (string)e.NewValue);
             };
 
             // When focus is returned to the textbox
@@ -103,7 +101,7 @@
             textBox.LostFocus += (object sender, RoutedEventArgs evnt) =>
             {
                 // Try to set the placeholder value
-                SetplaceHolderValue(textBox, (string)e.NewValue);
+                SetPlaceHolderValue(textBox, (string)e.NewValue);
             };
         }
 
@@ -112,7 +110,7 @@
         /// </summary>
         /// <param name="textBox"> The textbox to apply the placeholder onto </param>
         /// <param name="placeholder"> The Placeholder text to apply </param>
-        private static void SetplaceHolderValue(TextBox textBox, string placeholder)
+        private static void SetPlaceHolderValue(TextBox textBox, string placeholder)
         {
             // If the textbox isn't empty
             if (!(string.IsNullOrWhiteSpace(textBox.Text)))

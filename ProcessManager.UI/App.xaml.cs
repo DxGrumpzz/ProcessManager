@@ -33,6 +33,7 @@ namespace ProcessManager.UI
             // Setup DI stuff
             SetupDI();
 
+
             // Create and show window
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
@@ -77,8 +78,8 @@ namespace ProcessManager.UI
 
             DI.MainWindowViewModel = new MainWindowViewModel()
             {
-                CurrentView = new ProjectListView(
-                    new ProjectsListViewModel(DI.Projects))
+               CurrentView = new ProjectListView(
+                   new ProjectsListViewModel(DI.Projects)),
             };
 
             DI.FolderDialog = new WindowsFolderDialog();
@@ -94,14 +95,14 @@ namespace ProcessManager.UI
             DI.SystemTrayIcon.CreateIcon(DI.Projects
             .Select(project =>
             {
-                // The data which will be passed to the tray icon
-                var trayIconData = new SystemTrayIconData(project);
+            // The data which will be passed to the tray icon
+            var trayIconData = new SystemTrayIconData(project);
 
-                // A local function that will take a handle and "convert" it to a usable object
-                static T HandleToObj<T>(IntPtr handle)
+            // A local function that will take a handle and "convert" it to a usable object
+            static T HandleToObj<T>(IntPtr handle)
                 {
-                    // Take the handle and convert it to a *safe handle
-                    if (GCHandle.FromIntPtr(handle).Target is T obj)
+                // Take the handle and convert it to a *safe handle
+                if (GCHandle.FromIntPtr(handle).Target is T obj)
                         return obj;
                     else
                     {
@@ -110,16 +111,16 @@ namespace ProcessManager.UI
                     };
                 };
 
-                // A callback that will be called when the user decided to close the project
-                trayIconData.CloseProjectCallBack += (data) =>
-                {
+            // A callback that will be called when the user decided to close the project
+            trayIconData.CloseProjectCallBack += (data) =>
+        {
                     Project project = HandleToObj<Project>(data);
                     project.CloseProjectTree();
                 };
 
-                // A callback that will be called when the user decided to run the project
-                trayIconData.RunProjectCallBack += (data) =>
-                {
+            // A callback that will be called when the user decided to run the project
+            trayIconData.RunProjectCallBack += (data) =>
+        {
                     Project project = HandleToObj<Project>(data);
                     project.RunProject();
                 };
