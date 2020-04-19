@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.IO;
@@ -44,8 +44,9 @@ namespace ProcessManager.UI
         /// <summary>
         /// The project's processes as a "list" of ProcessItemViewModel
         /// </summary>
-        public IEnumerable<ProcessItemViewModel> ProcessList { get; }
-        
+        public IEnumerable<ProcessItemViewModel> ProcessList => Project.ProcessList
+            .Select(process => new ProcessItemViewModel(process)).ToArray();
+
 
         #region Public commands
 
@@ -104,5 +105,6 @@ namespace ProcessManager.UI
         {
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(this);
         }
+
     };
 };
