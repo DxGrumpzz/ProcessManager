@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Text.Json;
     using System.Windows.Input;
+    using System.Windows.Interop;
 
 
     /// <summary>
@@ -106,26 +107,36 @@
             // Write empty json brackets to file
             File.WriteAllText(configPath, "[\n\n]");
 
+            // Create the new project
             var newProject = new Project()
             {
                 ProjectPath = selectedFolder,
                 ProcessList = new List<ProcessModel>(),
             };
 
+            // Add the new project to the projects list
             DI.Projects.Add(newProject);
 
+            // Convert the new projects list to a json string
             var jsonString = JsonSerializer.Serialize(DI.Projects.Select(project => new
             {
                 ProjectPath = project.ProjectPath,
-            }), new JsonSerializerOptions()
+            }), 
+            new JsonSerializerOptions()
             {
                 WriteIndented = true,
             });
 
-
+            // Write the json to file
             File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);
 
+
+            // Add the project to this ViewModel's projects list
             Projects.Add(new ProjectItemViewModel(newProject));
+
+            // Update tray icon
+            DI.SystemTrayIcon.RemoveIcon();
+            DI.SetupTrayIcon(new WindowInteropHelper(App.Current.MainWindow).Handle);
         }
 
     };
