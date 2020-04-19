@@ -1,6 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
 
 
@@ -23,12 +24,21 @@
         public string ShowDialog()
         {
             IntPtr pathPointer = IntPtr.Zero;
+            string pathString = null;
 
-            OpenDirectoryDialog(ref pathPointer);
+            try
+            {
+                OpenDirectoryDialog(ref pathPointer);
 
-            string pathString = Marshal.PtrToStringUni(pathPointer);
-
-            DeallocPathPointer(pathPointer);
+                pathString = Marshal.PtrToStringUni(pathPointer);
+            }
+            // This is a terrible practice.
+            // Necessary to keep the app running IF on the off-chance that something happens in OpenDirectoryDialog function 
+            catch { }
+            finally
+            {
+                DeallocPathPointer(pathPointer);
+            };
 
             return pathString;
         }
