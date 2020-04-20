@@ -3,6 +3,7 @@ namespace ProcessManager.UI
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Interop;
 
@@ -12,9 +13,15 @@ namespace ProcessManager.UI
     /// </summary>
     public partial class App : Application
     {
+
+        [DllImport("ProcessManager.Core.dll")]
+        private extern static void Test();
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            Test();
 
             // Check if the processes file exists
             if (File.Exists(Localization.PROJECTS_FILE_NAME) == false)

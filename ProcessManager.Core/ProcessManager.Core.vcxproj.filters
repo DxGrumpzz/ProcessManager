@@ -7,7 +7,7 @@
     <ClCompile Include="ProcessManager.cpp">
       <Filter>ProcessManager</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessManagerDllCalls.cpp">
+    <ClCompile Include="ProcessManagerDllCalls.h">
       <Filter>ProcessManager</Filter>
     </ClCompile>
   </ItemGroup>

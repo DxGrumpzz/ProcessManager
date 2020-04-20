@@ -207,8 +207,6 @@ public:
         return TRUE;
     };
 
-
-
     // Runs a single process
     static DWORD RunProcess(const wchar_t* processName, const wchar_t* processArgs, ProcessClosedCallback processClosedCallback, bool visibleOnStartup)
     {

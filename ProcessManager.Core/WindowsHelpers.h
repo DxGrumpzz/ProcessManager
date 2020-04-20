@@ -1,11 +1,8 @@
 #pragma once
-#include <shlobj_core.h >
+#include <shlobj_core.h>
 #include <winbase.h>
 #include <string>
 
-
-// Simple macro used to "debug" WinApi calls. displays an Ansi MessageBox with error details 
-#define WINCALL(wincall) if(!wincall) { auto error = GetLastErrorAsStringA(); MessageBoxA(NULL, error.c_str(), "Error", NULL); throw std::exception(error.c_str()); }
 
 
 // Takes a DWORD error code and returns its string message 
@@ -46,6 +43,11 @@ std::string GetLastErrorAsStringA()
 
     return message;
 }
+
+
+// Simple macro used to "debug" WinApi calls. displays an Ansi MessageBox with error details 
+#define WINCALL(wincall) if(!wincall) { auto error = GetLastErrorAsStringA(); MessageBoxA(NULL, error.c_str(), "Error", NULL); throw std::exception(error.c_str()); }
+
 
 
 // Calls the windows Directory dialog.
