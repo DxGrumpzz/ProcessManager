@@ -4,7 +4,6 @@
     using System.Diagnostics;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Data;
 
     /// <summary>
     /// An attached property that displays a placeholder text when a textbox is "empty" of user text
@@ -31,8 +30,6 @@
                 typeof(bool),
                 typeof(PlaceHolder),
                 new PropertyMetadata(default(bool)));
-
-
 
 
         public static string GetText(DependencyObject obj)
@@ -62,6 +59,8 @@
                 Debugger.Break();
                 return;
             };
+
+            return;
 
             // Wait for control to *load not initialize.
             // Difference is initialize event is called much earlier than Loaded,
@@ -134,4 +133,5 @@
         }
 
     };
+
 };

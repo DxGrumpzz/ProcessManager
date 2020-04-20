@@ -20,11 +20,11 @@
 
                 if (invert == true)
                 {
-                    return !((bool)value) == true ? Visibility.Visible : Visibility.Hidden;
+                    return !System.Convert.ToBoolean(value) == true ? Visibility.Visible : Visibility.Hidden;
                 };
             };
 
-            return ((bool)value) == true ? Visibility.Visible : Visibility.Hidden;
+            return System.Convert.ToBoolean(value) == true ? Visibility.Visible : Visibility.Hidden;
         }
 
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
