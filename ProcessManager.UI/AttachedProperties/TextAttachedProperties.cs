@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Data;
 
     /// <summary>
     /// An attached property that displays a placeholder text when a textbox is "empty" of user text
@@ -62,11 +63,11 @@
                 return;
             };
 
-
-            // When the control is initialized 
-            textBox.Initialized += (object sender, EventArgs evnt) =>
+            // Wait for control to *load not initialize.
+            // Difference is initialize event is called much earlier than Loaded,
+            // So what happens is the Placeholder value doesn't show until user interacts with the control
+            textBox.Loaded += (object sender, RoutedEventArgs evnt) =>
             {
-                // Try to set the placeholder value
                 SetPlaceHolderValue(textBox, (string)e.NewValue);
             };
 
