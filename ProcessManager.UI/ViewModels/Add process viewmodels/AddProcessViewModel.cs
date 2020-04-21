@@ -111,15 +111,22 @@
                 project.ProcessList
                 .Select(process => new
                 {
+                    RunAsConsole = process.RunAsConsole,
+
+                    StartInDirectory = process.StartInDirectory,
+                    ConsoleScript = process.ConsoleScript,
+
                     ProcessPath = process.ProcessPath,
                     ProcessArgs = process.ProcessArgs,
                     ProcessLabel = process.ProcessLabel,
+
                     VisibleOnStartup = process.VisibleOnStartup,
                 }),
                 new JsonSerializerOptions()
                 {
                     WriteIndented = true,
                 });
+
 
             // Write the json to the project's config file
             File.WriteAllText(project.ProjectPathWithConfig, jsonString);
