@@ -92,6 +92,5 @@
         [DllImport(DLL)]
         public extern static void ShowSystemTrayIcon(IntPtr icon);
 
-
     };
 };

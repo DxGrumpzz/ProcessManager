@@ -13,15 +13,9 @@ namespace ProcessManager.UI
     /// </summary>
     public partial class App : Application
     {
-
-        [DllImport("ProcessManager.Core.dll")]
-        private extern static void Test();
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            //Test();
 
             // Check if the processes file exists
             if (File.Exists(Localization.PROJECTS_FILE_NAME) == false)
@@ -85,8 +79,6 @@ namespace ProcessManager.UI
                 CurrentView = new ProjectListView(
                    new ProjectsListViewModel(DI.Projects)),
             };
-
-
         }
     };
 };

@@ -1,24 +1,13 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
-    using System.IO;
-    using System.Linq;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// A class that contains data and functionality of a process
     /// </summary>
     public class ProcessModel
     {
-
-        #region Private fields
-
-        private string[] _cmdExtensions = new string[]
-        {
-            ".cmd",
-            ".bat",
-        };
-
-        #endregion
 
 
         #region Public properties
@@ -58,7 +47,22 @@
         /// </summary>
         public ProcessVisibilityState ProcessVisibilityState { get; set; }
 
-        public bool IsProcessConsole => _cmdExtensions.Contains(Path.GetExtension(ProcessPath));
+
+        /// <summary>
+        /// A boolean flag indicating that this process is to be ran from the console
+        /// </summary>
+        public bool RunAsConsole { get; set; }
+
+        /// <summary>
+        /// Directory path to run a console script from. Used only in console processes
+        /// </summary>
+        public string StartInDirectory { get; set; }
+
+        /// <summary>
+        /// A script to be ran in the console
+        /// </summary>
+        public string ConsoleScript { get; set; }
+
 
         #endregion
 
@@ -79,6 +83,9 @@
         public event Action<ProcessVisibilityState> ProcessVisibilityStateChanged;
 
 
+        [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
+        private extern static bool Test(string runFromDirectory, string script, Action processClosedEvent, bool visibleOnStartup, out ulong pid);
+
 
         /// <summary>
         /// Run the current process
@@ -90,11 +97,21 @@
             if (IsRunning == true)
                 return false;
 
-            if (IsProcessConsole)
+            if (RunAsConsole)
             {
                 // Call WinApi function to create the process and set the process ID
-                ulong processID = CoreDLL.RunConsoleProcess(ProcessPath, ProcessArgs, ProcessClosedEvent, VisibleOnStartup);
-                ProcessID = processID;
+                bool result = Test(StartInDirectory, ConsoleScript, ProcessClosedEvent, VisibleOnStartup, out ulong pid);
+
+                if (result == false)
+                {
+                    ProcessID = pid;
+                }
+                else
+                    ProcessID = pid;
+
+                ProcessInitializedEvent?.Invoke();
+
+                return result;
             }
             else
             {
@@ -112,6 +129,7 @@
             else
                 return false;
         }
+
 
         /// <summary>
         /// Close this process
@@ -150,7 +168,7 @@
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Shows a process to the user
@@ -164,7 +182,7 @@
             if (result == true)
             {
                 ProcessVisibilityState = ProcessVisibilityState.Visible;
-             
+
                 // Invoke event
                 ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState);
                 return true;
@@ -185,7 +203,7 @@
             if (result == true)
             {
                 ProcessVisibilityState = ProcessVisibilityState.Hidden;
-               
+
                 // Invoke event
                 ProcessVisibilityStateChanged?.Invoke(ProcessVisibilityState);
                 return true;

@@ -7,6 +7,7 @@
 #include <tlhelp32.h>
 
 #include "ProcessModel.h"
+#include <mutex>
 
 
 // A class that is responsible for interaction with the ProcessModel
@@ -129,30 +130,31 @@ public:
     }
 
 
+    inline static std::mutex _mutex;
+
     // A callback function that is invoke when a process is terminated
-    static void CALLBACK ProcessTerminatedCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+    static void ProcessTerminatedCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
     {
+        _mutex.lock();
+
         // Convert lpParam to the process ID
         DWORD processID = reinterpret_cast<DWORD>(lpParameter);
 
         // Find the closed process 
-        ProcessModel* process = ProcessManager::GetProcess(processID);
-
-        // Call the actuall callback
-        process->ProcessClosedCallback();
-
-
-        // Remove the process from the list
-        if (ProcessManager::ProcessList.size() == 1)
+        ProcessModel process;
+        size_t index = 0;
+        if (ProcessManager::GetProcess(processID, process, index) == true)
         {
-            ProcessManager::ProcessList.clear();
-        }
-        else
-        {
-            ProcessManager::ProcessList.erase(
-                std::remove(ProcessManager::ProcessList.begin(), ProcessManager::ProcessList.end(), *process));
+            // Call the actuall callback
+            process.ProcessClosedCallback();
+
+            auto s = ProcessManager::ProcessList.begin();
+
+            // Remove the process from the list
+            ProcessManager::ProcessList.erase(s + index);
         };
 
+        _mutex.unlock();
     }
 
     // Runs a single process
@@ -361,6 +363,31 @@ public:
 
         return nullptr;
     };
+
+    static bool GetProcess(DWORD processID, ProcessModel& processModel)
+    {
+        size_t ignored = 0;
+        return GetProcess(processID, processModel, ignored);
+    };
+
+    static bool GetProcess(DWORD processID, ProcessModel& processModel, size_t& index)
+    {
+        for (size_t a = 0; a < ProcessManager::ProcessList.size(); a++)
+        {
+            ProcessModel& currentProcess = ProcessManager::ProcessList[a];
+
+            if (currentProcess.GetPID() == processID)
+            {
+                processModel = currentProcess;
+                index = a;
+
+                return true;
+            };
+        };
+
+        return false;
+    };
+
 
     // Checks if a process is currently running
     static BOOL IsProcessRunning(DWORD processID)

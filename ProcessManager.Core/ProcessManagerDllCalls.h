@@ -78,92 +78,6 @@ DLL_CALL bool IsProcessRunning(DWORD processID)
 
 
 
-// A struct that stores information about a process in-between WNDENUMPROC calls
-struct EnumProcParam
-{
-    // The process' PID
-    DWORD ProcessID = NULL;
-
-    // An "out" variable that will contain the process' main window HWND
-    HWND HwndOut = NULL;
-
-    // A timing varialbe used to keep track of when the process HWND search has started
-    std::chrono::steady_clock::time_point StartTime = std::chrono::steady_clock::now();
-
-    // How long to keep searching for 
-    int TimeoutMS = 0;
-
-    // A boolean flag that indicates if the search has timed out
-    bool TimedOut = false;
-};
-
-// Returns a process' MainWindow handle
-static HWND GetProcessHWND(DWORD processID, int msTimeout = 3000)
-{
-    // Create a WndEnumProcParam struct to hold the data
-    EnumProcParam wndEnumProcParam;
-    wndEnumProcParam.ProcessID = processID;
-    wndEnumProcParam.HwndOut = NULL;
-    wndEnumProcParam.StartTime = std::chrono::steady_clock::now();
-    wndEnumProcParam.TimeoutMS = msTimeout;
-
-
-    // Continue iteration while the out HWND variable is null
-    while (wndEnumProcParam.HwndOut == NULL)
-    {
-        // This function iterates through every top-level window,
-        EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
-        {
-            // Only if the current window is visible to the user
-            if (IsWindowVisible(handle) == TRUE)
-            {
-                // Convert the LPARAM to WndEnumProcParam
-                EnumProcParam& enumProcParam = *reinterpret_cast<EnumProcParam*>(lParam);
-
-                // Get the current time 
-                std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-
-                // Get elapsed time 
-                auto elapsedTimeInMS = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - enumProcParam.StartTime).count();
-
-                // Check if we didn't timeout
-                if (elapsedTimeInMS >= enumProcParam.TimeoutMS)
-                {
-                    enumProcParam.TimedOut = true;
-                    return FALSE;
-                };
-
-                // Get the process PID
-                DWORD currentProcess = 0;
-                GetWindowThreadProcessId(handle, &currentProcess);
-
-                // Compare the id's, 
-                // if they match
-                if (enumProcParam.ProcessID == currentProcess)
-                {
-                    // Set the HWND out variable 
-                    enumProcParam.HwndOut = handle;
-
-                    // Return false(0) to stop the window iteration 
-                    return FALSE;
-                };
-            };
-
-            return TRUE;
-        }, reinterpret_cast<LPARAM>(&wndEnumProcParam));
-
-        if (wndEnumProcParam.TimedOut == true)
-        {
-            return NULL;
-        };
-    };
-
-    return wndEnumProcParam.HwndOut;
-}
-
-
-
-
 // Takes a DWORD error code and returns its string message 
 std::string GetLastErrorAsString()
 {
@@ -183,34 +97,58 @@ std::string GetLastErrorAsString()
     return message;
 }
 
-DLL_CALL void Test()
+
+DLL_CALL bool Test(const wchar_t* runFromDirectory, wchar_t* script, ProcessClosedCallback processClosedCallback, bool visibleOnStartup, DWORD& pid)
 {
     STARTUPINFOW startupInfo = { 0 };
     startupInfo.cb = sizeof(startupInfo);
 
     PROCESS_INFORMATION processInfo = { 0 };
 
-    wchar_t args[] = L"/C npm run start";
+    ProcessModel process(L"", L"");
+    process.StartInDirectory = runFromDirectory;
+    process.ConsoleScript = script;
 
-    if (!CreateProcessW(L"C:\\WINDOWS\\system32\\cmd.exe",
-        args,
+    std::wstring scriptAsWString(script);
+    scriptAsWString.insert(0, L"/C ");
+
+    wchar_t* cmdlines = const_cast<wchar_t*>(scriptAsWString.c_str());
+
+    if (!CreateProcessW(L"C:\\WINDOWS\\system32\\cmd.exe", cmdlines,
         NULL, NULL,
         FALSE,
         NULL,
         NULL,
-        L"C:\\Development\\Npm Test\\client",
+        runFromDirectory,
         &startupInfo,
         &processInfo))
     {
-        auto s = GetLastErrorAsString();
-        int ss = 9;
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+
+        return false;
     };
 
-    HWND hwnd = GetProcessHWND(processInfo.dwProcessId, 3000);
+    process.ProcessInfo = processInfo;
+    process.StartupInfo = startupInfo;
 
-    //ShowWindow(hwnd, SW_HIDE);
+    
+    HWND hwnd = ProcessManager::GetProcessHWND(processInfo.dwProcessId, 3000);
 
-    CloseHandle(processInfo.hProcess);
-    CloseHandle(processInfo.hThread);
+    process.MainWindowHandle = hwnd;
+    process.ProcessClosedCallback = processClosedCallback;
 
+    HANDLE hNewHandle;
+    RegisterWaitForSingleObject(&hNewHandle, process.ProcessInfo.hProcess, ProcessManager::ProcessTerminatedCallback, reinterpret_cast<PVOID>(process.GetPID()), INFINITE, WT_EXECUTEONLYONCE);
+
+    ProcessManager::ProcessList.push_back(process);
+
+
+    if (visibleOnStartup == false)
+        ShowWindow(process.MainWindowHandle, SW_HIDE);
+
+
+    pid = process.GetPID();
+
+    return true;
 };

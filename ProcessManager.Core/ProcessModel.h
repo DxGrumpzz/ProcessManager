@@ -15,7 +15,7 @@ class ProcessModel
 public:
     // The name (path) of the process
     std::wstring ProcessName;
-    
+
     // The process arguments
     std::wstring ProcessArgs;
 
@@ -36,7 +36,16 @@ public:
 
     // A WinEventHook function used to get the the process HWND's
     HWINEVENTHOOK Hook;
-    
+
+
+    bool RunAsConsole;
+
+    // Directory path to run a console script from. Used only in console processes
+    std::wstring StartInDirectory;
+
+    // A script to be ran in the console
+    std::wstring ConsoleScript;
+
 
     ProcessClosedCallback ProcessClosedCallback;
 
@@ -53,18 +62,21 @@ public:
     };
 
     ProcessModel(const wchar_t* processName, const wchar_t* processArgs) :
-        ProcessModel(std::wstring(processName), 
+        ProcessModel(std::wstring(processName),
                      std::wstring(processArgs == nullptr ?
                      L"" :
                      processArgs))
     {
     };
 
+    ProcessModel()
+    {
+    };
 
 public:
 
     // Retrieve the process PID
-    DWORD GetPID() const
+    inline DWORD GetPID() const
     {
         return ProcessInfo.dwProcessId;
     };

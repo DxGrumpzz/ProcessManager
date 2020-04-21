@@ -8,11 +8,9 @@
        
         Title="Process Manager" 
       
-        Height="250" 
+        Height="275" 
         Width="700"
         
-        MinHeight="125"
-        MinWidth="265"
         
         d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">
 
