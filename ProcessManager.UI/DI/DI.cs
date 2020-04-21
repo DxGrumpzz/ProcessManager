@@ -28,8 +28,10 @@
         public static MainWindowViewModel MainWindowViewModel { get; set; }
 
         public static SystemTrayIcon SystemTrayIcon { get; set; }
-        
-        public static IFolderDialog FolderDialog { get; set; }
+
+
+        public static IFolderDialog FolderDialog => new WindowsFolderDialog();
+        public static IFileDialog FileDialog => new WindowsFileDialog();
 
 
 
@@ -39,7 +41,6 @@
         /// <param name="hwnd"></param>
         public static void SetupTrayIcon(IntPtr hwnd)
         {
-            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter, so we need a valid window to initialize this class
             // Create the SystemTrayIcon class
             SystemTrayIcon = new SystemTrayIcon(Localization.APP_ICON_LOCATION, hwnd);
 

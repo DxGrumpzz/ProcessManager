@@ -21,7 +21,7 @@ namespace ProcessManager.UI
         {
             base.OnStartup(e);
 
-            Test();
+            //Test();
 
             // Check if the processes file exists
             if (File.Exists(Localization.PROJECTS_FILE_NAME) == false)
@@ -42,6 +42,7 @@ namespace ProcessManager.UI
             .Show();
 
             // Setup TrayIcon stuff
+            // This is here and not in SetupDI because SystemTrayIcon takes an HWND as a parameter, so we need a valid window to initialize this class
             DI.SetupTrayIcon(new WindowInteropHelper(Current.MainWindow).Handle);
         }
 
@@ -85,7 +86,7 @@ namespace ProcessManager.UI
                    new ProjectsListViewModel(DI.Projects)),
             };
 
-            DI.FolderDialog = new WindowsFolderDialog();
+
         }
     };
 };
