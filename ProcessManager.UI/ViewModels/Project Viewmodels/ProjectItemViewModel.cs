@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -54,7 +55,9 @@
         public ICommand GotoMainPageCommnad { get; }
         public ICommand CloseProjectCommand { get; }
         public ICommand RunProjectCommand { get; }
+
         public ICommand AddNewProcessCommand { get; }
+        public ICommand AddNewConsoleProcessCommand { get; }
 
         #endregion
 
@@ -70,15 +73,19 @@
             RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand);
 
             AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
+            AddNewConsoleProcessCommand = new RelayCommand(ExecuteAddNewConsoleProcessCommand);
         }
 
+        private void ExecuteAddNewConsoleProcessCommand()
+        {
+            DI.MainWindowViewModel.CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(this));
+        }
 
         private void ExecuteAddNewProcessCommand()
         {
             DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(this));
         }
 
-        
         private void ExecuteRunProjectCommand()
         {
             foreach (var process in Project.ProcessList)
@@ -95,7 +102,6 @@
             };
         }
 
-
         private void ExecuteGotoMainPageommnad()
         {
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
@@ -105,6 +111,7 @@
         {
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(this);
         }
+
 
     };
 };
