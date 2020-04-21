@@ -16,11 +16,13 @@
                     <Grid>
 
                         <!-- The sole purpose of this control's existance here is to maintain the default TextBox look and feel -->
-                        <TextBox Text="{TemplateBinding Text}"/>
+                        <TextBox Text="{TemplateBinding Text}"
+                                 IsHitTestVisible="False"/>
 
                         <!-- A content host. Necessary  to "store" the value when data binding -->
                         <Decorator x:Name="PART_ContentHost"
                                    Opacity="0"
+                                   Focusable="False"
                                    Margin="1,1,0,0"/>
 
                         <!-- Watermark/placeholder text presenter -->
