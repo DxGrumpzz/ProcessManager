@@ -50,35 +50,32 @@ std::string GetLastErrorAsStringA()
 
 
 
-// Calls the windows Directory dialog.
+// Calls the windows Directory dialog using COM.
 // Returns the path to the opened folder
 extern "C" _declspec(dllexport) void OpenDirectoryDialog(wchar_t*& path)
 {
-    // Hold the folder's path 
-    path = new wchar_t[MAX_PATH] { 0 };
+    // The file dialog modal window 
+    IFileDialog* fileDialog;
 
-    // Data that will be sent to SHBrowseForFolderW
-    BROWSEINFOW browseInfo = { 0 };
+    // Create an instance of IFileDialog
+    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+    {
+        // Set the file dialog to only browse folders
+        fileDialog->SetOptions(FOS_PICKFOLDERS);
 
-    // The "title" 
-    browseInfo.lpszTitle = L"Select project folder";
+        // Show the file dialog
+        if (SUCCEEDED(fileDialog->Show(GetActiveWindow())))
+        {
+            // Get result
+            IShellItem* psi;
+            if (SUCCEEDED(fileDialog->GetResult(&psi)))
+            {
+                // Convert result to a readable string
+                psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path);
 
-    browseInfo.ulFlags = BIF_USENEWUI | BIF_STATUSTEXT | BIF_UAHINT;
-
-    // Open the dialog
-    LPITEMIDLIST pidl = SHBrowseForFolderW(&browseInfo);
-    
-    if (pidl == 0)
-        return;
-
-    // get the name of the folder and put it in path
-    SHGetPathFromIDListW(pidl, path);
-};
-
-// Frees memory of an unhandled string
-extern "C" _declspec(dllexport) void DeallocPathPointer(wchar_t* path)
-{
-    // Because we create a string that hold a path in OpenDirectoryDialog function
-    // we must de-allocate it from within C++ because C# doesn't handle "those" kinds of strings
-    delete[] path;
+                psi->Release();
+            };
+        };
+        fileDialog->Release();
+    };
 };
