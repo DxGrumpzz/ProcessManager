@@ -4,7 +4,7 @@
 
 
 
-    
+    <!-- A textbox style that allows a placeholder to be shown inside the textbox-->
     <Style TargetType="{x:Type TextBox}" x:Key="PlaceholderTextbox">
 
         <Setter Property="Template">
@@ -15,8 +15,15 @@
 
                     <Grid>
 
-                        <TextBox x:Name="MainTextBox" Text="{TemplateBinding Text}"/>
+                        <!-- The sole purpose of this control's existance here is to maintain the default TextBox look and feel -->
+                        <TextBox Text="{TemplateBinding Text}"/>
 
+                        <!-- A content host. Necessary  to "store" the value when data binding -->
+                        <Decorator x:Name="PART_ContentHost"
+                                   Opacity="0"
+                                   Margin="1,1,0,0"/>
+
+                        <!-- Watermark/placeholder text presenter -->
                         <TextBlock Text="{Binding Path=(local:PlaceHolder.Text),
                                    RelativeSource={RelativeSource Mode=TemplatedParent}}" 
                            
@@ -24,12 +31,11 @@
                            
                                    Margin="3,1,0,0"
                            
+                                   Focusable="False"
                                    IsHitTestVisible="False"
-                           
-                                   Panel.ZIndex="1"
-
-                                   Visibility="{Binding ElementName=MainTextBox,
-                                   Path=Text.Length,
+                                    
+                                   Visibility="{Binding Path=Text.Length,
+                                   RelativeSource={RelativeSource Mode=TemplatedParent},
                                    UpdateSourceTrigger=PropertyChanged,
                                    Converter={local:BooleanToVisibilityValueConverter},
                                    ConverterParameter=True}" />
