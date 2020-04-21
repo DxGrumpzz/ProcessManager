@@ -86,16 +86,16 @@ HMENU CreateTrayIconMenu(std::vector<SystemTrayIconData*>* menuData)
    
         // Add the close and run menu options
         MENUITEMINFOW closeProjectMenuItem = CreateMenuItem(++index, L"Close", project);
-        WINCALL(InsertMenuItemW(innerMenu, 0, FALSE, &closeProjectMenuItem));
+        /*/*WINCALL*/(InsertMenuItemW(innerMenu, 0, FALSE, &closeProjectMenuItem));
        
         // Add a 1 in the ten thousands place and remove after creating the menu
         MENUITEMINFOW runProjectMenuItem = CreateMenuItem(++(index += 10000), L"Run", project);
-        WINCALL(InsertMenuItemW(innerMenu, 1, FALSE, &runProjectMenuItem));
+        /*/*WINCALL*/(InsertMenuItemW(innerMenu, 1, FALSE, &runProjectMenuItem));
         index -= 10000;
 
         // Create the main menu item 
         MENUITEMINFOW projectMenu = AddMenuItemSub(innerMenu, MENUITEMID + (index - 1), project->ProjectName, project);
-        WINCALL(InsertMenuItemW(menu, 0, FALSE, &projectMenu));
+        /*WINCALL*/(InsertMenuItemW(menu, 0, FALSE, &projectMenu));
 
         // Increment the index to the next project menu item sub menu
         index += 100;

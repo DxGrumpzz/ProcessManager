@@ -1,13 +1,12 @@
-#pragma once
+#include "WindowsHelpers.h"
+
 #include <shlobj_core.h>
 #include <winbase.h>
 #include <string>
 #include <chrono>
 
-
-
 // Takes a DWORD error code and returns its string message 
-static std::wstring GetLastErrorAsStringW()
+std::wstring GetLastErrorAsStringW()
 {
     // Stores the error message as a string in memory
     LPWSTR buffer = nullptr;
@@ -27,7 +26,7 @@ static std::wstring GetLastErrorAsStringW()
 
 
 // Takes a DWORD error code and returns its string message 
-static std::string GetLastErrorAsStringA()
+std::string GetLastErrorAsStringA()
 {
     // Stores the error message as a string in memory
     LPSTR buffer = nullptr;
@@ -53,7 +52,7 @@ static std::string GetLastErrorAsStringA()
 
 // Calls the windows Directory dialog using COM.
 // Returns the path to the opened folder
-extern "C" _declspec(dllexport) inline void OpenDirectoryDialog(wchar_t*& path)
+extern "C" _declspec(dllexport) void OpenDirectoryDialog(wchar_t*& path)
 {
     // The file dialog modal window 
     IFileDialog* fileDialog;
@@ -82,7 +81,6 @@ extern "C" _declspec(dllexport) inline void OpenDirectoryDialog(wchar_t*& path)
 };
 
 
-
 // A struct that stores information about a process in-between WNDENUMPROC calls
 struct EnumProcParam
 {
@@ -103,7 +101,7 @@ struct EnumProcParam
 };
 
 // Returns a process' MainWindow handle
-static HWND GetProcessHWND(DWORD processID, int msTimeout = 3000)
+static HWND GetProcessHWND(DWORD processID, int msTimeout)
 {
     // Create a WndEnumProcParam struct to hold the data
     EnumProcParam wndEnumProcParam;

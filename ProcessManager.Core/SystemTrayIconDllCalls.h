@@ -1,11 +1,12 @@
+#pragma once
 #include <windows.h>
 #include <string>
 #include <array>
 #include <exception>
 #include <vector>
 
-#include "SystemTrayIconData.h"
 #include "WindowsHelpers.h"
+#include "SystemTrayIconData.h"
 #include "SystemTrayIconData.h"
 #include "TrayIconMenuHelpers.h"
 

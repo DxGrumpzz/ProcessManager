@@ -2,6 +2,7 @@
 #include "ProcessManager.h"
 #include "ProcessModel.h"
 
+
 #define DLL_CALL extern "C" __declspec(dllexport) 
 
 
@@ -79,23 +80,23 @@ DLL_CALL bool IsProcessRunning(DWORD processID)
 
 
 // Takes a DWORD error code and returns its string message 
-std::string GetLastErrorAsString()
-{
-    // Stores the error message as a string in memory
-    LPSTR buffer = nullptr;
-
-    // Format DWORD error ID to a string 
-    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                   NULL,
-                   GetLastError(),
-                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPSTR)&buffer, 0, NULL);
-
-    // Create std string from buffer
-    std::string message(buffer);
-
-    return message;
-}
+//std::string GetLastErrorAsString()
+//{
+//    // Stores the error message as a string in memory
+//    LPSTR buffer = nullptr;
+//
+//    // Format DWORD error ID to a string 
+//    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+//                   NULL,
+//                   GetLastError(),
+//                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//                   (LPSTR)&buffer, 0, NULL);
+//
+//    // Create std string from buffer
+//    std::string message(buffer);
+//
+//    return message;
+//}
 
 
 DLL_CALL bool Test(const wchar_t* runFromDirectory, wchar_t* script, ProcessClosedCallback processClosedCallback, bool visibleOnStartup, DWORD& pid)
@@ -133,7 +134,7 @@ DLL_CALL bool Test(const wchar_t* runFromDirectory, wchar_t* script, ProcessClos
     process.StartupInfo = startupInfo;
 
     
-    HWND hwnd = ProcessManager::GetProcessHWND(processInfo.dwProcessId, 3000);
+    HWND hwnd = GetProcessHWND(processInfo.dwProcessId, 3000);
 
     process.MainWindowHandle = hwnd;
     process.ProcessClosedCallback = processClosedCallback;

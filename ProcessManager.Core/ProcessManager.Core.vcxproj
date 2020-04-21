@@ -167,8 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ProcessManagerDllCalls.h" />
-    <ClCompile Include="ProcessManager.cpp" />
-    <ClCompile Include="SystemTrayIconDllCalls.cpp" />
+    <ClCompile Include="SystemTrayIconDllCalls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProcessManager.h" />

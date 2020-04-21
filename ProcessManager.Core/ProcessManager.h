@@ -5,9 +5,10 @@
 #include <fstream>
 #include <algorithm>
 #include <tlhelp32.h>
-
-#include "ProcessModel.h"
 #include <mutex>
+
+#include "WindowsHelpers.h"
+#include "ProcessModel.h"
 
 
 // A class that is responsible for interaction with the ProcessModel
@@ -18,117 +19,10 @@ class ProcessManager
 public:
 
     // The list of processes that will be ran
-    static std::vector<ProcessModel> ProcessList;
+    inline static std::vector<ProcessModel> ProcessList;
 
 
 public:
-
-    // A struct that stores information about a process in-between WNDENUMPROC calls
-    struct EnumProcParam
-    {
-        // The process' PID
-        DWORD ProcessID = NULL;
-
-        // An "out" variable that will contain the process' main window HWND
-        HWND HwndOut = NULL;
-
-        // A timing varialbe used to keep track of when the process HWND search has started
-        std::chrono::steady_clock::time_point StartTime = std::chrono::steady_clock::now();
-
-        // How long to keep searching for 
-        int TimeoutMS = 0;
-
-        // A boolean flag that indicates if the search has timed out
-        bool TimedOut = false;
-    };
-
-    // Returns a process' MainWindow handle
-    static HWND GetProcessHWND(DWORD processID, int msTimeout = 3000)
-    {
-        // Create a WndEnumProcParam struct to hold the data
-        EnumProcParam wndEnumProcParam;
-        wndEnumProcParam.ProcessID = processID;
-        wndEnumProcParam.HwndOut = NULL;
-        wndEnumProcParam.StartTime = std::chrono::steady_clock::now();
-        wndEnumProcParam.TimeoutMS = msTimeout;
-
-
-        // Continue iteration while the out HWND variable is null
-        while (wndEnumProcParam.HwndOut == NULL)
-        {
-            // This function iterates through every top-level window,
-            EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
-            {
-                // Only if the current window is visible to the user
-                if (IsWindowVisible(handle) == TRUE)
-                {
-                    // Convert the LPARAM to WndEnumProcParam
-                    EnumProcParam& enumProcParam = *reinterpret_cast<EnumProcParam*>(lParam);
-
-                    // Get the current time 
-                    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-
-                    // Get elapsed time 
-                    auto elapsedTimeInMS = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - enumProcParam.StartTime).count();
-
-                    // Check if we didn't timeout
-                    if (elapsedTimeInMS >= enumProcParam.TimeoutMS)
-                    {
-                        enumProcParam.TimedOut = true;
-                        return FALSE;
-                    };
-
-                    // Get the process PID
-                    DWORD currentProcess = 0;
-                    GetWindowThreadProcessId(handle, &currentProcess);
-
-                    // Compare the id's, 
-                    // if they match
-                    if (enumProcParam.ProcessID == currentProcess)
-                    {
-                        // Set the HWND out variable 
-                        enumProcParam.HwndOut = handle;
-
-                        // Return false(0) to stop the window iteration 
-                        return FALSE;
-                    };
-                };
-
-                return TRUE;
-            }, reinterpret_cast<LPARAM>(&wndEnumProcParam));
-
-            if (wndEnumProcParam.TimedOut == true)
-            {
-                return NULL;
-            };
-        };
-
-        return wndEnumProcParam.HwndOut;
-    }
-
-    static std::vector<HWND> GetProcessHWNDs(DWORD processID)
-    {
-        std::pair<std::vector<HWND>, DWORD> param = std::make_pair(std::vector<HWND>(), processID);
-
-        EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
-        {
-            std::pair<std::vector<HWND>, DWORD>& param = *reinterpret_cast<std::pair<std::vector<HWND>, DWORD>*>(lParam);
-
-            DWORD currentProcess = 0;
-            GetWindowThreadProcessId(handle, &currentProcess);
-
-            if (param.second == currentProcess)
-            {
-                param.first.push_back(handle);
-            };
-
-            return TRUE;
-
-        }, reinterpret_cast<LPARAM>(&param));
-
-        return param.first;
-    }
-
 
     inline static std::mutex _mutex;
 
