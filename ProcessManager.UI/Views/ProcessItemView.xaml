@@ -19,7 +19,7 @@
             <ColumnDefinition Width="AUTO"/>
         </Grid.ColumnDefinitions>
 
-        
+
         <Grid local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}" 
               local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
 

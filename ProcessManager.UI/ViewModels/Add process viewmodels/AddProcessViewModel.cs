@@ -21,7 +21,7 @@
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _selectedProcessPath = "No process selected";
+        private string _selectedProcessPath;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _addProcessEnabled;
@@ -55,7 +55,7 @@
 
         public bool ProcessVisibleOnStartup { get; set; }
 
-        public string ProcessLabel { get; set; }
+        public string ProcessLabel { get; set; } = string.Empty;
 
         public bool AddProcessEnabled
         {
@@ -131,7 +131,7 @@
         private void ExecuteSelectProcessCommand()
         {
             // Use the open file dialog to select a process
-            IFileDialog fileDialog = new WindowsFileDialog();
+            var fileDialog = DI.FileDialog;
 
             // If user has selected a process
             if (fileDialog.ShowOpenFileDialog() == true)
@@ -161,7 +161,6 @@
         {
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
         }
-
 
     };
 };

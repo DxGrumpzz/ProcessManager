@@ -59,6 +59,15 @@
                         
                         Command="{Binding AddNewProcessCommand}"/>
 
+
+                <Button Content="Add console process"
+                        
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Left"
+                        
+                        Command="{Binding AddNewConsoleProcessCommand}"/>
+                
+
             </StackPanel>
             
         </ScrollViewer>

@@ -49,12 +49,16 @@
         <!-- Process args -->
         <TextBox local:PlaceHolder.Text="Process args (space separated, Optional)"
                  
-                 Text="{Binding ProcessAgs, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{Binding ProcessAgs}"
+                 
+                 Style="{StaticResource PlaceholderTextbox}"/>
 
         <!-- Process label -->
         <TextBox local:PlaceHolder.Text="Process label (Optional)"
                  
-                 Text="{Binding ProcessLabel, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{Binding ProcessLabel}"
+                 
+                 Style="{StaticResource PlaceholderTextbox}"/>
 
 
 
