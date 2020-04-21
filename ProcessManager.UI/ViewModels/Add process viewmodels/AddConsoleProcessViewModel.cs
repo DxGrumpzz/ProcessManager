@@ -1,7 +1,9 @@
 namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Text.Json;
     using System.Windows.Input;
 
 
@@ -108,6 +110,59 @@ namespace ProcessManager.UI
 
         private void ExecuteAddProcessCommand()
         {
+            // Validate directory path
+            if (string.IsNullOrWhiteSpace(ConsoleDirectory) == true &&
+                Directory.Exists(ConsoleDirectory) == false)
+                return;
+
+            // Validate console script
+            if (string.IsNullOrWhiteSpace(ConsoleScript) == true)
+                return;
+
+            var project = ProjectVM.Project;
+
+            ProcessModel process = new ProcessModel()
+            {
+                RunAsConsole = true,
+                
+                ProcessPath = ConsoleDirectory,
+
+                StartInDirectory = ConsoleDirectory,
+                ConsoleScript  = ConsoleScript,
+                
+                VisibleOnStartup = ProcessVisibleOnStartup,
+
+                ProcessLabel = ProcessLabel
+            };
+
+            project.ProcessList.Add(process);
+
+            // Convert the process list inside the project to json
+            string jsonString = JsonSerializer.Serialize(
+                project.ProcessList
+                .Select(process => new
+                {
+                    RunAsConsole = process.RunAsConsole,
+
+                    StartInDirectory = process.StartInDirectory,
+                    ConsoleScript = process.ConsoleScript,
+
+                    ProcessPath = process.ProcessPath,
+                    ProcessArgs = process.ProcessArgs,
+                    ProcessLabel = process.ProcessLabel,
+
+                    VisibleOnStartup = process.VisibleOnStartup,
+                }),
+                new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                });
+
+
+            // Write the json to the project's config file
+            File.WriteAllText(project.ProjectPathWithConfig, jsonString);
+
+
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
         }
 
