@@ -1,5 +1,5 @@
 #pragma once
-* C#include "ProcessModel.h"
+#include "ProcessModel.h"
 
 
 #define DLL_CALL extern "C" __declspec(dllexport) 
