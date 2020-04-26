@@ -170,7 +170,6 @@
     <ClCompile Include="SystemTrayIconDllCalls.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ProcessManager.h" />
     <ClInclude Include="ProcessModel.h" />
     <ClInclude Include="SystemTrayIconData.h" />
     <ClInclude Include="TrayIconMenuHelpers.h" />

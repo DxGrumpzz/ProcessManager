@@ -15,9 +15,6 @@
     <ClInclude Include="TrayIconMenuHelpers.h">
       <Filter>SystemTrayIcon</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessManager.h">
-      <Filter>ProcessManager</Filter>
-    </ClInclude>
     <ClInclude Include="ProcessModel.h">
       <Filter>ProcessManager</Filter>
     </ClInclude>
