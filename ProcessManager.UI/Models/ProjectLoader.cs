@@ -75,7 +75,7 @@
         {
             foreach (var project in _projects)
             {
-                project.ProcessList = new List<ProcessModel>(_processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
+                project.ProcessList = new List<IProcessModel>(_processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
             };
         }
 

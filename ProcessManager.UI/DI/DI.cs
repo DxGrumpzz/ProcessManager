@@ -14,7 +14,7 @@
         /// <summary>
         /// The process list loaded from file
         /// </summary>
-        public static List<ProcessModel> ProcessList { get; set; }
+        public static List<IProcessModel> ProcessList { get; set; }
 
         /// <summary>
         /// The process list file loader/reader

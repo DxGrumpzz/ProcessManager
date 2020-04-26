@@ -16,7 +16,7 @@
 
         public string ProjectPathWithConfig => Path.Combine(ProjectPath, "ProcessManger.Config.Json");
 
-        public IList<ProcessModel> ProcessList { get; set; }
+        public IList<IProcessModel> ProcessList { get; set; }
 
 
 
@@ -40,7 +40,7 @@
         {
             foreach (var process in ProcessList)
             {
-                process.CloseProcessTree();
+                process.CloseProcess();
             };
         }
 

@@ -10,10 +10,7 @@ namespace ProcessManager.UI
     public class ProcessItemViewModel : BaseViewModel
     {
         public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(
-            new ProcessModel()
-            {
-                ProcessPath = Path.GetRandomFileName(),
-            });
+            new GUIProcess(Path.GetRandomFileName()));
 
 
         #region Private fields
@@ -35,12 +32,27 @@ namespace ProcessManager.UI
         /// <summary>
         /// The process associated with this viewmodel
         /// </summary>
-        public ProcessModel Process { get; set; }
+        public IProcessModel Process { get; set; }
 
         /// <summary>
         /// The process path, Formatted
         /// </summary>
-        public string ProcessPath => Path.GetFullPath(Process.ProcessPath);
+        public string ProcessPath 
+        {
+            get
+            {
+                if (Process is ConsoleProcess consoleProcess)
+                    return Path.GetFullPath(consoleProcess.StartupDirectory);
+                else if (Process is GUIProcess guiProcess)
+                    return Path.GetFullPath(guiProcess.ProcessPath);
+                else
+                {
+                    Debugger.Break();
+                    return null;
+                };
+
+            }
+        } 
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
@@ -85,7 +97,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// A boolean flag that indicates if the associated process has a label
         /// </summary>
-        public bool ProcessHasLabel => string.IsNullOrWhiteSpace(Process.ProcessLabel);
+        public bool ProcessHasLabel => false;// string.IsNullOrWhiteSpace(Process.ProcessLabel);
 
         #endregion
 
@@ -106,27 +118,35 @@ namespace ProcessManager.UI
 
 
 
-        public ProcessItemViewModel(ProcessModel process)
+        public ProcessItemViewModel(IProcessModel process)
         {
             Process = process;
 
             _processRunning = process.IsRunning;
-            _processVisible = process.ProcessVisibilityState > 0 ? true : false;
+
+            // TODO: add visiblity to processes
+            //_processVisible = process.ProcessVisibilityState > 0 ? true : false;
 
 
             // Bind the process closed event
-            Process.ProcessClosedEvent += () => ProcessRunning = false;
+            Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
-            Process.ProcessInitializedEvent += () =>
-            {
-                if (Process.VisibleOnStartup == false)
-                    ProcessVisible = false;
-                else
-                    ProcessVisible = true;
+            // TODO: add initialization event to processes
+            /*
+             Process.ProcessInitializedEvent += () =>
+             {
+                 if (Process.VisibleOnStartup == false)
+                     ProcessVisible = false;
+                 else
+                     ProcessVisible = true;
 
 
-                ProcessRunning = true;
-            };
+                 ProcessRunning = true;
+             };
+            */
+
+            // TODO: add visiblity event to processes
+            /*
             Process.ProcessVisibilityStateChanged += (ProcessVisibilityState visibilityState) =>
             {
                 if (visibilityState == ProcessVisibilityState.Visible)
@@ -138,13 +158,14 @@ namespace ProcessManager.UI
                     ProcessVisible = false;
                 };
             };
+            */
 
 
             RunProcessCommand = new RelayCommand(() => Process.RunProcess());
-            CloseProcessCommand = new RelayCommand(() => Process.CloseProcessTree());
+            CloseProcessCommand = new RelayCommand(() => Process.CloseProcess());
 
-            ShowProcessCommand = new RelayCommand(() => Process.ShowProcess());
-            HideProcessCommand = new RelayCommand(() => Process.HideProcess());
+            ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
+            HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
 
 
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file

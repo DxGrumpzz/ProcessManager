@@ -121,37 +121,47 @@ namespace ProcessManager.UI
 
             var project = ProjectVM.Project;
 
-            ProcessModel process = new ProcessModel()
-            {
-                RunAsConsole = true,
-                
-                ProcessPath = ConsoleDirectory,
-
-                StartInDirectory = ConsoleDirectory,
-                ConsoleScript  = ConsoleScript,
-                
-                VisibleOnStartup = ProcessVisibleOnStartup,
-
-                ProcessLabel = ProcessLabel
-            };
-
-            project.ProcessList.Add(process);
+            project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory));
 
             // Convert the process list inside the project to json
             string jsonString = JsonSerializer.Serialize(
                 project.ProcessList
-                .Select(process => new
+                .Select<IProcessModel, object>(process =>
                 {
-                    RunAsConsole = process.RunAsConsole,
+                    switch (process)
+                    {
+                        case ConsoleProcess consoleProcess:
+                        {
+                            return new
+                            {
+                                RunAsConsole = true,
 
-                    StartInDirectory = process.StartInDirectory,
-                    ConsoleScript = process.ConsoleScript,
+                                StartInDirectory = consoleProcess.StartupDirectory,
+                                ConsoleScript = consoleProcess.ConsoleScript,
 
-                    ProcessPath = process.ProcessPath,
-                    ProcessArgs = process.ProcessArgs,
-                    ProcessLabel = process.ProcessLabel,
+                                VisibleOnStartup = true,
+                            };
+                        };
 
-                    VisibleOnStartup = process.VisibleOnStartup,
+                        case GUIProcess guiProcess:
+                        {
+                            return new
+                            {
+                                RunAsConsole = false,
+                                
+                                ProcessPath = guiProcess.ProcessPath,
+                                ProcessArgs = guiProcess.ProcessArgs,
+
+                                VisibleOnStartup = true,
+                            };
+                        };
+
+                        default:
+                        {
+                            Debugger.Break();
+                            return null;
+                        }
+                    };
                 }),
                 new JsonSerializerOptions()
                 {

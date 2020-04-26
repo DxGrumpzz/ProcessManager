@@ -98,33 +98,52 @@
         {
             var project = ProjectVM.Project;
 
-            project.ProcessList.Add(new ProcessModel()
-            {
-                ProcessPath = SelectedProcessPath,
-                VisibleOnStartup = ProcessVisibleOnStartup,
-                ProcessArgs = ProcessAgs,
-                ProcessLabel = ProcessLabel,
-            });
+            project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs));
 
             // Convert the process list inside the project to json
             string jsonString = JsonSerializer.Serialize(
                 project.ProcessList
-                .Select(process => new
+                .Select(process =>
                 {
-                    RunAsConsole = process.RunAsConsole,
+                    switch (process)
+                    {
+                        case ConsoleProcess consoleProcess:
+                        {
+                            return new JsonProcessModel
+                            {
+                                RunAsConsole = true,
 
-                    StartInDirectory = process.StartInDirectory,
-                    ConsoleScript = process.ConsoleScript,
+                                StartInDirectory = consoleProcess.StartupDirectory,
+                                ConsoleScript = consoleProcess.ConsoleScript,
 
-                    ProcessPath = process.ProcessPath,
-                    ProcessArgs = process.ProcessArgs,
-                    ProcessLabel = process.ProcessLabel,
+                                VisibleOnStartup = true,
+                            };
+                        };
 
-                    VisibleOnStartup = process.VisibleOnStartup,
+                        case GUIProcess guiProcess:
+                        {
+                            return new JsonProcessModel
+                            {
+                                RunAsConsole = false,
+
+                                ProcessPath = guiProcess.ProcessPath,
+                                ProcessArgs = guiProcess.ProcessArgs,
+
+                                VisibleOnStartup = true,
+                            };
+                        };
+
+                        default:
+                        {
+                            Debugger.Break();
+                            return default;
+                        }
+                    };
                 }),
                 new JsonSerializerOptions()
                 {
                     WriteIndented = true,
+                    IgnoreNullValues = true,
                 });
 
 

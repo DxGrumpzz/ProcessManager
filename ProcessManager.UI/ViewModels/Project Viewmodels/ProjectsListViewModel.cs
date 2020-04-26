@@ -23,17 +23,17 @@
                 new ProjectItemViewModel(new Project()
                 {
                     ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
-                    ProcessList = new List<ProcessModel>(),
+                    ProcessList = new List<IProcessModel>(),
                 }),
                 new ProjectItemViewModel(new Project()
                 {
                     ProjectPath = $@"D:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
-                    ProcessList = new List<ProcessModel>(),
+                    ProcessList = new List<IProcessModel>(),
                 }),
                 new ProjectItemViewModel(new Project()
                 {
                     ProjectPath = $@"A:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
-                    ProcessList = new List<ProcessModel>(),
+                    ProcessList = new List<IProcessModel>(),
                 }),
             },
         };
@@ -111,7 +111,7 @@
             var newProject = new Project()
             {
                 ProjectPath = selectedFolder,
-                ProcessList = new List<ProcessModel>(),
+                ProcessList = new List<IProcessModel>(),
             };
 
             // Add the new project to the projects list

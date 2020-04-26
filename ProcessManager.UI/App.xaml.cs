@@ -3,7 +3,6 @@ namespace ProcessManager.UI
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Interop;
 
