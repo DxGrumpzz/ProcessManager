@@ -132,18 +132,16 @@ namespace ProcessManager.UI
             Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
             // TODO: add initialization event to processes
-            /*
-             Process.ProcessInitializedEvent += () =>
+             Process.ProcessInitializedCallback += (IProcessModel process) =>
              {
-                 if (Process.VisibleOnStartup == false)
-                     ProcessVisible = false;
-                 else
-                     ProcessVisible = true;
+                 //if (Process.VisibleOnStartup == false)
+                 //    ProcessVisible = false;
+                 //else
+                 //    ProcessVisible = true;
 
 
                  ProcessRunning = true;
              };
-            */
 
             // TODO: add visiblity event to processes
             /*

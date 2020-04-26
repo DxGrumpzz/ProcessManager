@@ -29,7 +29,9 @@
         protected extern static void CreateProcessObject(string processPath, string processArgs,
                                                          string consoleScript, string startupDirectory,
                                                          bool runAsConsole,
-                                                         _ProcessClosedCallBack processClosedCallback, ref IntPtr process);
+                                                         _ProcessClosedCallBack processClosedCallback, 
+                                                         _ProcessClosedCallBack processInitialziedCallback,
+                                                         ref IntPtr process);
 
         [DllImport(DLL_NAME)]
         protected extern static void DestroyProcessObject(ref IntPtr process);
@@ -59,9 +61,13 @@
 
         public virtual bool IsRunning => ProcessRunning(_processPointer);
 
+
         protected _ProcessClosedCallBack _processClosedCallback;
+        protected _ProcessClosedCallBack _processInitialziedCallback;
+
 
         public abstract event Action<IProcessModel> ProcessClosedCallback;
+        public abstract event Action<IProcessModel> ProcessInitializedCallback;
 
 
         public virtual bool RunProcess()

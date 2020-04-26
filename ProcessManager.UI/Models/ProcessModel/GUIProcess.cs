@@ -11,6 +11,7 @@
         public override bool IsRunning => ProcessRunning(_processPointer);
 
         public override event Action<IProcessModel> ProcessClosedCallback;
+        public override event Action<IProcessModel> ProcessInitializedCallback;
 
 
         /// <summary>
@@ -34,7 +35,12 @@
                 ProcessClosedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(processPath, processArgs, null, null, false, _processClosedCallback, ref _processPointer);
+            _processInitialziedCallback = (IntPtr process) =>
+            {
+                ProcessInitializedCallback?.Invoke(this);
+            };
+
+            CreateProcessObject(processPath, processArgs, null, null, false, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
 

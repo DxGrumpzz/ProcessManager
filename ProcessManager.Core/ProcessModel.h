@@ -68,10 +68,15 @@ public:
     // A callback function that will be called when this process terminates
     ProcessClosedCallBack ProcessClosedCallback;
 
+    // A callback function that will be called when his process initialized
+    ProcessClosedCallBack ProcessInitializedCallback;
+
 
 public:
 
     ProcessModel() :
+        _registerCallbackHandle(NULL),
+
         ProcessInfo({ 0 }),
         StartupInfo({ 0 }),
 
@@ -86,8 +91,7 @@ public:
         StartupDirectory(L""),
 
         ProcessClosedCallback(NULL),
-        _registerCallbackHandle(NULL)
-
+        ProcessInitializedCallback(NULL)
     {
         StartupInfo.cb = sizeof(StartupInfo);
     };
@@ -101,10 +105,17 @@ public:
         // In windows, process initialization is different depending if the "process" is a cmd script or a GUI process
         // So we run different functions depending on the "type" of process
 
+        bool result = false;
+
         if (RunAsConsole == true)
-            return RunProcessAsConsole();
+            result =  RunProcessAsConsole();
         else
-            return RunProcessAsGUI();
+            result = RunProcessAsGUI();
+
+        if (result == true)
+            ProcessInitializedCallback(this);
+
+        return result;
     };
 
     // Closes the process

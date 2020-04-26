@@ -9,7 +9,9 @@
 DLL_CALL void CreateProcessObject(const wchar_t* processPath, const wchar_t* processArgs,
                                   const wchar_t* consoleScript, const wchar_t* startupDirectory,
                                   bool runAsConsole,
-                                  ProcessClosedCallBack processClosedCallback, ProcessModel*& process)
+                                  ProcessClosedCallBack processClosedCallback, 
+                                  ProcessClosedCallBack processInitialziedCallback,
+                                  ProcessModel*& process)
 {
     process = new ProcessModel();
 
@@ -26,6 +28,7 @@ DLL_CALL void CreateProcessObject(const wchar_t* processPath, const wchar_t* pro
         process->ProcessArgs = processArgs;
     };
 
+    process->ProcessInitializedCallback = processInitialziedCallback;
     process->ProcessClosedCallback = processClosedCallback;
 };
 

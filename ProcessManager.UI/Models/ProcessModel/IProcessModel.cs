@@ -12,6 +12,8 @@
 
 
         public event Action<IProcessModel> ProcessClosedCallback;
+        
+        public event Action<IProcessModel> ProcessInitializedCallback;
 
         public bool RunProcess();
         public bool CloseProcess();

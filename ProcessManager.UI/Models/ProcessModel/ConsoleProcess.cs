@@ -23,6 +23,7 @@
 
         public override event Action<IProcessModel> ProcessClosedCallback;
 
+        public override event Action<IProcessModel> ProcessInitializedCallback;
 
         public ConsoleProcess(string consoleScript, string startupDirectory)
         {
@@ -34,7 +35,12 @@
                 ProcessClosedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(null, null, consoleScript, startupDirectory, true, _processClosedCallback, ref _processPointer);
+            _processInitialziedCallback = (IntPtr process) =>
+            {
+                ProcessInitializedCallback?.Invoke(this);
+            };
+
+            CreateProcessObject(null, null, consoleScript, startupDirectory, true, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
         ~ConsoleProcess()
