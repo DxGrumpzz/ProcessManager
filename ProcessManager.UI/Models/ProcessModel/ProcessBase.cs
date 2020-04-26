@@ -61,6 +61,7 @@
 
         public virtual bool IsRunning => ProcessRunning(_processPointer);
 
+        public ProcessVisibilityState VisibilityState { get; private set; }
 
         protected _ProcessClosedCallBack _processClosedCallback;
         protected _ProcessClosedCallBack _processInitialziedCallback;
@@ -69,6 +70,7 @@
         public abstract event Action<IProcessModel> ProcessClosedCallback;
         public abstract event Action<IProcessModel> ProcessInitializedCallback;
 
+        public event Action<IProcessModel, ProcessVisibilityState> ProcessVisibilityChanged;
 
         public virtual bool RunProcess()
         {
@@ -89,12 +91,20 @@
 
         public virtual void HideProcessWindow()
         {
-            ShowProcessWindow(_processPointer);
+            if (HideProcessWindow(_processPointer) == true)
+            {
+                VisibilityState = ProcessVisibilityState.Hidden;
+                ProcessVisibilityChanged?.Invoke(this, VisibilityState);
+            };
         }
 
         public virtual void ShowProcessWindow()
         {
-            HideProcessWindow(_processPointer);
+            if (ShowProcessWindow(_processPointer) == true)
+            {
+                VisibilityState = ProcessVisibilityState.Visible;
+                ProcessVisibilityChanged?.Invoke(this, VisibilityState);
+            };
         }
 
     };

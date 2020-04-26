@@ -122,10 +122,9 @@ namespace ProcessManager.UI
         {
             Process = process;
 
-            _processRunning = process.IsRunning;
+            ProcessRunning = process.IsRunning;
 
-            // TODO: add visiblity to processes
-            //_processVisible = process.ProcessVisibilityState > 0 ? true : false;
+            ProcessVisible = process.VisibilityState == ProcessVisibilityState.Visible ? true : false;
 
 
             // Bind the process closed event
@@ -144,8 +143,7 @@ namespace ProcessManager.UI
              };
 
             // TODO: add visiblity event to processes
-            /*
-            Process.ProcessVisibilityStateChanged += (ProcessVisibilityState visibilityState) =>
+            Process.ProcessVisibilityChanged += (IProcessModel process, ProcessVisibilityState visibilityState) =>
             {
                 if (visibilityState == ProcessVisibilityState.Visible)
                 {
@@ -156,7 +154,6 @@ namespace ProcessManager.UI
                     ProcessVisible = false;
                 };
             };
-            */
 
 
             RunProcessCommand = new RelayCommand(() => Process.RunProcess());

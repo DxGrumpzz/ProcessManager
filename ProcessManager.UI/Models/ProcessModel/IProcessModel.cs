@@ -10,6 +10,10 @@
     {
         public bool IsRunning { get; }
 
+        public ProcessVisibilityState VisibilityState { get; }
+
+
+        public event Action<IProcessModel, ProcessVisibilityState> ProcessVisibilityChanged;
 
         public event Action<IProcessModel> ProcessClosedCallback;
         

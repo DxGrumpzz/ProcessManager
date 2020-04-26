@@ -155,10 +155,14 @@ public:
     };
 
 
+
     // Shows this process' main window
     bool ShowProcessWindow()
     {
-        return ShowWindow(MainWindowHandle, SW_SHOW);
+        // Why am I returning the inverse '!' of ShowWindow function ?
+        //https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow#return-value
+        // "If the window was previously hidden, the return value is zero."
+        return !ShowWindow(MainWindowHandle, SW_SHOW);
     };
 
     // Hides this process' main window
