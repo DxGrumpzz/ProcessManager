@@ -37,7 +37,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// The process path, Formatted
         /// </summary>
-        public string ProcessPath 
+        public string ProcessPath
         {
             get
             {
@@ -52,7 +52,7 @@ namespace ProcessManager.UI
                 };
 
             }
-        } 
+        }
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
@@ -130,19 +130,17 @@ namespace ProcessManager.UI
             // Bind the process closed event
             Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
-            // TODO: add initialization event to processes
-             Process.ProcessInitializedCallback += (IProcessModel process) =>
-             {
-                 //if (Process.VisibleOnStartup == false)
-                 //    ProcessVisible = false;
-                 //else
-                 //    ProcessVisible = true;
+            Process.ProcessInitializedCallback += (IProcessModel process) =>
+            {
+                if (Process.VisibleOnStartup == false)
+                    ProcessVisible = false;
+                else
+                    ProcessVisible = true;
 
 
-                 ProcessRunning = true;
-             };
+                ProcessRunning = true;
+            };
 
-            // TODO: add visiblity event to processes
             Process.ProcessVisibilityChanged += (IProcessModel process, ProcessVisibilityState visibilityState) =>
             {
                 if (visibilityState == ProcessVisibilityState.Visible)

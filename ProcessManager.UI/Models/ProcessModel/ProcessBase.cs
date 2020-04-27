@@ -29,6 +29,7 @@
         protected extern static void CreateProcessObject(string processPath, string processArgs,
                                                          string consoleScript, string startupDirectory,
                                                          bool runAsConsole,
+                                                         bool visibleOnStartup,
                                                          _ProcessClosedCallBack processClosedCallback, 
                                                          _ProcessClosedCallBack processInitialziedCallback,
                                                          ref IntPtr process);
@@ -65,7 +66,10 @@
 
         public ProcessVisibilityState VisibilityState { get; private set; }
 
-        
+        public bool VisibleOnStartup { get; set; }
+
+
+
         protected _ProcessClosedCallBack _processClosedCallback;
         protected _ProcessClosedCallBack _processInitialziedCallback;
 

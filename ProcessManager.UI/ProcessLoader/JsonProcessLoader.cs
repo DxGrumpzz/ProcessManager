@@ -31,14 +31,14 @@
                 {
                     if(jsonProcess.RunAsConsole == true)
                     {
-                        return new ConsoleProcess(jsonProcess.ConsoleScript, jsonProcess.StartInDirectory)
+                        return new ConsoleProcess(jsonProcess.ConsoleScript, jsonProcess.StartInDirectory, jsonProcess.VisibleOnStartup)
                         {
                             ProcessLabel = jsonProcess.ProcessLabel,
                         };
                     }
                     else
                     {
-                        return new GUIProcess(jsonProcess.ProcessPath, jsonProcess.ProcessArgs)
+                        return new GUIProcess(jsonProcess.ProcessPath, jsonProcess.ProcessArgs, jsonProcess.VisibleOnStartup)
                         {
                             ProcessLabel = jsonProcess.ProcessLabel,
                         };

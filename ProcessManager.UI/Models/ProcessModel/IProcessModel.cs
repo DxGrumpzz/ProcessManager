@@ -10,16 +10,13 @@
     {
 
         public bool IsRunning { get; }
-
+        public bool VisibleOnStartup { get; set; }
         public ProcessVisibilityState VisibilityState { get; }
-
         public string ProcessLabel { get; set; }
 
 
         public event Action<IProcessModel, ProcessVisibilityState> ProcessVisibilityChanged;
-
         public event Action<IProcessModel> ProcessClosedCallback;
-
         public event Action<IProcessModel> ProcessInitializedCallback;
 
 

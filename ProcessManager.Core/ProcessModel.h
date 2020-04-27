@@ -55,6 +55,9 @@ public:
 
     // A boolean flag that indicates if this process is to run as a console script
     bool RunAsConsole;
+    
+    // A boolean flag that indicates if this process will be visible when it's initialized
+    bool VisibleOnStartup;
 
 
     // The console script to run
@@ -85,6 +88,8 @@ public:
         ProcessArgs(L""),
 
         RunAsConsole(false),
+        
+        VisibleOnStartup(true),
 
         ConsoleScript(L""),
         StartupDirectory(L""),
@@ -114,7 +119,13 @@ public:
 
         // If process initialized succesfully invoke the initialzied event
         if (result == true)
+        {
+            // Hide process window if request
+            if (VisibleOnStartup == false)
+                HideProcessWindow();
+
             ProcessInitializedCallback(this);
+        };
 
 
         return result;

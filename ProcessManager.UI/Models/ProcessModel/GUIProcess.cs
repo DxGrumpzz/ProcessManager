@@ -25,7 +25,7 @@
         public string ProcessArgs { get; }
 
 
-        public GUIProcess(string processPath, string processArgs = "")
+        public GUIProcess(string processPath, string processArgs = "", bool visibleOnStartup = true)
         {
             ProcessPath = processPath;
             ProcessArgs = processArgs;
@@ -40,7 +40,7 @@
                 ProcessInitializedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(processPath, processArgs, null, null, false, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
+            CreateProcessObject(processPath, processArgs, null, null, false, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
 

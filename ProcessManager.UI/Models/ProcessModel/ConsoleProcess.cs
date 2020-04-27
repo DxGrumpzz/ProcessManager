@@ -25,7 +25,7 @@
 
         public override event Action<IProcessModel> ProcessInitializedCallback;
 
-        public ConsoleProcess(string consoleScript, string startupDirectory)
+        public ConsoleProcess(string consoleScript, string startupDirectory, bool visibleOnStartup = true)
         {
             ConsoleScript = consoleScript;
             StartupDirectory = startupDirectory;
@@ -40,7 +40,7 @@
                 ProcessInitializedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(null, null, consoleScript, startupDirectory, true, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
+            CreateProcessObject(null, null, consoleScript, startupDirectory, true, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
         ~ConsoleProcess()

@@ -124,6 +124,7 @@ namespace ProcessManager.UI
             project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory)
             {
                 ProcessLabel = ProcessLabel,
+                VisibleOnStartup = ProcessVisibleOnStartup,
             });
 
             // Convert the process list inside the project to json
@@ -138,13 +139,13 @@ namespace ProcessManager.UI
                             return new JsonProcessModel
                             {
                                 RunAsConsole = true,
-
+                                
                                 StartInDirectory = consoleProcess.StartupDirectory,
                                 ConsoleScript = consoleProcess.ConsoleScript,
 
                                 ProcessLabel = consoleProcess.ProcessLabel,
 
-                                VisibleOnStartup = true,
+                                VisibleOnStartup = consoleProcess.VisibleOnStartup,
                             };
                         };
 
@@ -159,7 +160,7 @@ namespace ProcessManager.UI
 
                                 ProcessLabel = guiProcess.ProcessLabel,
 
-                                VisibleOnStartup = true,
+                                VisibleOnStartup = guiProcess.VisibleOnStartup,
                             };
                         };
 

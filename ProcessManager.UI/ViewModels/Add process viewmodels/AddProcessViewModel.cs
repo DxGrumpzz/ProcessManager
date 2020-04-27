@@ -101,6 +101,7 @@
             project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs)
             {
                 ProcessLabel = ProcessLabel,
+                VisibleOnStartup = ProcessVisibleOnStartup,
             });
 
             // Convert the process list inside the project to json
@@ -116,12 +117,12 @@
                             {
                                 RunAsConsole = true,
 
+                                VisibleOnStartup = consoleProcess.VisibleOnStartup,
+
                                 StartInDirectory = consoleProcess.StartupDirectory,
                                 ConsoleScript = consoleProcess.ConsoleScript,
 
                                 ProcessLabel = consoleProcess.ProcessLabel,
-
-                                VisibleOnStartup = true,
                             };
                         };
 
@@ -130,13 +131,13 @@
                             return new JsonProcessModel
                             {
                                 RunAsConsole = false,
+                          
+                                VisibleOnStartup = guiProcess.VisibleOnStartup,
 
                                 ProcessPath = guiProcess.ProcessPath,
                                 ProcessArgs = guiProcess.ProcessArgs,
 
                                 ProcessLabel = guiProcess.ProcessLabel,
-
-                                VisibleOnStartup = true,
                             };
                         };
 
