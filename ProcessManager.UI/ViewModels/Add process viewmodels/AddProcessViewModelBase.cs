@@ -11,7 +11,7 @@
     public class AddProcessViewModelBase : BaseViewModel
     {
       
-        private AddProcessViewModelBase() { }
+        protected AddProcessViewModelBase() { }
 
 
         /// <summary>
