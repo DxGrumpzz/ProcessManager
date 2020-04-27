@@ -35,7 +35,6 @@ private:
     // A handle used in RegisterWaitForSingleObject function 
     HANDLE _registerCallbackHandle;
 
-
 public:
 
     // A struct that contains information about this process
@@ -107,13 +106,16 @@ public:
 
         bool result = false;
 
+        // Try to run the process
         if (RunAsConsole == true)
-            result =  RunProcessAsConsole();
+            result = RunProcessAsConsole();
         else
             result = RunProcessAsGUI();
 
+        // If process initialized succesfully invoke the initialzied event
         if (result == true)
             ProcessInitializedCallback(this);
+
 
         return result;
     };
@@ -121,13 +123,18 @@ public:
     // Closes the process
     bool CloseProcess()
     {
-        // Send a close message to the process window and wait for response
-        SendMessageW(MainWindowHandle, WM_CLOSE, NULL, NULL);
+        if (IsRunning() == true)
+        {
+            // Send a close message to the process window and wait for response
+            SendMessageW(MainWindowHandle, WM_CLOSE, NULL, NULL);
 
-        // Close process handles
-        CleanProcessHandles();
+            // Close process handles
+            CleanProcessHandles();
 
-        return true;
+            return true;
+        }
+        else
+            return false;
     };
 
 
@@ -162,7 +169,9 @@ public:
         // Why am I returning the inverse '!' of ShowWindow function ?
         //https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow#return-value
         // "If the window was previously hidden, the return value is zero."
-        return !ShowWindow(MainWindowHandle, SW_SHOW);
+        BOOL result = ShowWindow(MainWindowHandle, SW_SHOW);
+
+        return !result;
     };
 
     // Hides this process' main window
