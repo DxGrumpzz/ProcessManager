@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Diagnostics;
@@ -53,7 +53,7 @@
         public string[] ProcessAgsSplit => ProcessAgs?.Split(' ');
 
 
-        public bool ProcessVisibleOnStartup { get; set; }
+        public bool ProcessVisibleOnStartup { get; set; } = true;
 
         public string ProcessLabel { get; set; } = string.Empty;
 
@@ -98,10 +98,9 @@
         {
             var project = ProjectVM.Project;
 
-            project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs)
+            project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
-                VisibleOnStartup = ProcessVisibleOnStartup,
             });
 
             // Convert the process list inside the project to json

@@ -29,6 +29,7 @@
         {
             ConsoleScript = consoleScript;
             StartupDirectory = startupDirectory;
+            VisibleOnStartup = visibleOnStartup;
 
             _processClosedCallback = (IntPtr process) =>
             {

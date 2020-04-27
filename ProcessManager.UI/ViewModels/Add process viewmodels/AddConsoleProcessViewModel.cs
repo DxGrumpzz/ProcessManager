@@ -50,7 +50,7 @@ namespace ProcessManager.UI
 
         public string ProcessLabel { get; set; }
 
-        public bool ProcessVisibleOnStartup { get; set; }
+        public bool ProcessVisibleOnStartup { get; set; } = true;
 
         #endregion
 
@@ -121,10 +121,9 @@ namespace ProcessManager.UI
 
             var project = ProjectVM.Project;
 
-            project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory)
+            project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
-                VisibleOnStartup = ProcessVisibleOnStartup,
             });
 
             // Convert the process list inside the project to json

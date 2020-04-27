@@ -29,6 +29,8 @@
         {
             ProcessPath = processPath;
             ProcessArgs = processArgs;
+            VisibleOnStartup = visibleOnStartup;
+
 
             _processClosedCallback = (IntPtr process) =>
             {
