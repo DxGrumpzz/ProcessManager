@@ -31,11 +31,17 @@
                 {
                     if(jsonProcess.RunAsConsole == true)
                     {
-                        return new ConsoleProcess(jsonProcess.ConsoleScript, jsonProcess.StartInDirectory);
+                        return new ConsoleProcess(jsonProcess.ConsoleScript, jsonProcess.StartInDirectory)
+                        {
+                            ProcessLabel = jsonProcess.ProcessLabel,
+                        };
                     }
                     else
                     {
-                        return new GUIProcess(jsonProcess.ProcessPath, jsonProcess.ProcessArgs);
+                        return new GUIProcess(jsonProcess.ProcessPath, jsonProcess.ProcessArgs)
+                        {
+                            ProcessLabel = jsonProcess.ProcessLabel,
+                        };
                     };
 
                 });

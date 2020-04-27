@@ -98,7 +98,10 @@
         {
             var project = ProjectVM.Project;
 
-            project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs));
+            project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs)
+            {
+                ProcessLabel = ProcessLabel,
+            });
 
             // Convert the process list inside the project to json
             string jsonString = JsonSerializer.Serialize(
@@ -116,6 +119,8 @@
                                 StartInDirectory = consoleProcess.StartupDirectory,
                                 ConsoleScript = consoleProcess.ConsoleScript,
 
+                                ProcessLabel = consoleProcess.ProcessLabel,
+
                                 VisibleOnStartup = true,
                             };
                         };
@@ -129,6 +134,8 @@
                                 ProcessPath = guiProcess.ProcessPath,
                                 ProcessArgs = guiProcess.ProcessArgs,
 
+                                ProcessLabel = guiProcess.ProcessLabel,
+
                                 VisibleOnStartup = true,
                             };
                         };
@@ -137,7 +144,7 @@
                         {
                             Debugger.Break();
                             return default;
-                        }
+                        };
                     };
                 }),
                 new JsonSerializerOptions()

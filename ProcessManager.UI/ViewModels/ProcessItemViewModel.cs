@@ -97,7 +97,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// A boolean flag that indicates if the associated process has a label
         /// </summary>
-        public bool ProcessHasLabel => false;// string.IsNullOrWhiteSpace(Process.ProcessLabel);
+        public bool ProcessHasLabel => !string.IsNullOrWhiteSpace(Process.ProcessLabel);
 
         #endregion
 
@@ -164,7 +164,7 @@ namespace ProcessManager.UI
 
 
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
-            if (ProcessHasLabel == false)
+            if (ProcessHasLabel == true)
             {
                 MouseEnterCommand = new RelayCommand(() => ProcessLabelVisible = true);
 

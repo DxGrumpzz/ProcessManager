@@ -121,23 +121,28 @@ namespace ProcessManager.UI
 
             var project = ProjectVM.Project;
 
-            project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory));
+            project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory)
+            {
+                ProcessLabel = ProcessLabel,
+            });
 
             // Convert the process list inside the project to json
             string jsonString = JsonSerializer.Serialize(
                 project.ProcessList
-                .Select<IProcessModel, object>(process =>
+                .Select(process =>
                 {
                     switch (process)
                     {
                         case ConsoleProcess consoleProcess:
                         {
-                            return new
+                            return new JsonProcessModel
                             {
                                 RunAsConsole = true,
 
                                 StartInDirectory = consoleProcess.StartupDirectory,
                                 ConsoleScript = consoleProcess.ConsoleScript,
+
+                                ProcessLabel = consoleProcess.ProcessLabel,
 
                                 VisibleOnStartup = true,
                             };
@@ -145,12 +150,14 @@ namespace ProcessManager.UI
 
                         case GUIProcess guiProcess:
                         {
-                            return new
+                            return new JsonProcessModel
                             {
                                 RunAsConsole = false,
                                 
                                 ProcessPath = guiProcess.ProcessPath,
                                 ProcessArgs = guiProcess.ProcessArgs,
+
+                                ProcessLabel = guiProcess.ProcessLabel,
 
                                 VisibleOnStartup = true,
                             };
@@ -159,13 +166,14 @@ namespace ProcessManager.UI
                         default:
                         {
                             Debugger.Break();
-                            return null;
+                            return default;
                         }
                     };
                 }),
                 new JsonSerializerOptions()
                 {
                     WriteIndented = true,
+                    IgnoreNullValues = true,
                 });
 
 

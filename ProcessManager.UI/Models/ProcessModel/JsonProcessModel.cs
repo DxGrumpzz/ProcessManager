@@ -7,6 +7,8 @@
     {
         public bool VisibleOnStartup { get; set; }
 
+        public string ProcessLabel { get; set; }
+
 
         public string ProcessPath { get; set; }
         public string ProcessArgs { get; set; }

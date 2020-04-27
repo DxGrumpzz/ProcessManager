@@ -59,10 +59,13 @@
 
         protected IntPtr _processPointer = IntPtr.Zero;
 
+        public string ProcessLabel { get; set; }
+
         public virtual bool IsRunning => ProcessRunning(_processPointer);
 
         public ProcessVisibilityState VisibilityState { get; private set; }
 
+        
         protected _ProcessClosedCallBack _processClosedCallback;
         protected _ProcessClosedCallBack _processInitialziedCallback;
 
@@ -71,6 +74,7 @@
         public abstract event Action<IProcessModel> ProcessInitializedCallback;
 
         public event Action<IProcessModel, ProcessVisibilityState> ProcessVisibilityChanged;
+
 
         public virtual bool RunProcess()
         {
