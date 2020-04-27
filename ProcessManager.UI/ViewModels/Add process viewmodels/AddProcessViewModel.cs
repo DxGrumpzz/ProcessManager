@@ -1,16 +1,13 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Text.Json;
     using System.Windows.Input;
 
     /// <summary>
     /// 
     /// </summary>
-    public class AddProcessViewModel : BaseViewModel
+    public class AddProcessViewModel : AddProcessViewModelBase
     {
         public static AddProcessViewModel DesignInstance => new AddProcessViewModel()
         {
@@ -103,56 +100,7 @@ namespace ProcessManager.UI
                 ProcessLabel = ProcessLabel,
             });
 
-            // Convert the process list inside the project to json
-            string jsonString = JsonSerializer.Serialize(
-                project.ProcessList
-                .Select(process =>
-                {
-                    switch (process)
-                    {
-                        case ConsoleProcess consoleProcess:
-                        {
-                            return new JsonProcessModel
-                            {
-                                RunAsConsole = true,
-
-                                VisibleOnStartup = consoleProcess.VisibleOnStartup,
-
-                                StartInDirectory = consoleProcess.StartupDirectory,
-                                ConsoleScript = consoleProcess.ConsoleScript,
-
-                                ProcessLabel = consoleProcess.ProcessLabel,
-                            };
-                        };
-
-                        case GUIProcess guiProcess:
-                        {
-                            return new JsonProcessModel
-                            {
-                                RunAsConsole = false,
-                          
-                                VisibleOnStartup = guiProcess.VisibleOnStartup,
-
-                                ProcessPath = guiProcess.ProcessPath,
-                                ProcessArgs = guiProcess.ProcessArgs,
-
-                                ProcessLabel = guiProcess.ProcessLabel,
-                            };
-                        };
-
-                        default:
-                        {
-                            Debugger.Break();
-                            return default;
-                        };
-                    };
-                }),
-                new JsonSerializerOptions()
-                {
-                    WriteIndented = true,
-                    IgnoreNullValues = true,
-                });
-
+            string jsonString = SerializeProcessList(project);
 
             // Write the json to the project's config file
             File.WriteAllText(project.ProjectPathWithConfig, jsonString);

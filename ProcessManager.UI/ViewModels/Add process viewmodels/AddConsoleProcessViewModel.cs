@@ -2,15 +2,13 @@ namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Text.Json;
     using System.Windows.Input;
 
 
     /// <summary>
     /// 
     /// </summary>
-    public class AddConsoleProcessViewModel : BaseViewModel
+    public class AddConsoleProcessViewModel : AddProcessViewModelBase
     {
 
         public static AddConsoleProcessViewModel DesignInstance => new AddConsoleProcessViewModel()
@@ -126,55 +124,7 @@ namespace ProcessManager.UI
                 ProcessLabel = ProcessLabel,
             });
 
-            // Convert the process list inside the project to json
-            string jsonString = JsonSerializer.Serialize(
-                project.ProcessList
-                .Select(process =>
-                {
-                    switch (process)
-                    {
-                        case ConsoleProcess consoleProcess:
-                        {
-                            return new JsonProcessModel
-                            {
-                                RunAsConsole = true,
-                                
-                                StartInDirectory = consoleProcess.StartupDirectory,
-                                ConsoleScript = consoleProcess.ConsoleScript,
-
-                                ProcessLabel = consoleProcess.ProcessLabel,
-
-                                VisibleOnStartup = consoleProcess.VisibleOnStartup,
-                            };
-                        };
-
-                        case GUIProcess guiProcess:
-                        {
-                            return new JsonProcessModel
-                            {
-                                RunAsConsole = false,
-                                
-                                ProcessPath = guiProcess.ProcessPath,
-                                ProcessArgs = guiProcess.ProcessArgs,
-
-                                ProcessLabel = guiProcess.ProcessLabel,
-
-                                VisibleOnStartup = guiProcess.VisibleOnStartup,
-                            };
-                        };
-
-                        default:
-                        {
-                            Debugger.Break();
-                            return default;
-                        }
-                    };
-                }),
-                new JsonSerializerOptions()
-                {
-                    WriteIndented = true,
-                    IgnoreNullValues = true,
-                });
+            string jsonString = SerializeProcessList(project);
 
 
             // Write the json to the project's config file

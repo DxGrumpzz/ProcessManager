@@ -37,7 +37,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// The process path, Formatted
         /// </summary>
-        public string ProcessPath
+        public string ProcessPath 
         {
             get
             {
@@ -52,7 +52,7 @@ namespace ProcessManager.UI
                 };
 
             }
-        }
+        } 
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
@@ -124,22 +124,22 @@ namespace ProcessManager.UI
 
             ProcessRunning = process.IsRunning;
 
-            ProcessVisible = process.VisibleOnStartup;// == ProcessVisibilityState.Visible ? true : false;
+            ProcessVisible = process.VisibleOnStartup;
 
 
             // Bind the process closed event
             Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
-            Process.ProcessInitializedCallback += (IProcessModel process) =>
-            {
-                if (Process.VisibleOnStartup == false)
-                    ProcessVisible = false;
-                else
-                    ProcessVisible = true;
+             Process.ProcessInitializedCallback += (IProcessModel process) =>
+             {
+                 if (Process.VisibleOnStartup == false)
+                     ProcessVisible = false;
+                 else
+                     ProcessVisible = true;
 
 
-                ProcessRunning = true;
-            };
+                 ProcessRunning = true;
+             };
 
             Process.ProcessVisibilityChanged += (IProcessModel process, ProcessVisibilityState visibilityState) =>
             {
@@ -165,7 +165,6 @@ namespace ProcessManager.UI
             if (ProcessHasLabel == true)
             {
                 MouseEnterCommand = new RelayCommand(() => ProcessLabelVisible = true);
-
                 MouseLeaveCommand = new RelayCommand(() => ProcessLabelVisible = false);
             };
         }
