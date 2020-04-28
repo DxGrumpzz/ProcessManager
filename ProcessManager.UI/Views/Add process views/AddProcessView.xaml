@@ -49,7 +49,7 @@
                      
                      Text="{Binding SelectedProcessPath, UpdateSourceTrigger=PropertyChanged}"
                      
-                     local:PlaceHolder.Text="A path where to run the process from"
+                     local:PlaceHolder.Text="A path to the process"
                      
                      Style="{StaticResource PlaceholderTextbox}"/>
 
