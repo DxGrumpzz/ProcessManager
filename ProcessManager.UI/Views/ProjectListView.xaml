@@ -22,7 +22,9 @@
         <TextBlock Text="Projects: "/>
 
 
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="1"
+                      
+                      VerticalScrollBarVisibility="Auto">
 
             <StackPanel>
 
