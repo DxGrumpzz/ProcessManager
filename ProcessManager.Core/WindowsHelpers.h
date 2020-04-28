@@ -53,10 +53,11 @@ static std::string GetLastErrorAsStringA()
 
 // Calls the windows Directory dialog using COM.
 // Returns the path to the opened folder
-extern "C" _declspec(dllexport) inline void OpenDirectoryDialog(wchar_t*& path)
+extern "C" _declspec(dllexport) inline bool OpenDirectoryDialog(wchar_t*& path)
 {
     // The file dialog modal window 
     IFileDialog* fileDialog;
+    bool result = false;
 
     // Create an instance of IFileDialog
     if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
@@ -73,12 +74,18 @@ extern "C" _declspec(dllexport) inline void OpenDirectoryDialog(wchar_t*& path)
             {
                 // Convert result to a readable string
                 psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path);
-
                 psi->Release();
+
+                result = true;
             };
-        };
+        }
+        else
+            result = false;
+
         fileDialog->Release();
     };
+      
+    return result;
 };
 
 

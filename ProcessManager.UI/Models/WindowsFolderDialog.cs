@@ -1,7 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
-    using System.Diagnostics;
     using System.Runtime.InteropServices;
 
 
@@ -11,33 +10,35 @@
     public class WindowsFolderDialog : IFolderDialog
     {
         [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
-        private static extern void OpenDirectoryDialog(ref IntPtr path);
+        private static extern bool OpenDirectoryDialog(ref IntPtr path);
+
+        public string SelectedPath { get; private set; }
+
 
         /// <summary>
         /// Calls the windows Open file dialog and returns a string contaning the path to the selected folder
         /// </summary>
         /// <returns></returns>
-        public string ShowDialog()
+        public bool ShowDialog()
         {
             IntPtr pathPointer = IntPtr.Zero;
-            string pathString = null;
 
             try
             {
-                OpenDirectoryDialog(ref pathPointer);
+                bool result = OpenDirectoryDialog(ref pathPointer);
 
-                pathString = Marshal.PtrToStringUni(pathPointer);
+                if (result == true)
+                    SelectedPath = Marshal.PtrToStringUni(pathPointer);
+
+                return result;
             }
             // This is a terrible practice.
-            // Necessary to keep the app running IF on the off-chance that something happens in OpenDirectoryDialog function 
-            catch { }
+            // Necessary to keep the app running IF on the off-chance something happens in OpenDirectoryDialog function 
+            catch { return false; }
             finally
             {
                 Marshal.FreeCoTaskMem(pathPointer);
             };
-
-            return pathString;
         }
-
     };
 };
