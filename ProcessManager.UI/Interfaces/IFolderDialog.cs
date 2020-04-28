@@ -8,12 +8,14 @@
     /// </summary>
     public interface IFolderDialog
     {
-     
+        
+        public string SelectedPath { get; }
+
         /// <summary>
         /// Call the OS' folder dialog
         /// </summary>
         /// <returns></returns>
-        public string ShowDialog();
+        public bool ShowDialog();
 
     };
 };
