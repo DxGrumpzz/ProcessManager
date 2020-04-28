@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,11 @@
         /// <summary>
         /// An event the fires when <see cref="CanExecute(object)"/> has changed
         /// </summary>
-        public event EventHandler CanExecuteChanged = (sender, e) => { };
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 		
 
         #region Private fields
@@ -185,7 +189,12 @@
         /// <summary>
         /// An event the fires when <see cref="CanExecute(object)"/> has changed
         /// </summary>
-        public event EventHandler CanExecuteChanged = (sender, e) => { };
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
   
         
         #region Private fields
