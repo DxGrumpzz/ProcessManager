@@ -8,6 +8,7 @@
     public interface IUserDialog
     {
         public UserDialogResult ShowDialog(string dialogText, string dialogTitle = "");
+        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "");
 
     };
 };
