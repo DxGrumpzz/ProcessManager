@@ -1,17 +1,13 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+    using System.Windows;
 
     /// <summary>
     /// 
     /// </summary>
     public interface IUserDialog
     {
-
-        public void ShowDialog(string dialogText, string dialogTitle = "");
-
+        public UserDialogResult ShowDialog(string dialogText, string dialogTitle = "");
 
     };
 };
