@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ProcessManager.UI
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
-		
+
 
         #region Private fields
 
@@ -53,32 +53,32 @@ namespace ProcessManager.UI
         /// </summary>
         private Func<bool> _methodPredicate;
 
-		#endregion
+        #endregion
 
 
-		#region Constructors
+        #region Constructors
 
-		/// <summary>
-		/// Main <see cref="RelayCommand"/> class constructor
-		/// </summary>
-		/// <param name="action"></param>
-		/// <param name="predicate"></param>
-		public RelayCommand(Action action, Func<bool> predicate = null)
-		{
-			// Checks if the method predicate is true or false and execute or disables the
-			// button accordingly
-			_methodPredicate = predicate;
+        /// <summary>
+        /// Main <see cref="RelayCommand"/> class constructor
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="predicate"></param>
+        public RelayCommand(Action action, Func<bool> predicate = null)
+        {
+            // Checks if the method predicate is true or false and execute or disables the
+            // button accordingly
+            _methodPredicate = predicate;
 
-			// Sets the delegate to the passed method
-			_methodDelegate = action;
-		}
+            // Sets the delegate to the passed method
+            _methodDelegate = action;
+        }
 
-		/// <summary>
-		/// <see cref="RelayCommand"/> constructor that will accept passed parameters
-		/// </summary>
-		/// <param name="action"></param>
-		/// <param name="predicate"></param>
-		public RelayCommand(Action<object> parameterAction, Func<bool> predicate = null)
+        /// <summary>
+        /// <see cref="RelayCommand"/> constructor that will accept passed parameters
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="predicate"></param>
+        public RelayCommand(Action<object> parameterAction, Func<bool> predicate = null)
         {
             // Checks if the method predicate is true or false and execute or disables the
             // button accordingly
@@ -148,14 +148,24 @@ namespace ProcessManager.UI
         /// Executes the action
         /// </summary>
         /// <param name="parameter"></param>
-        public void Execute(object parameter = null)
+        public async void Execute(object parameter = null)
         {
             // If the passed parameter is null
             if (parameter is null)
             {
                 // Invokes the parameter-less delegate
                 _methodDelegate?.Invoke();
-                _asyncMethodDelegate?.Invoke();
+
+
+                try
+                {
+                    if (_asyncMethodDelegate != null)
+                        await _asyncMethodDelegate?.Invoke();
+                }
+                catch
+                {
+                    throw;
+                }
 
 
                 // If the actions enumerable has commands
@@ -195,8 +205,7 @@ namespace ProcessManager.UI
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-  
-        
+
         #region Private fields
 
         /// <summary>
@@ -240,11 +249,20 @@ namespace ProcessManager.UI
         /// Executes the action
         /// </summary>
         /// <param name="parameter"></param>
-        public void Execute(object parameter = null)
+        public async void Execute(object parameter = null)
         {
             // Invoke if not null
             _method?.Invoke((T)parameter);
-            _aasyncMethod?.Invoke((T)parameter);
+
+            try
+            {
+                if (!(_aasyncMethod is null))
+                    await _aasyncMethod?.Invoke((T)parameter);
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
