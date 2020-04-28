@@ -10,11 +10,22 @@
     /// </summary>
     public class WindowsUserDialog : IUserDialog
     {
+        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "")
+        {
+            var messageBoxResult = MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo);
+         
+            return MessageBoxResultToUserDialogResult(messageBoxResult);
+        }
 
         public UserDialogResult ShowDialog(string dialogText, string dialogTitle = "")
         {
             var messageBoxResult = MessageBox.Show(dialogText, dialogTitle);
 
+            return MessageBoxResultToUserDialogResult(messageBoxResult);
+        }
+
+        private UserDialogResult MessageBoxResultToUserDialogResult(MessageBoxResult messageBoxResult)
+        {
             switch (messageBoxResult)
             {
                 case MessageBoxResult.Cancel:
@@ -37,8 +48,6 @@
                     throw new Exception($"Unexpected value in retured in {messageBoxResult}");
                 };
             };
-
         }
-
     };
 };
