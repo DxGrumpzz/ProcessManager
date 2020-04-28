@@ -88,8 +88,12 @@
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
             BackToProjectPageCommand = new RelayCommand(ExecuteBackToProjectPageCommand);
 
-            AddProcessCommand = new RelayCommand(ExecuteAddProcessCommand);
+            AddProcessCommand = new RelayCommand(
+                ExecuteAddProcessCommand, 
+                // Don't enable the button until the user chose a valid process path
+                () => SelectedProcessPath?.Length >= 6);
         }
+
 
         private void ExecuteAddProcessCommand()
         {

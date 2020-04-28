@@ -6,13 +6,14 @@
              xmlns:local="clr-namespace:ProcessManager.UI"
              mc:Ignorable="d" 
              
-             d:DesignHeight="200" 
+             d:DesignHeight="250" 
              d:DesignWidth="500"
              
              d:DataContext="{x:Static local:AddProcessViewModel.DesignInstance}">
 
 
-    <StackPanel local:UniformMargin.Margin="0,0,0,10">
+    <StackPanel Margin="10" 
+                local:UniformMargin.Margin="0,0,0,10">
 
         <!-- Back to Main page or project buttons -->
         <StackPanel HorizontalAlignment="Left"
@@ -32,6 +33,9 @@
         </StackPanel>
 
 
+        <TextBlock Text="Run a process as a GUI application"/>
+
+
         <!-- Select process button and text -->
         <StackPanel Margin="0,10,0,0">
 
@@ -41,7 +45,13 @@
                     
                     Command="{Binding SelectProcessCommand}"/>
 
-            <TextBlock Text="{Binding SelectedProcessPath}"/>
+            <TextBox x:Name="ProcessPathTextBox" 
+                     
+                     Text="{Binding SelectedProcessPath, UpdateSourceTrigger=PropertyChanged}"
+                     
+                     local:PlaceHolder.Text="A path where to run the process from"
+                     
+                     Style="{StaticResource PlaceholderTextbox}"/>
 
         </StackPanel>
 
@@ -72,8 +82,6 @@
         <!-- Add process button -->
         <Button Content="Add process"
                 
-                IsEnabled="{Binding AddProcessEnabled}"
-                
                 Padding="5,0"
                 
                 Margin="0,10,0,0"
@@ -81,6 +89,7 @@
                 VerticalAlignment="Top"
                 
                 Command="{Binding AddProcessCommand}"/>
+
 
     </StackPanel>
 

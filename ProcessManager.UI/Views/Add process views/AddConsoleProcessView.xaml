@@ -12,7 +12,8 @@
              d:DataContext="{x:Static local:AddConsoleProcessViewModel.DesignInstance}">
 
 
-    <StackPanel local:UniformMargin.Margin="0,0,0,10">
+    <StackPanel Margin="10"
+                local:UniformMargin.Margin="0,0,0,10">
 
         <!-- Back to Main page or project buttons -->
         <StackPanel HorizontalAlignment="Left"
@@ -46,9 +47,11 @@
                     Command="{Binding SelectDirectoryCommand}"/>
 
             <!-- Console directory -->
-            <TextBox local:PlaceHolder.Text="The directory where the console will run from"
+            <TextBox x:Name="ConsoleDirectoryTextBox" 
                      
-                     Text="{Binding ConsoleDirectory}"
+                     local:PlaceHolder.Text="The directory where the console will run from"
+                     
+                     Text="{Binding ConsoleDirectory, UpdateSourceTrigger=PropertyChanged}"
                      
                      Style="{StaticResource PlaceholderTextbox}"/>
 
@@ -68,18 +71,15 @@
                  Style="{StaticResource PlaceholderTextbox}"/>
 
 
-
         <!-- Process visible on startup -->
         <CheckBox Content="Process visible onstartup"
                   
                   
                   IsChecked="{Binding ProcessVisibleOnStartup}"/>
 
-
+        
         <!-- Add process button -->
         <Button Content="Add process"
-                
-                IsEnabled="{Binding AddProcessEnabled}"
                 
                 Padding="5,0"
                 

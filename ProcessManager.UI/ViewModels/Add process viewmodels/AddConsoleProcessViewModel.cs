@@ -10,7 +10,6 @@ namespace ProcessManager.UI
     /// </summary>
     public class AddConsoleProcessViewModel : AddProcessViewModelBase
     {
-
         public static AddConsoleProcessViewModel DesignInstance => new AddConsoleProcessViewModel()
         {
 
@@ -78,7 +77,9 @@ namespace ProcessManager.UI
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
             BackToProjectPageCommand = new RelayCommand(ExecuteBackToProjectPageCommand);
 
-            AddProcessCommand = new RelayCommand(ExecuteAddProcessCommand);
+            AddProcessCommand = new RelayCommand(
+                ExecuteAddProcessCommand,
+                () => ConsoleDirectory?.Length >= 3);
         }
 
 
