@@ -97,6 +97,13 @@
 
         private void ExecuteAddProcessCommand()
         {
+            if(string.IsNullOrWhiteSpace(SelectedProcessPath) ||
+                SelectedProcessPath?.Length < 6)
+            {
+                DI.UserDialog.ShowDialog("An invalid process path was given");
+                return;
+            };
+
             var project = ProjectVM.Project;
 
             project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs, ProcessVisibleOnStartup)
@@ -136,6 +143,7 @@
             };
 
         }
+
 
         private void ExecuteBackToMainPageCommand()
         {

@@ -19,7 +19,7 @@ namespace ProcessManager.UI
             // Check if the processes file exists
             if (File.Exists(Localization.PROJECTS_FILE_NAME) == false)
             {
-                MessageBox.Show($"Unable to find {Localization.PROJECTS_FILE_NAME}");
+                DI.UserDialog.ShowDialog($"Unable to find {Localization.PROJECTS_FILE_NAME}");
 
                 // Exit application
                 Environment.Exit(1);

@@ -112,11 +112,17 @@ namespace ProcessManager.UI
             // Validate directory path
             if (string.IsNullOrWhiteSpace(ConsoleDirectory) == true &&
                 Directory.Exists(ConsoleDirectory) == false)
+            {
+                DI.UserDialog.ShowDialog("Invalid directory was selected");
                 return;
+            };
 
             // Validate console script
             if (string.IsNullOrWhiteSpace(ConsoleScript) == true)
+            {
+                DI.UserDialog.ShowDialog("Console script shouldn't be empty");
                 return;
+            };
 
             var project = ProjectVM.Project;
 

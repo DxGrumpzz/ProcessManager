@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -64,6 +64,7 @@
 
         #endregion
 
+
         #region Public commands
 
         public ICommand AddNewProjectCommnad { get; }
@@ -99,7 +100,10 @@
 
             // If folder already contains Project.Config file
             if (File.Exists(configPath))
+            {
+                DI.UserDialog.ShowDialog($"Selected folder already contains a \'{Localization.PROJECT_CONFIG_FILE_NAME}\' file");
                 return;
+            };
 
             // Create Project.Config 
             File.Create(configPath).Dispose();
