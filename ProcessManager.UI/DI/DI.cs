@@ -33,6 +33,7 @@
         public static IFolderDialog FolderDialog => new WindowsFolderDialog();
         public static IFileDialog FileDialog => new WindowsFileDialog();
 
+        public static IUserDialog UserDialog => new WindowsUserDialog();
 
 
         /// <summary>
