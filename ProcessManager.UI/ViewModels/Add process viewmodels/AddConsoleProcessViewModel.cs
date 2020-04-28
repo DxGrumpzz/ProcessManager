@@ -87,12 +87,11 @@ namespace ProcessManager.UI
         {
             var folderDialog = DI.FolderDialog;
 
-            string directory = folderDialog.ShowDialog();
-
-            if (string.IsNullOrEmpty(directory))
+            var result = folderDialog.ShowDialog();
+            if (result == false)
                 return;
 
-            ConsoleDirectory = directory;
+            ConsoleDirectory = folderDialog.SelectedPath;
         }
 
 

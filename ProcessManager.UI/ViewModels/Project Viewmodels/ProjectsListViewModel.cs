@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -91,12 +91,13 @@ namespace ProcessManager.UI
 
         private void ExecuteAddNewProjectCommnad()
         {
-            string selectedFolder = DI.FolderDialog.ShowDialog();
+            var folderDialog = DI.FolderDialog;
+            var selectedFolderResult = folderDialog.ShowDialog();
 
-            if (string.IsNullOrWhiteSpace(selectedFolder))
+            if (selectedFolderResult == false)
                 return;
 
-            string configPath = Path.Combine(selectedFolder, Localization.PROJECT_CONFIG_FILE_NAME);
+            string configPath = Path.Combine(folderDialog.SelectedPath, Localization.PROJECT_CONFIG_FILE_NAME);
 
             // If folder already contains Project.Config file
             if (File.Exists(configPath))
@@ -114,7 +115,7 @@ namespace ProcessManager.UI
             // Create the new project
             var newProject = new Project()
             {
-                ProjectPath = selectedFolder,
+                ProjectPath = folderDialog.SelectedPath,
                 ProcessList = new List<IProcessModel>(),
             };
 
@@ -125,7 +126,7 @@ namespace ProcessManager.UI
             var jsonString = JsonSerializer.Serialize(DI.Projects.Select(project => new
             {
                 ProjectPath = project.ProjectPath,
-            }), 
+            }),
             new JsonSerializerOptions()
             {
                 WriteIndented = true,
