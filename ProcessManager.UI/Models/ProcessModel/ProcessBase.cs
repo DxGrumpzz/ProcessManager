@@ -67,6 +67,8 @@
         public ProcessVisibilityState VisibilityState { get; private set; }
 
         public bool VisibleOnStartup { get; set; }
+        
+        public ProcessType ProcessType { get; set; }
 
 
 

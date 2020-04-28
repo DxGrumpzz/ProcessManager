@@ -13,6 +13,7 @@
         public bool VisibleOnStartup { get; set; }
         public ProcessVisibilityState VisibilityState { get; }
         public string ProcessLabel { get; set; }
+        public ProcessType ProcessType { get; set; }
 
 
         public event Action<IProcessModel, ProcessVisibilityState> ProcessVisibilityChanged;
