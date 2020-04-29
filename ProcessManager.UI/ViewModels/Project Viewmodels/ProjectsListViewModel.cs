@@ -165,9 +165,7 @@
             File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);
 
             // Update tray icon
-            DI.SystemTrayIcon.RemoveIcon();
-            DI.SetupTrayIcon(new WindowInteropHelper(App.Current.MainWindow).Handle);
-
+            DI.SystemTrayIcon.RebuildIcon(showAfterBuild: true);
 
             // Add the project to this ViewModel's projects list
             Projects.Add(new ProjectItemViewModel(newProject));
