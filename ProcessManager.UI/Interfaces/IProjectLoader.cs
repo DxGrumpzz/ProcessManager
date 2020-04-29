@@ -8,12 +8,12 @@
     /// </summary>
     public interface IProjectLoader
     {
-        void LoadProjectsDirectories();
+        public void LoadProjectsDirectories();
 
         public void ValidateLoadedProjects();
 
         public void LoadProjectProcesses();
         
-        IEnumerable<Project> GetProjectsList();
+        public IEnumerable<Project> GetProjectsList();
     };
 };
