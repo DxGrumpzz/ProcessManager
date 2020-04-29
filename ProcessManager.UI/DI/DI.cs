@@ -29,6 +29,13 @@
         public static IFileDialog FileDialog => GetService<IFileDialog>(); 
 
         public static IUserDialog UserDialog => GetService<IUserDialog>();
-        
+
+
+        private static TService GetService<TService>()
+        {
+            var service = Provider.GetService(typeof(TService));
+            return (TService)service;
+        }
+
     };
 };
