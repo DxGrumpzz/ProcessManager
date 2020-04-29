@@ -7,45 +7,70 @@
 
 
     /// <summary>
-    /// 
+    /// An implementation of <see cref="IProjectLoader"/>
     /// </summary>
     public class ProjectLoader : IProjectLoader
     {
+        /// <summary>
+        /// A process loader
+        /// </summary>
         private readonly IProcessLoader _processLoader;
 
-        private readonly string _filename;
+
+        /// <summary>
+        /// The name of the file contaning the projects
+        /// </summary>
+        private readonly string _projectsFilename;
+        
+        /// <summary>
+        /// The name of the Project config file
+        /// </summary>
         private readonly string _projectConfigFilename;
 
+
+        /// <summary>
+        /// An enumerable of loaded projects
+        /// </summary>
         private IEnumerable<Project> _projects;
 
-        public ProjectLoader(IProcessLoader processLoader, string filename, string projectConfigFilename)
+
+        public ProjectLoader(IProcessLoader processLoader, string projectsFilename, string projectConfigFilename)
         {
             _processLoader = processLoader;
-            _filename = filename;
+            _projectsFilename = projectsFilename;
             _projectConfigFilename = projectConfigFilename;
         }
 
-
-        public bool ProjectsFileExists()
+        public void LoadProjectsDirectories()
         {
-            if (File.Exists(_filename) == false)
+            try
             {
-                return false;
+                // Using a json serializer, deserialzie the data inside the Projects file into C# objects
+                _projects = JsonSerializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(_projectsFilename));
+            }
+            // Projects file contains invalid json
+            catch (JsonException jsonException)
+            {
+                throw new Exception($"Failed to read {_projectsFilename}, File doesn't contain valid json data. \nError: {jsonException}");
+            }
+            // An unknown error has occured
+            catch (Exception exception)
+            {
+                throw new Exception($"Failed to read {_projectsFilename}. Uknown error has occured. \nError: {exception}");
             };
-
-            return true;
         }
-
 
         public void ValidateLoadedProjects()
         {
             foreach (var project in _projects)
             {
+                // Check if project directory exists
                 if (Directory.Exists(project.ProjectPath) == false)
                 {
                     throw new Exception($"{project.ProjectPath} is not a valid directory or it doesn't exist");
                 };
 
+                // Check if project contains project config file
                 if (File.Exists(Path.Combine(project.ProjectPath, _projectConfigFilename)) == false)
                 {
                     throw new Exception($"{project.ProjectPath} doesn't contain a \"ProcessManger.Config.Json\" file");
@@ -54,28 +79,14 @@
         }
 
 
-        public void LoadProjectsDirectories()
-        {
-            try
-            {
-                _projects = JsonSerializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(_filename));
-            }
-            catch (JsonException jsonException)
-            {
-                throw new Exception($"Failed to read {_filename}, File doesn't contain valid json data. \nError: {jsonException}");
-            }
-            catch (Exception exception)
-            {
-                throw new Exception($"Failed to read {_filename}. Uknown error has occured. \nError: {exception}");
-            };
-        }
-
-
         public void LoadProjectProcesses()
         {
             foreach (var project in _projects)
             {
-                project.ProcessList = new List<IProcessModel>(_processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
+                // Load the process list inside the project
+                project.ProcessList = new List<IProcessModel>(
+                    // Read Project config file and deserialize
+                    _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
             };
         }
 
@@ -84,5 +95,6 @@
         {
             return _projects;
         }
+
     };
 };

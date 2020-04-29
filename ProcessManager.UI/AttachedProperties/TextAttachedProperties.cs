@@ -3,7 +3,7 @@
     using System.Windows;
 
     /// <summary>
-    /// An attached property that displays a placeholder text when a textbox is "empty" of user text
+    /// An attached property that is used in PlaceholderTextbox style to display the placeholder text
     /// </summary>
     public static class PlaceHolder
     {

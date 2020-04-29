@@ -9,8 +9,15 @@
     /// </summary>
     public class WindowsFolderDialog : IFolderDialog
     {
+
+        /// <summary>
+        /// Calls a COM function to open the Windows FileDialog
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
         private static extern bool OpenDirectoryDialog(ref IntPtr path);
+
 
         public string SelectedPath { get; private set; }
 
@@ -21,15 +28,20 @@
         /// <returns></returns>
         public bool ShowDialog()
         {
+            // A pointer to an unmanaged string
             IntPtr pathPointer = IntPtr.Zero;
 
             try
             {
+                // Open the folder dialog
                 bool result = OpenDirectoryDialog(ref pathPointer);
 
+                // If user chose a folder
                 if (result == true)
+                    // Marhsal the unmanaged to managed string
                     SelectedPath = Marshal.PtrToStringUni(pathPointer);
 
+                // return the selected path
                 return result;
             }
             // This is a terrible practice.
@@ -37,6 +49,7 @@
             catch { return false; }
             finally
             {
+                // Because we call COM function and pathPointer is allocated inside a COM function we must free it using COM
                 Marshal.FreeCoTaskMem(pathPointer);
             };
         }

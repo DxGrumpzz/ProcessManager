@@ -7,16 +7,30 @@
     /// </summary>
     public class SystemTrayIcon
     {
+
+        #region Private fields
+
         /// <summary>
         /// The Icon's pointer/handle
         /// </summary>
         private IntPtr _iconPointer;
 
+        /// <summary>
+        /// A HWND to the calling window
+        /// </summary>
         private IntPtr _mainWindowHandle;
 
+        /// <summary>
+        /// A "factory" function used to send data to the TrayIcon
+        /// </summary>
         private Func<SystemTrayIconData[]> _iconDataFactory;
 
+        /// <summary>
+        /// Path to the icon's file
+        /// </summary>
         private string _iconPath;
+
+        #endregion
 
 
         public SystemTrayIcon(Func<SystemTrayIconData[]> iconDataFactory)
@@ -43,13 +57,20 @@
             _iconPointer = CoreDLL.CreateSystemTrayIcon(mainWindowHandle, iconPath, trayIconData, trayIconData.Length);
         }
 
-
+        /// <summary>
+        /// Allows "refreshing" the icon's data after adding a new project
+        /// </summary>
+        /// <param name="showAfterBuild"></param>
         public void RebuildIcon(bool showAfterBuild = false)
         {
+            // Remove the icon 
             RemoveIcon();
+
+            // Re-build the icon
             BuildIcon(_iconPath, _mainWindowHandle);
 
 
+            // Show the icon if requested
             if (showAfterBuild == true)
                 ShowIcon();
         }

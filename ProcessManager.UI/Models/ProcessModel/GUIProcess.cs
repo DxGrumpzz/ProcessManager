@@ -4,7 +4,7 @@
 
 
     /// <summary>
-    /// 
+    /// A process running using the OS gui
     /// </summary>
     public class GUIProcess : ProcessBase
     {

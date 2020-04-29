@@ -4,7 +4,7 @@
 
 
     /// <summary>
-    /// 
+    /// A process that will be ran directly from the console
     /// </summary>
     public class ConsoleProcess : ProcessBase
     {

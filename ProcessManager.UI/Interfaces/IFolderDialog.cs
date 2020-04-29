@@ -8,7 +8,9 @@
     /// </summary>
     public interface IFolderDialog
     {
-        
+        /// <summary>
+        /// The user's selected path
+        /// </summary>
         public string SelectedPath { get; }
 
         /// <summary>

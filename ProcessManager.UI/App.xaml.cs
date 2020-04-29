@@ -95,7 +95,7 @@ namespace ProcessManager.UI
             serviceCollection.AddScoped<IProjectLoader>((serviceProvider) =>
             new ProjectLoader(
                     processLoader: serviceProvider.GetService<IProcessLoader>(),
-                    filename: Localization.PROJECTS_FILE_NAME,
+                    projectsFilename: Localization.PROJECTS_FILE_NAME,
                     projectConfigFilename: Localization.PROJECT_CONFIG_FILE_NAME));
 
 

@@ -3,7 +3,7 @@ namespace ProcessManager.UI
     using System;
 
     /// <summary>
-    /// 
+    /// An enum for available process types
     /// </summary>
     public enum ProcessType
     {

@@ -33,7 +33,9 @@
         /// </summary>
         public ProjectItemViewModel ProjectVM { get; }
 
-
+        /// <summary>
+        /// A path to the process
+        /// </summary>
         public string SelectedProcessPath
         {
             get => _selectedProcessPath;
@@ -44,14 +46,19 @@
             }
         }
 
-
+        /// <summary>
+        /// An argument list for the process
+        /// </summary>
         public string ProcessAgs { get; set; } = string.Empty;
 
-        public string[] ProcessAgsSplit => ProcessAgs?.Split(' ');
-
-
+        /// <summary>
+        /// A boolean flag indiacting if this process will be visible when it starts
+        /// </summary>
         public bool ProcessVisibleOnStartup { get; set; } = true;
 
+        /// <summary>
+        /// A label associated with this process
+        /// </summary>
         public string ProcessLabel { get; set; } = string.Empty;
 
         public bool AddProcessEnabled
@@ -106,6 +113,7 @@
 
             var project = ProjectVM.Project;
 
+            // Add the process  to the projets' process list
             project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
@@ -117,7 +125,7 @@
             File.WriteAllText(project.ProjectPathWithConfig, jsonString);
 
             // Return back to the Project's view
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
+            ExecuteBackToProjectPageCommand();
         }
 
         private void ExecuteSelectProcessCommand()
@@ -129,17 +137,7 @@
             if (fileDialog.ShowOpenFileDialog() == true)
             {
                 // Set selected path
-                SelectedProcessPath = fileDialog.GetOpenFileDialogRresult();
-
-                // Vertify that the selected path is valid
-                if (string.IsNullOrWhiteSpace(SelectedProcessPath) == false &&
-                    File.Exists(SelectedProcessPath) == true)
-                {
-                    // Allow user to add the process
-                    AddProcessEnabled = true;
-                }
-                else
-                    AddProcessEnabled = false;
+                SelectedProcessPath = fileDialog.SelectedFilePath;
             };
 
         }
