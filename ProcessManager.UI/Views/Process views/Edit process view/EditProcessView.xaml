@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="ProcessManager.UI.EditGUIProcessView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProcessManager.UI"
+             
+             mc:Ignorable="d" 
+             
+             d:DesignHeight="350" 
+             d:DesignWidth="500"
+             
+             d:DataContext="{x:Static local:EditGUIProcessViewModel.DesignInstance}">
+
+
+
+    <StackPanel Margin="10"
+                local:UniformMargin.Margin="0,0,0,10">
+
+        
+        <!-- Back to Main page or project buttons -->
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                
+                <ColumnDefinition Width="AUTO"/>
+                <ColumnDefinition Width="AUTO"/>
+                
+                <ColumnDefinition/>
+                
+            </Grid.ColumnDefinitions>
+            
+            <Button Content="Back to project page" 
+                    
+                    Command="{Binding BackToProjectPageCommand}"/>
+
+            <Button Content="Back to main page" 
+             
+                    Margin="10,0,0,0"
+                    Grid.Column="1"
+                    
+                    Command="{Binding BackToMainPageCommand}"/>
+
+            
+            <Button Content="Delete process"
+            
+                    HorizontalAlignment="Right"
+                    Grid.Column="2"
+                    
+                    Command="{Binding DeleteProcessCommand}"/>
+
+        </Grid>
+
+
+        <TextBlock Text="Edit a process" />
+
+
+        <!-- Select process button and text -->
+        <StackPanel Margin="0,10,0,0">
+
+            <Button Content="Select process"
+                    
+                    HorizontalAlignment="Left"
+                    
+                    Command="{Binding SelectProcessPathCommand}"/>
+
+            <TextBox x:Name="ProcessPathTextBox" 
+                     
+                     Text="{Binding SelectedPath, UpdateSourceTrigger=PropertyChanged}"
+                     
+                     local:PlaceHolder.Text="A path to the process"
+                     
+                     Style="{StaticResource PlaceholderTextbox}"/>
+
+        </StackPanel>
+
+
+        <!-- Process args -->
+        <TextBox local:PlaceHolder.Text="Process args"
+                 
+                 Text="{Binding Arguments}"
+                 
+                 Style="{StaticResource PlaceholderTextbox}"/>
+
+        
+        <!-- Process label -->
+        <TextBox local:PlaceHolder.Text="Process label"
+                 
+                 Text="{Binding ProcessLabel}"
+                 
+                 Style="{StaticResource PlaceholderTextbox}"/>
+
+
+        <!-- Process visible on startup -->
+        <CheckBox Content="Process visible onstartup"
+                  
+                  IsChecked="{Binding ProcessVisibleOnStartup}"/>
+
+
+        <!-- Add process button -->
+        <Button Content="Save"
+                
+                Padding="5,0"
+                
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                
+                Command="{Binding SaveProcessCommand}"/>
+        
+        
+    </StackPanel>
+    
+
+</UserControl>
