@@ -56,7 +56,7 @@
         public static IFileDialog FileDialog => GetService<IFileDialog>(); 
         
         /// <summary>
-        /// A User dialog. Used to ask for user to make a decision, Such as; 
+        /// A User dialog. Used for: asking auser to make a decision, Such as; 
         /// if to include an existing project directory to app
         /// </summary>
         public static IUserDialog UserDialog => GetService<IUserDialog>();
