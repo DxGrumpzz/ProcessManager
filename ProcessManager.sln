@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessManager", "ProcessMa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestProcess", "TestProcess\TestProcess.vcxproj", "{22A9589F-0396-42CC-AE1F-AC1F3F4A2EEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.UI", "ProcessManager.UI\ProcessManager.UI.csproj", "{66D97BA9-3F55-46B4-AF18-6BBD51365FE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.UI", "ProcessManager.UI\ProcessManager.UI.csproj", "{66D97BA9-3F55-46B4-AF18-6BBD51365FE1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessManager.Core", "ProcessManager.Core\ProcessManager.Core.vcxproj", "{5D0458AF-5275-4318-85F5-81137AAF0A64}"
 EndProject

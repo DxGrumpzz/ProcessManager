@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Compile Remove="Models\ProcessModel.cs" />
-    <Compile Remove="ProcessLoader\ProcessLoader.cs" />
   </ItemGroup>
 
   <ItemGroup>
