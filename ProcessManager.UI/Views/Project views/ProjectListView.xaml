@@ -1,0 +1,20 @@
+
+                                <!-- A very simple element that is rendered above the project's path.
+                                     The only reason this is here is because I don't want 'ProjectItemViewModel' to contain a command that switches to itself-->
+                                <Border DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+                                        
+                                        Cursor="Hand"
+                                        
+                                        Background="Transparent">
+
+                                    <Border.InputBindings>
+
+                                        <MouseBinding MouseAction="LeftClick"
+                                                      
+                                                      Command="{Binding SwitchToProjectViewCommand}"
+                                                      CommandParameter="{Binding ElementName=MainGrid, Path=DataContext}"/>
+
+                                    </Border.InputBindings>
+
+                                </Border>
+

@@ -70,6 +70,8 @@
 
         public ICommand AddNewProjectCommnad { get; }
 
+        public ICommand SwitchToProjectViewCommand { get; }
+
         #endregion
 
 
@@ -87,8 +89,14 @@
             }));
 
             AddNewProjectCommnad = new RelayCommand(ExecuteAddNewProjectCommnad);
+            SwitchToProjectViewCommand = new RelayCommand<ProjectItemViewModel>(ExecuteSwitchToProjectViewCommand);
         }
 
+
+        private void ExecuteSwitchToProjectViewCommand(ProjectItemViewModel project)
+        {
+            DI.MainWindowViewModel.CurrentView = new ProjectItemView(project);
+        }
 
         private void ExecuteAddNewProjectCommnad()
         {
