@@ -82,6 +82,16 @@ namespace ProcessManager.UI
 
         private IServiceCollection SetupDI(IServiceCollection serviceCollection)
         {
+            // Setup serializer
+            serviceCollection.AddTransient<ISerializer>((ServiceProvider) =>
+            new JsonSerializer(
+                new JsonSerializerOptions()
+                {
+                    IgnoreNullValues = true,
+                    WriteIndented = true,
+                }));
+
+
             // Add folder dialog 
             serviceCollection.AddScoped<IFolderDialog>((serviceProvider) => new WindowsFolderDialog());
 
@@ -89,14 +99,15 @@ namespace ProcessManager.UI
             serviceCollection.AddScoped<IFileDialog>((serviceProvider) => new WindowsFileDialog());
 
             // Create a process loader
-            serviceCollection.AddScoped<IProcessLoader>((serviceProvider) => new JsonProcessLoader());
+            serviceCollection.AddScoped<IProcessLoader>((serviceProvider) => new ProcessLoader(serviceProvider.GetService<ISerializer>()));
 
 
             // Setup project loader
             serviceCollection.AddScoped<IProjectLoader>((serviceProvider) =>
             new ProjectLoader(
-                    processLoader: serviceProvider.GetService<IProcessLoader>(),
-                    projectsFilename: Localization.PROJECTS_FILE_NAME,
+                    processLoader:         serviceProvider.GetService<IProcessLoader>(),
+                    serializer:            serviceProvider.GetService<ISerializer>(),
+                    projectsFilename:      Localization.PROJECTS_FILE_NAME,
                     projectConfigFilename: Localization.PROJECT_CONFIG_FILE_NAME));
 
 
@@ -164,15 +175,6 @@ namespace ProcessManager.UI
                 // Convert to an array Because
                 .ToArray()));
 
-
-            serviceCollection.AddTransient<ISerializer>((ServiceProvider) =>
-            new JsonSerializer(
-                new JsonSerializerOptions()
-                {
-                    IgnoreNullValues = true,
-                    WriteIndented = true,
-                }));
-        
 
             return serviceCollection;
         }
