@@ -160,13 +160,10 @@
 
 
             // Convert the new projects list to a json string
-            var jsonString = DI.Serializer.SerializeToString(DI.Projects.Select(project => new
-            {
-                ProjectPath = project.ProjectPath,
-            }));
+            var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);
 
             // Write the json to file
-            File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);
+            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, jsonBytes);
 
             // Update tray icon
             DI.SystemTrayIcon.RebuildIcon(showAfterBuild: true);

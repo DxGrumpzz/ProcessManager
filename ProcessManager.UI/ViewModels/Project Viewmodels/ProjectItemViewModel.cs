@@ -81,19 +81,11 @@
             // Remove this project from from list in DI
             DI.Projects.Remove(Project);
 
-            // Convert the 'new' projects list to json objects
-            var projectsAsJson = DI.Projects
-                .Select(project =>
-                new
-                {
-                    ProjectPath = project.ProjectPath,
-                });
-                
             // Convert the json object to json string
-            string jsonString = DI.Serializer.SerializeToString(projectsAsJson);
+            var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);
 
             // Write the json string to Projects file
-            File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);
+            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, jsonBytes);
 
             // Switch back to main page
             SwitchToProjectListView();
