@@ -1,9 +1,9 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text.Json;
     using System.Windows.Input;
 
     /// <summary>
@@ -14,9 +14,9 @@ namespace ProcessManager.UI
         public static ProjectItemViewModel DesignInstance => new ProjectItemViewModel(new Project()
         {
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
-            
+
             ProcessList = new IProcessModel[]
-            { 
+            {
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.exe"),
 
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat"),
@@ -46,6 +46,8 @@ namespace ProcessManager.UI
         public ICommand AddNewProcessCommand { get; }
         public ICommand AddNewConsoleProcessCommand { get; }
 
+        public ICommand DeleteProjectCommand { get; }
+
         #endregion
 
 
@@ -53,7 +55,6 @@ namespace ProcessManager.UI
         {
             Project = project;
 
-            GotoProjectViewCommnad = new RelayCommand(ExecuteGotoProjectViewCommnad);
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
 
             CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand);
@@ -61,6 +62,41 @@ namespace ProcessManager.UI
 
             AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
             AddNewConsoleProcessCommand = new RelayCommand(ExecuteAddNewConsoleProcessCommand);
+
+            DeleteProjectCommand = new RelayCommand(ExecuteDeleteProjectCommand);
+        }
+
+
+        private void ExecuteDeleteProjectCommand()
+        {
+            var userDialog = DI.UserDialog;
+
+            // Ask for user confirmation
+            var result = userDialog.ShowChoiceDialog($"Are you absolutley sure you want to delete \'{Project.ProjectName}\' from your project list ?", "Delete project confirmation");
+
+            // Don't do anything if user didn't confirm the deletion
+            if (result != UserDialogResult.Yes)
+                return;
+
+            // Remove this project from from list in DI
+            DI.Projects.Remove(Project);
+
+            // Convert the 'new' projects list to json objects
+            var projectsAsJson = DI.Projects
+                .Select(project =>
+                new
+                {
+                    ProjectPath = project.ProjectPath,
+                });
+
+            // Convert the json object to json string
+            string jsonString = JsonSerializer.Serialize(projectsAsJson);
+
+            // Write the json string to Projects file
+            File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);
+
+            // Switch back to main page
+            SwitchToProjectListView();
         }
 
         private void ExecuteAddNewConsoleProcessCommand()
