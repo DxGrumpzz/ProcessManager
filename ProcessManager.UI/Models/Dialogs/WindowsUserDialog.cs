@@ -10,10 +10,15 @@
     /// </summary>
     public class WindowsUserDialog : IUserDialog
     {
-        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "")
+        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "", UserDialogButton defaultUserDialogButton = UserDialogButton.No)
         {
+            MessageBoxResult messageBoxResult = default;
+
             // Show the messagebox with Yes, no, and close buttons
-            MessageBoxResult messageBoxResult = MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo, default, MessageBoxResult.No);
+            if (defaultUserDialogButton == UserDialogButton.No)
+                messageBoxResult = MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo, default, MessageBoxResult.No);
+            else if (defaultUserDialogButton == UserDialogButton.Yes)
+                messageBoxResult= MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo, default, MessageBoxResult.Yes);
 
             return MessageBoxResultToUserDialogResult(messageBoxResult);
         }
