@@ -52,6 +52,9 @@
                 case MessageBoxResult.None:
                     return UserDialogResult.None;
 
+                case MessageBoxResult.OK:
+                    return UserDialogResult.None;
+
                 default:
                 {
                     // How the hell did you get here ??
