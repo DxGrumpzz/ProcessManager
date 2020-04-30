@@ -15,6 +15,7 @@
         /// A process loader
         /// </summary>
         private readonly IProcessLoader _processLoader;
+        private readonly ISerializer _serializer;
 
 
         /// <summary>
@@ -34,9 +35,11 @@
         private IEnumerable<Project> _projects;
 
 
-        public ProjectLoader(IProcessLoader processLoader, string projectsFilename, string projectConfigFilename)
+        public ProjectLoader(IProcessLoader processLoader, ISerializer serializer, string projectsFilename, string projectConfigFilename)
         {
             _processLoader = processLoader;
+            _serializer = serializer;
+
             _projectsFilename = projectsFilename;
             _projectConfigFilename = projectConfigFilename;
         }
@@ -46,7 +49,7 @@
             try
             {
                 // Using a json serializer, deserialzie the data inside the Projects file into C# objects
-                _projects = DI.Serializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(_projectsFilename));
+                _projects = _serializer.DeserializerProjects(File.ReadAllBytes(_projectsFilename));
             }
             // Projects file contains invalid json
             catch (JsonException jsonException)
