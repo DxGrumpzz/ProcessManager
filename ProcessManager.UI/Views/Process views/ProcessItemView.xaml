@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              
              d:DesignHeight="25" 
-             d:DesignWidth="300"
+             d:DesignWidth="400"
              
              d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
 
@@ -21,15 +21,24 @@
 
 
         <Grid local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}" 
-              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
+              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
+              
+              Cursor="Hand">
+
+            <Grid.InputBindings>
+                
+                <MouseBinding MouseAction="LeftClick"
+                              Command="{Binding EditProcessCommand}"/>
+                
+            </Grid.InputBindings>
 
             <!-- The name of this process -->
             <TextBlock Text="{Binding ProcessPath}"
-                       
+
                        Visibility="{Binding ProcessLabelVisible,
                        Converter={local:BooleanToVisibilityValueConverter}, 
                        ConverterParameter='True'}"
-                       
+
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Center"/>
 
@@ -142,6 +151,7 @@
 
             </Button>
 
+            
         </StackPanel>
 
     </Grid>
