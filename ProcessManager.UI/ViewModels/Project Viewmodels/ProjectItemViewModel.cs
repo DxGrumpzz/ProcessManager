@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text.Json;
     using System.Windows.Input;
 
     /// <summary>
@@ -25,6 +24,7 @@
             },
         });
 
+
         /// <summary>
         /// The project associated with this viewmodel
         /// </summary>
@@ -34,7 +34,7 @@
         /// The project's processes as a "list" of ProcessItemViewModel
         /// </summary>
         public IEnumerable<ProcessItemViewModel> ProcessList => Project.ProcessList
-            .Select(process => new ProcessItemViewModel(process)).ToArray();
+            .Select(process => new ProcessItemViewModel(this, process)).ToArray();
 
 
         #region Public commands
@@ -54,6 +54,7 @@
         public ProjectItemViewModel(Project project)
         {
             Project = project;
+            
 
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
 
@@ -65,6 +66,7 @@
 
             DeleteProjectCommand = new RelayCommand(ExecuteDeleteProjectCommand);
         }
+
 
 
         private void ExecuteDeleteProjectCommand()
@@ -117,11 +119,11 @@
             };
         }
 
+
         private void ExecuteGotoMainPageommnad()
         {
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
         }
-
 
         private void SwitchToProjectListView()
         {

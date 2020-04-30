@@ -9,7 +9,7 @@ namespace ProcessManager.UI
     /// </summary>
     public class ProcessItemViewModel : BaseViewModel
     {
-        public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(
+        public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(null,
             new GUIProcess(Path.GetRandomFileName()));
 
 
@@ -28,6 +28,9 @@ namespace ProcessManager.UI
 
 
         #region Public properties
+
+        public ProjectItemViewModel Project { get; set; }
+
 
         /// <summary>
         /// The process associated with this viewmodel
@@ -114,12 +117,15 @@ namespace ProcessManager.UI
         public ICommand MouseEnterCommand { get; }
         public ICommand MouseLeaveCommand { get; }
 
+
+        public ICommand EditProcessCommand { get; }
+
         #endregion
 
 
-
-        public ProcessItemViewModel(IProcessModel process)
+        public ProcessItemViewModel(ProjectItemViewModel project, IProcessModel process)
         {
+            Project = project;
             Process = process;
 
             ProcessRunning = process.IsRunning;
@@ -160,6 +166,8 @@ namespace ProcessManager.UI
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
             HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
 
+            EditProcessCommand = new RelayCommand(() => 
+            DI.MainWindowViewModel.CurrentView = new EditGUIProcessView(new EditGUIProcessViewModel(project, this)));
 
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
             if (ProcessHasLabel == true)
@@ -168,5 +176,7 @@ namespace ProcessManager.UI
                 MouseLeaveCommand = new RelayCommand(() => ProcessLabelVisible = false);
             };
         }
+
+
     };
 };
