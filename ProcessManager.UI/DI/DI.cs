@@ -61,6 +61,11 @@
         /// </summary>
         public static IUserDialog UserDialog => GetService<IUserDialog>();
 
+        /// <summary>
+        /// The app's serializer
+        /// </summary>
+        public static ISerializer Serializer => GetService<ISerializer>();
+
 
         /// <summary>
         /// A shortcut for GetService function in IServiceProvider
