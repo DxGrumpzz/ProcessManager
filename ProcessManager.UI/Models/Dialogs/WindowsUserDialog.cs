@@ -13,8 +13,7 @@
         public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "")
         {
             // Show the messagebox with Yes, no, and close buttons
-            var messageBoxResult = MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo);
-
+            MessageBoxResult messageBoxResult = MessageBox.Show(dialogText, dialogTitle, MessageBoxButton.YesNo, default, MessageBoxResult.No);
 
             return MessageBoxResultToUserDialogResult(messageBoxResult);
         }
