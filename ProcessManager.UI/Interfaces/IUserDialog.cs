@@ -22,7 +22,7 @@
         /// <param name="dialogText"> The text inside the dialog </param>
         /// <param name="dialogTitle"> The dialog's title text  </param>
         /// <returns></returns>
-        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "");
+        public UserDialogResult ShowChoiceDialog(string dialogText, string dialogTitle = "", UserDialogButton defaultDialogButton = UserDialogButton.No);
 
     };
 };
