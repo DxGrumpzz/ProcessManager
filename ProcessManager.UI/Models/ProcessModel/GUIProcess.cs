@@ -17,12 +17,12 @@
         /// <summary>
         /// A string contaning the path to the process
         /// </summary>
-        public string ProcessPath { get; }
+        public string ProcessPath { get; set; }
 
         /// <summary>
         /// A string contaning the process arguments 
         /// </summary>
-        public string ProcessArgs { get; }
+        public string ProcessArgs { get; set; }
 
 
         public GUIProcess(string processPath, string processArgs = "", bool visibleOnStartup = true)
