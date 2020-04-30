@@ -8,6 +8,7 @@ namespace ProcessManager.UI
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Text.Json;
     using System.Windows;
     using System.Windows.Interop;
 
@@ -83,7 +84,7 @@ namespace ProcessManager.UI
         {
             // Add folder dialog 
             serviceCollection.AddScoped<IFolderDialog>((serviceProvider) => new WindowsFolderDialog());
-            
+
             // Add file dialog
             serviceCollection.AddScoped<IFileDialog>((serviceProvider) => new WindowsFileDialog());
 
@@ -163,6 +164,15 @@ namespace ProcessManager.UI
                 // Convert to an array Because
                 .ToArray()));
 
+
+            serviceCollection.AddTransient<ISerializer>((ServiceProvider) =>
+            new JsonSerializer(
+                new JsonSerializerOptions()
+                {
+                    IgnoreNullValues = true,
+                    WriteIndented = true,
+                }));
+        
 
             return serviceCollection;
         }

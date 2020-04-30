@@ -160,14 +160,10 @@
 
 
             // Convert the new projects list to a json string
-            var jsonString = JsonSerializer.Serialize(DI.Projects.Select(project => new
+            var jsonString = DI.Serializer.SerializeToString(DI.Projects.Select(project => new
             {
                 ProjectPath = project.ProjectPath,
-            }),
-            new JsonSerializerOptions()
-            {
-                WriteIndented = true,
-            });
+            }));
 
             // Write the json to file
             File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);

@@ -88,9 +88,9 @@
                 {
                     ProjectPath = project.ProjectPath,
                 });
-
+                
             // Convert the json object to json string
-            string jsonString = JsonSerializer.Serialize(projectsAsJson);
+            string jsonString = DI.Serializer.SerializeToString(projectsAsJson);
 
             // Write the json string to Projects file
             File.WriteAllText(Localization.PROJECTS_FILE_NAME, jsonString);

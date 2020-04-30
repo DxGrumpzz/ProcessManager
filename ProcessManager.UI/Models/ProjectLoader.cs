@@ -46,7 +46,7 @@
             try
             {
                 // Using a json serializer, deserialzie the data inside the Projects file into C# objects
-                _projects = JsonSerializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(_projectsFilename));
+                _projects = DI.Serializer.Deserialize<IEnumerable<Project>>(File.ReadAllBytes(_projectsFilename));
             }
             // Projects file contains invalid json
             catch (JsonException jsonException)

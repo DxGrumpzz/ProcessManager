@@ -22,7 +22,7 @@
         protected string SerializeProcessList(Project project)
         {
             // Convert the process list inside the project to json
-            return JsonSerializer.Serialize(
+            return DI.Serializer.SerializeToString(
                 project.ProcessList
                 .Select(process =>
                 {
@@ -40,12 +40,7 @@
                             return default;
                         };
                     };
-                }),
-                new JsonSerializerOptions()
-                {
-                    WriteIndented = true,
-                    IgnoreNullValues = true,
-                });
+                }));
         }
 
 

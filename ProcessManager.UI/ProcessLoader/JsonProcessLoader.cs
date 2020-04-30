@@ -25,7 +25,7 @@
             try
             {
                 // Parse json data
-                var jsonData = JsonSerializer.Deserialize<IEnumerable<JsonProcessModel>>(json);
+                var jsonData = DI.Serializer.DeserializeFromString<IEnumerable<JsonProcessModel>>(json);
 
                 return jsonData.Select<JsonProcessModel, IProcessModel>(jsonProcess =>
                 {
