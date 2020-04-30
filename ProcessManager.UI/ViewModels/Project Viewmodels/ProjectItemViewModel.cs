@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -39,7 +39,6 @@
 
         #region Public commands
 
-        public ICommand GotoProjectViewCommnad { get; }
         public ICommand GotoMainPageCommnad { get; }
         public ICommand CloseProjectCommand { get; }
         public ICommand RunProjectCommand { get; }
@@ -95,11 +94,11 @@
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
         }
 
-        private void ExecuteGotoProjectViewCommnad()
-        {
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(this);
-        }
 
+        private void SwitchToProjectListView()
+        {
+            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
+        }
 
     };
 };
