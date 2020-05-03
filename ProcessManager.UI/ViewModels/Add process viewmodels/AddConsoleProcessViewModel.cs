@@ -67,9 +67,12 @@ namespace ProcessManager.UI
         #region Commands
 
         public ICommand SelectDirectoryCommand { get; }
+        public ICommand SelectCurrentDirectoryCommand { get; }
+
 
         public ICommand BackToMainPageCommand { get; }
         public ICommand BackToProjectPageCommand { get; }
+
 
         public ICommand AddProcessCommand { get; }
 
@@ -84,7 +87,8 @@ namespace ProcessManager.UI
             ProjectVM = projectVM;
 
             SelectDirectoryCommand = new RelayCommand(ExecuteSelectDirectoryCommand);
-
+            SelectCurrentDirectoryCommand = new RelayCommand(() =>
+                ConsoleDirectory = ProjectVM.Project.ProjectPath);
 
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
             BackToProjectPageCommand = new RelayCommand(ExecuteBackToProjectPageCommand);
@@ -99,11 +103,24 @@ namespace ProcessManager.UI
         {
             var folderDialog = DI.FolderDialog;
 
-            // Show the folder dialog 
-            var result = folderDialog.ShowDialog();
-            
+
+            bool folderDialogResult;
+
+            // Check if the Console directory actually exists
+            if (string.IsNullOrWhiteSpace(ConsoleDirectory) == true &&
+                // Check if directory exists
+                Directory.Exists(ConsoleDirectory) == false)
+            {
+                // Show the folder dialog 
+                folderDialogResult = folderDialog.ShowDialog();
+            }
+            else
+                // Show the folder dialog from ConsoleDirectory
+                folderDialogResult = folderDialog.ShowDialogFrom(ConsoleDirectory);
+
+
             // Check if the user has chose a valid directory
-            if (result == false)
+            if (folderDialogResult == false)
                 return;
 
             // set the console directory to the selectd path
