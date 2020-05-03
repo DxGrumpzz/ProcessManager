@@ -105,10 +105,12 @@
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var consoleProcess = (ConsoleProcess)ProcessVM.Process;
             var project = ProjectVM.Project;
 
             var index = project.ProcessList.IndexOf(ProcessVM.Process);
+
+            if (index == -1)
+                return;
 
             project.ProcessList[index] = new ConsoleProcess(ConsoleScript, ConsoleDirectory, ProcessVisibleOnStartup)
             {
