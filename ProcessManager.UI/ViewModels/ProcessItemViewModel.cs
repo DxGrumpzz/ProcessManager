@@ -1,5 +1,6 @@
 namespace ProcessManager.UI
 {
+    using System;
     using System.Diagnostics;
     using System.IO;
     using System.Windows.Input;
@@ -40,7 +41,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// The process path, Formatted
         /// </summary>
-        public string ProcessPath 
+        public string ProcessPath
         {
             get
             {
@@ -55,7 +56,7 @@ namespace ProcessManager.UI
                 };
 
             }
-        } 
+        }
 
         /// <summary>
         /// A boolean flag that indicates if this process is currently running
@@ -136,16 +137,16 @@ namespace ProcessManager.UI
             // Bind the process closed event
             Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
-             Process.ProcessInitializedCallback += (IProcessModel process) =>
-             {
-                 if (Process.VisibleOnStartup == false)
-                     ProcessVisible = false;
-                 else
-                     ProcessVisible = true;
+            Process.ProcessInitializedCallback += (IProcessModel process) =>
+            {
+                if (Process.VisibleOnStartup == false)
+                    ProcessVisible = false;
+                else
+                    ProcessVisible = true;
 
 
-                 ProcessRunning = true;
-             };
+                ProcessRunning = true;
+            };
 
             Process.ProcessVisibilityChanged += (IProcessModel process, ProcessVisibilityState visibilityState) =>
             {
@@ -166,8 +167,7 @@ namespace ProcessManager.UI
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
             HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
 
-            EditProcessCommand = new RelayCommand(() => 
-            DI.MainWindowViewModel.CurrentView = new EditGUIProcessView(new EditGUIProcessViewModel(project, this)));
+            EditProcessCommand = new RelayCommand(ExecuteEditProcessCommand);
 
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
             if (ProcessHasLabel == true)
@@ -177,6 +177,19 @@ namespace ProcessManager.UI
             };
         }
 
+        private void ExecuteEditProcessCommand()
+        {
+            switch (Process)
+            {
+                case ConsoleProcess _:
+                    DI.MainWindowViewModel.CurrentView = new EditConsoleProcessView(new EditConsoleProcessViewModel(Project, this));
+                    break;
 
+                case GUIProcess _:
+                    DI.MainWindowViewModel.CurrentView = new EditGUIProcessView(new EditGUIProcessViewModel(Project, this));
+                    break;
+
+            };
+        }
     };
 };
