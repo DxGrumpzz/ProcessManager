@@ -79,9 +79,16 @@
         protected abstract void ExecuteSaveProcessCommand();
 
 
+        /// <summary>
+        /// Validates that a given <see cref="IProcessModel"/> is of correct type
+        /// </summary>
+        /// <typeparam name="TProcess"> The type of expected process </typeparam>
+        /// <param name="process"> The actual process </param>
+        /// <returns></returns>
         protected TProcess ValidateProcessType<TProcess>(IProcessModel process)
             where TProcess : IProcessModel
         {
+            // Using pattern matching, check if process 'is a' TProcess
             if (!(process is TProcess))
             {
                 Debugger.Break();
