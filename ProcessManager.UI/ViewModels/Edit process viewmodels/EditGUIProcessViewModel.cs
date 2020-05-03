@@ -31,9 +31,9 @@ namespace ProcessManager.UI
 
         #region Public properties
 
-        public string SelectedPath 
-        { 
-            get => _selectedPath; 
+        public string SelectedPath
+        {
+            get => _selectedPath;
             set
             {
                 _selectedPath = value;
@@ -83,45 +83,26 @@ namespace ProcessManager.UI
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var process = (GUIProcess)ProcessVM.Process;
             var project = ProjectVM.Project;
 
             int index = project.ProcessList.IndexOf(ProcessVM.Process);
 
-            if(index != -1)
+            if (index != -1)
+                return;
+
+            project.ProcessList[index] = new GUIProcess(SelectedPath, Arguments, ProcessVisibleOnStartup)
             {
-                project.ProcessList[index] = new GUIProcess(SelectedPath, Arguments, ProcessVisibleOnStartup)
-                {
-                    ProcessLabel = ProcessLabel,
-                };
+                ProcessLabel = ProcessLabel,
             };
 
-            var projectBytes = DI.Serializer.SerializeToString(
-                project.ProcessList
-                .Select(process =>
-                {
-                    switch (process)
-                    {
-                        case ConsoleProcess consoleProcess:
-                            return ConsoleProcessAsJsonProcess(consoleProcess);
+            var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
 
-                        case GUIProcess guiProcess:
-                            return GUIProcessAsJsonProcess(guiProcess);
-
-                        default:
-                        {
-                            Debugger.Break();
-                            return default;
-                        };
-                    };
-                }));
-
-            File.WriteAllText(project.ProjectPathWithConfig, projectBytes);
+            File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
         }
 
-
+        /*
 
         /// <summary>
         /// Converts a <see cref="GUIProcess"/> to a <see cref="ConsoleProcess"/> 
@@ -163,6 +144,7 @@ namespace ProcessManager.UI
             };
         }
 
+        */
 
     };
-}; 
+};
