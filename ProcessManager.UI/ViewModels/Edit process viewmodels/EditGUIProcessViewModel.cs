@@ -6,6 +6,7 @@ namespace ProcessManager.UI
     using System.Linq;
     using System.Windows.Input;
 
+
     /// <summary>
     /// 
     /// </summary>
@@ -21,38 +22,27 @@ namespace ProcessManager.UI
 
         #region Private fields
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _selectedPath;
-        private string _args;
-        private string _processLabel;
 
         #endregion
 
 
         #region Public properties
 
-        public string SelectedPath
-        {
-            get => _selectedPath;
+        public string SelectedPath 
+        { 
+            get => _selectedPath; 
             set
             {
                 _selectedPath = value;
+                OnPropertyChanged();
             }
         }
 
-        public string Arguments
-        {
-            get => _args;
-            set
-            {
-                _args = value;
-            }
-        }
+        public string Arguments { get; set; }
 
-        public string ProcessLabel
-        {
-            get => _processLabel;
-            set { _processLabel = value; }
-        }
+        public string ProcessLabel { get; set; }
 
         public bool ProcessVisibleOnStartup { get; set; }
 
@@ -101,10 +91,15 @@ namespace ProcessManager.UI
             var process = (GUIProcess)ProcessVM.Process;
             var project = ProjectVM.Project;
 
-            process.ProcessPath = SelectedPath;
-            process.ProcessArgs = Arguments;
-            process.ProcessLabel = ProcessLabel;
-            process.VisibleOnStartup = ProcessVisibleOnStartup;
+            int index = project.ProcessList.IndexOf(ProcessVM.Process);
+
+            if(index != -1)
+            {
+                project.ProcessList[index] = new GUIProcess(SelectedPath, Arguments, ProcessVisibleOnStartup)
+                {
+                    ProcessLabel = ProcessLabel,
+                };
+            };
 
             var projectBytes = DI.Serializer.SerializeToString(
                 project.ProcessList
@@ -175,4 +170,4 @@ namespace ProcessManager.UI
 
 
     };
-};
+}; 
