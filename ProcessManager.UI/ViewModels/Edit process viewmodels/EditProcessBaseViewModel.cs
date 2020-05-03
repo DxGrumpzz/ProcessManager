@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -77,6 +78,19 @@
 
         protected abstract void ExecuteSaveProcessCommand();
 
+
+        protected TProcess ValidateProcessType<TProcess>(IProcessModel process)
+            where TProcess : IProcessModel
+        {
+            if (!(process is TProcess))
+            {
+                Debugger.Break();
+                throw new Exception($"Invalid process supplied.\n" +
+                    $"{nameof(process)} is {process.GetType()}, expected {typeof(TProcess)}");
+            };
+
+            return (TProcess)process;
+        }
 
 
 

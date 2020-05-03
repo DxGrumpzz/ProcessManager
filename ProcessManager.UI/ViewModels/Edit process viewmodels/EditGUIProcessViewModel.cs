@@ -4,6 +4,7 @@ namespace ProcessManager.UI
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Input;
 
 
@@ -59,12 +60,7 @@ namespace ProcessManager.UI
         private EditGUIProcessViewModel() { }
         public EditGUIProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
         {
-            if (!(processItemViewModel.Process is GUIProcess process))
-            {
-                Debugger.Break();
-                throw new Exception($"Invalid process supplied.\n" +
-                    $"{processItemViewModel.Process} is {processItemViewModel.Process.GetType()}, expected {nameof(GUIProcess)}");
-            };
+            var process = ValidateProcessType<GUIProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
             ProjectVM = projectViewModel;
@@ -76,7 +72,6 @@ namespace ProcessManager.UI
 
             SelectProcessPathCommand = new RelayCommand(ExecuteSelectProcessPathCommand);
         }
-
 
         private void ExecuteSelectProcessPathCommand()
         {

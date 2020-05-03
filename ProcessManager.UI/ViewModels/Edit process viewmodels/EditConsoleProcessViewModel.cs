@@ -79,13 +79,7 @@
         private EditConsoleProcessViewModel() { }
         public EditConsoleProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
         {
-            // TODO: encapsulate this statement into a function
-            if (!(processItemViewModel.Process is ConsoleProcess process))
-            {
-                Debugger.Break();
-                throw new Exception($"Invalid process supplied.\n" +
-                    $"{processItemViewModel.Process} is {processItemViewModel.Process.GetType()}, expected {nameof(ConsoleProcess)}");
-            };
+            var process = ValidateProcessType<ConsoleProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
             ProjectVM = projectViewModel;
