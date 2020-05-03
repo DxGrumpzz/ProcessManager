@@ -19,5 +19,9 @@
         /// <returns></returns>
         public bool ShowDialog();
 
+
+        public bool ShowDialogFrom(string directoryPath);
+
+
     };
 };

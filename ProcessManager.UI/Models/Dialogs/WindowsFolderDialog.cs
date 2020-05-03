@@ -18,6 +18,9 @@
         [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
         private static extern bool OpenDirectoryDialog(ref IntPtr path);
 
+        [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
+        private static extern bool OpenDirectoryDialogFrom(ref IntPtr path, string openFrom);
+
 
         public string SelectedPath { get; private set; }
 
@@ -53,5 +56,34 @@
                 Marshal.FreeCoTaskMem(pathPointer);
             };
         }
+
+        public bool ShowDialogFrom(string openFrom)
+        {
+            // A pointer to an unmanaged string
+            IntPtr pathPointer = IntPtr.Zero;
+
+            try
+            {
+                // Open the folder dialog
+                bool result = OpenDirectoryDialogFrom(ref pathPointer, openFrom);
+
+                // If user chose a folder
+                if (result == true)
+                    // Marhsal the unmanaged to managed string
+                    SelectedPath = Marshal.PtrToStringUni(pathPointer);
+
+                // return the selected path
+                return result;
+            }
+            // This is a terrible practice.
+            // Necessary to keep the app running IF on the off-chance something happens in OpenDirectoryDialog function 
+            catch { return false; }
+            finally
+            {
+                // Because we call COM function and pathPointer is allocated inside a COM function we must free it using COM
+                Marshal.FreeCoTaskMem(pathPointer);
+            };
+        }
+
     };
 };
