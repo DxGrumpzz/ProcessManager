@@ -84,12 +84,7 @@ namespace ProcessManager.UI
         {
             // Setup serializer
             serviceCollection.AddTransient<ISerializer>((ServiceProvider) =>
-            new JsonSerializer(
-                new JsonSerializerOptions()
-                {
-                    IgnoreNullValues = true,
-                    WriteIndented = true,
-                }));
+            new JsonSerializer());
 
 
             // Add folder dialog 

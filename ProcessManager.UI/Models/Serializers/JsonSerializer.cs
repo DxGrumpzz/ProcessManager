@@ -13,11 +13,27 @@
     {
 
         private readonly JsonSerializerOptions _serializerOptions = default;
+        private readonly JsonWriterOptions _jsonWriterOptions;
 
-        public JsonSerializer(JsonSerializerOptions serializerOptions = null)
+
+        public JsonSerializer()
         {
-            if (serializerOptions != null)
-                _serializerOptions = serializerOptions;
+            _serializerOptions = new JsonSerializerOptions()
+            { 
+                WriteIndented = true,
+            };
+
+            _jsonWriterOptions = new JsonWriterOptions()
+            { 
+                Indented = true,
+            };
+
+        }
+
+        public JsonSerializer(JsonSerializerOptions serializerOptions, JsonWriterOptions jsonWriterOptions)
+        {
+            _serializerOptions = serializerOptions;
+            _jsonWriterOptions = jsonWriterOptions;
         }
 
 
@@ -25,7 +41,7 @@
         {
             using (var memoryStream = new MemoryStream())
             {
-                using (var jsonWriter = new Utf8JsonWriter(memoryStream))
+                using (var jsonWriter = new Utf8JsonWriter(memoryStream, _jsonWriterOptions))
                 {
                     System.Text.Json.JsonSerializer.Serialize(jsonWriter, data, objType, _serializerOptions);
 
