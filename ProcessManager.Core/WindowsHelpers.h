@@ -3,8 +3,9 @@
 #include <winbase.h>
 #include <string>
 #include <chrono>
-
-
+#include <comdef.h>
+#include <iostream>
+#include <atlbase.h>
 
 // Takes a DWORD error code and returns its string message 
 static std::wstring GetLastErrorAsStringW()
@@ -84,9 +85,59 @@ extern "C" _declspec(dllexport) inline bool OpenDirectoryDialog(wchar_t*& path)
 
         fileDialog->Release();
     };
-      
+
     return result;
 };
+
+
+// Opens the IFileDialog from an existing path
+extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, const wchar_t* openFrom)
+{
+    // The file dialog modal window 
+    CComPtr<IFileDialog> fileDialog;
+
+    // Result of the modal window
+    // True, User has chose a folder.
+    // False, User has closed the modal without choosing
+    bool result = false;
+
+    // Create an instance of IFileDialog
+    if (SUCCEEDED(CoCreateInstance(__uuidof(FileOpenDialog), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+    {
+        // Set the file dialog to only browse folders
+        fileDialog->SetOptions(FOS_PICKFOLDERS);
+
+        // An option that will store the 'openFrom' value
+        CComPtr<IShellItem> openFromOption;
+
+        // Set openFromOption value to 'openFrom'
+        if (SUCCEEDED(SHCreateItemFromParsingName(openFrom, NULL, IID_PPV_ARGS(&openFromOption))))
+        {
+            // Set starting folder
+            if (SUCCEEDED(fileDialog->SetFolder(openFromOption)))
+            {
+                // Show the file dialog
+                if (SUCCEEDED(fileDialog->Show(GetActiveWindow())))
+                {
+                    // Get result
+                    CComPtr<IShellItem> psi;
+                    if (SUCCEEDED(fileDialog->GetResult(&psi)))
+                    {
+                        // Convert result to a readable string
+                        if (SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
+                        {
+                            result = true;
+                        };
+                    };
+                }
+                else
+                    result = false;
+            };
+        };
+    };
+
+    return result;
+}
 
 
 
