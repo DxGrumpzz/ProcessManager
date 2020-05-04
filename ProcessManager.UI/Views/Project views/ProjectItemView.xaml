@@ -40,12 +40,16 @@
         </StackPanel>
         
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      FocusVisualStyle="{x:Null}">
 
-            <StackPanel>
+            <StackPanel >
 
-                <!-- The list of processes to run --> 
-                <ItemsControl ItemsSource="{Binding ProcessList}">
+                <!-- The list of processes to run -->
+                <ItemsControl ItemsSource="{Binding ProcessList}" 
+                              FocusVisualStyle="{x:Null}"
+                              
+                              Grid.IsSharedSizeScope="True">
 
                     <ItemsControl.ItemTemplate>
 
@@ -76,7 +80,6 @@
                         
                         Command="{Binding AddNewConsoleProcessCommand}"/>
                 
-
             </StackPanel>
             
         </ScrollViewer>

@@ -15,22 +15,14 @@
     <Grid>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="AUTO"/>
+            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col0"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col2"/>
         </Grid.ColumnDefinitions>
 
 
         <Grid local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}" 
-              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
-              
-              Cursor="Hand">
-
-            <Grid.InputBindings>
-                
-                <MouseBinding MouseAction="LeftClick"
-                              Command="{Binding EditProcessCommand}"/>
-                
-            </Grid.InputBindings>
+              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
 
             <!-- The name of this process -->
             <TextBlock Text="{Binding ProcessPath}"
@@ -58,6 +50,7 @@
         <!-- Run and close buttons container -->
         <StackPanel Orientation="Horizontal"
                     
+                    HorizontalAlignment="Right"
                     local:UniformMargin.Margin="5,0,0,0"
                     
                     Grid.Column="1">
@@ -151,8 +144,19 @@
 
             </Button>
 
-            
+
         </StackPanel>
+
+
+        <!-- Eidt process button -->
+        <Button Grid.Column="2" 
+                
+                Content="{Binding Process.ProcessType, 
+                Converter={local:ProcessTypeToEditTextConverter}}"
+                
+                Margin="10,0,0,0"
+                
+                Command="{Binding EditProcessCommand}"/>
 
     </Grid>
 
