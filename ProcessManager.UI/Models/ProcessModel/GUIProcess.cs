@@ -31,6 +31,9 @@
             ProcessArgs = processArgs;
             VisibleOnStartup = visibleOnStartup;
 
+            // Set process type
+            ProcessType = ProcessType.GUI;
+
 
             _processClosedCallback = (IntPtr process) =>
             {

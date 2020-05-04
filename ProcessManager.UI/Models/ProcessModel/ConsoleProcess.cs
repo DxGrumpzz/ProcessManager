@@ -31,6 +31,9 @@
             StartupDirectory = startupDirectory;
             VisibleOnStartup = visibleOnStartup;
 
+            // Set process type
+            ProcessType = ProcessType.Console;
+
             _processClosedCallback = (IntPtr process) =>
             {
                 ProcessClosedCallback?.Invoke(this);
