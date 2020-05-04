@@ -1,7 +1,6 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
@@ -77,7 +76,7 @@ namespace ProcessManager.UI
         /// </summary>
         /// <param name="parameter"></param>
         public void Execute(object parameter)
-            {
+        {
             // If this RelayCommand is using single fire mode
             if (_singleFire == true)
                 // Check if this command is currently running
@@ -89,18 +88,18 @@ namespace ProcessManager.UI
 
 
             // Execute command
-                try
-                {
+            try
+            {
                 _methodDelegate?.Invoke();
-                }
+            }
             finally
-                {
+            {
                 // After command finishes reset flag
                 _isRunning = false;
-                    };
-            }
-
+            };
         }
+
+    }
 
 
     /// <summary>
@@ -178,4 +177,89 @@ namespace ProcessManager.UI
             }
         }
     }
-}
+
+    /// <summary>
+    /// An asynchronous "overload" of <see cref="RelayCommand"/>. Allows proper* execution of async Task commands
+    /// </summary>
+    public class AsyncRelayCommand : ICommand
+    {
+
+        #region Private fields
+
+        /// <summary>
+        /// An asynchronous function that will be executed
+        /// </summary>
+        private readonly Func<Task> _asyncAction;
+
+        /// <summary>
+        /// A condition which will tell if the command should execute or not
+        /// </summary>
+        private readonly Predicate<bool> _predicate;
+
+        /// <summary>
+        /// A boolean flag that indicates if the command will be executed once until it finishes execution of <see cref="_methodDelegate"/>
+        /// </summary>
+        private bool _singleFire;
+
+        /// <summary>
+        /// A boolean flag that indicates if this command is currently running
+        /// </summary>
+        private bool _isRunning;
+
+        #endregion
+
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+
+        /// <summary>
+        /// Default constrcutor
+        /// </summary>
+        /// <param name="asyncAction"> The asynchrounous action to execute </param>
+        /// <param name="predicate"> A function predicate used to indicate if the control associated with this command will be enabled </param>
+        /// <param name="singleFire"> A boolean flag that indicates if this function will run once until it completes before executiong again </param>
+        public AsyncRelayCommand(Func<Task> asyncAction, Predicate<bool> predicate = null, bool singleFire = false)
+        {
+            _asyncAction = asyncAction;
+            _predicate = predicate;
+
+            _singleFire = singleFire;
+        }
+
+
+        public bool CanExecute(object parameter)
+        {
+            return _predicate == null || _predicate.Invoke((bool)parameter);
+        }
+
+
+        public async void Execute(object parameter)
+        {
+            // If this RelayCommand is using single fire mode
+            if (_singleFire == true)
+                // Check if this command is currently running
+                if (_isRunning == true)
+                    return;
+
+            // Set running mode to true
+            _isRunning = true;
+
+
+            // Execute command
+            try
+            {
+                await _asyncAction?.Invoke();
+            }
+            finally
+            {
+                _isRunning = false;
+            };
+        }
+
+    };
+
+};
