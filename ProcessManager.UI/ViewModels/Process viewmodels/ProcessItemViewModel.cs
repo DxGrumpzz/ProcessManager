@@ -3,6 +3,7 @@ namespace ProcessManager.UI
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     /// <summary>
@@ -161,8 +162,6 @@ namespace ProcessManager.UI
             };
 
 
-            RunProcessCommand = new RelayCommand(() => Process.RunProcess());
-            CloseProcessCommand = new RelayCommand(() => Process.CloseProcess());
 
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
             HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
