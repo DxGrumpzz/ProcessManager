@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     /// <summary>
@@ -54,12 +55,11 @@
         public ProjectItemViewModel(Project project)
         {
             Project = project;
-            
 
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
 
-            CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand);
-            RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand);
+            RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand, singleFire: true);
+            CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand, singleFire: true);
 
             AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
             AddNewConsoleProcessCommand = new RelayCommand(ExecuteAddNewConsoleProcessCommand);
@@ -107,15 +107,18 @@
         {
             foreach (var process in Project.ProcessList)
             {
-                process.RunProcess();
+                Task.Run(process.RunProcess);
             };
         }
 
         private void ExecuteCloseProjectCommand()
         {
-            foreach (var process in Project.ProcessList)
+            // Only close running processes 
+            var runningProcesses = Project.ProcessList.Where(process => process.IsRunning == true);
+            
+            foreach (var process in runningProcesses)
             {
-                process.CloseProcess();
+                Task.Run(process.CloseProcess);
             };
         }
 

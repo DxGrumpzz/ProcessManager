@@ -162,6 +162,11 @@ namespace ProcessManager.UI
             };
 
 
+            RunProcessCommand = new AsyncRelayCommand(
+                async () => await Task.Run(Process.RunProcess));
+
+            CloseProcessCommand = new AsyncRelayCommand(
+                async () => await Task.Run(Process.CloseProcess));
 
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
             HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
