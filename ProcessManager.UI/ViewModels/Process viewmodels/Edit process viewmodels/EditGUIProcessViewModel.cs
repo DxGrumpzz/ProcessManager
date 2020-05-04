@@ -31,6 +31,9 @@ namespace ProcessManager.UI
 
         #region Public properties
 
+        /// <summary>
+        /// A path that the user has selected for this process
+        /// </summary>
         public string SelectedPath
         {
             get => _selectedPath;
@@ -41,10 +44,19 @@ namespace ProcessManager.UI
             }
         }
 
+        /// <summary>
+        /// A new string of arguments for this process
+        /// </summary>
         public string Arguments { get; set; }
 
+        /// <summary>
+        /// A new text label for this process
+        /// </summary>
         public string ProcessLabel { get; set; }
 
+        /// <summary>
+        /// A bool flag that indicates if this process will be visible on startup
+        /// </summary>
         public bool ProcessVisibleOnStartup { get; set; }
 
         #endregion
@@ -85,66 +97,27 @@ namespace ProcessManager.UI
         {
             var project = ProjectVM.Project;
 
+            // Find process
             int index = project.ProcessList.IndexOf(ProcessVM.Process);
 
+            // Check if no process found
             if (index != -1)
                 return;
 
+            // Update process reference directly with the new edits
             project.ProcessList[index] = new GUIProcess(SelectedPath, Arguments, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
             };
 
+            // Serialize project list 
             var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
 
+            // Update project config file
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
+            // Switch back to the 
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
         }
-
-        /*
-
-        /// <summary>
-        /// Converts a <see cref="GUIProcess"/> to a <see cref="ConsoleProcess"/> 
-        /// </summary>
-        /// <param name="consoleProcess"></param>
-        /// <returns></returns>
-        private JsonProcessModel ConsoleProcessAsJsonProcess(ConsoleProcess consoleProcess)
-        {
-            return new JsonProcessModel
-            {
-                RunAsConsole = true,
-
-                VisibleOnStartup = consoleProcess.VisibleOnStartup,
-
-                StartInDirectory = consoleProcess.StartupDirectory,
-                ConsoleScript = consoleProcess.ConsoleScript,
-
-                ProcessLabel = consoleProcess.ProcessLabel,
-            };
-        }
-
-        /// <summary>
-        /// Converts a <see cref="GUIProcess"/> to a <see cref="JsonProcessModel"/> 
-        /// </summary>
-        /// <param name="consoleProcess"></param>
-        /// <returns></returns>
-        private JsonProcessModel GUIProcessAsJsonProcess(GUIProcess guiProcess)
-        {
-            return new JsonProcessModel
-            {
-                RunAsConsole = false,
-
-                VisibleOnStartup = guiProcess.VisibleOnStartup,
-
-                ProcessPath = guiProcess.ProcessPath,
-                ProcessArgs = guiProcess.ProcessArgs,
-
-                ProcessLabel = guiProcess.ProcessLabel,
-            };
-        }
-
-        */
-
     };
 };

@@ -3,7 +3,6 @@
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Windows.Input;
 
 
@@ -12,11 +11,24 @@
     /// </summary>
     public abstract class EditProcessBaseViewModel : BaseViewModel
     {
-        
+
+        #region Public properties
+
+        /// <summary>
+        /// A process VM associated with this viewmodel
+        /// </summary>
         public ProcessItemViewModel ProcessVM { get; set; }
 
+        /// <summary>
+        /// A project viewmodel associated with the process
+        /// </summary>
         public ProjectItemViewModel ProjectVM { get; set; }
 
+
+        #endregion
+
+
+        #region Public commands
 
         public ICommand SaveProcessCommand { get; }
         public ICommand DeleteProcessCommand { get; }
@@ -24,6 +36,8 @@
         public ICommand BackToProjectPageCommand { get; }
         public ICommand BackToMainPageCommand { get; }
 
+
+        #endregion
 
 
         protected EditProcessBaseViewModel()
@@ -35,43 +49,32 @@
             BackToProjectPageCommand = new RelayCommand(() =>
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM));
 
-            BackToProjectPageCommand = new RelayCommand(() =>
+            BackToMainPageCommand = new RelayCommand(() =>
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects)));
         }
 
+
         protected virtual void ExecuteDeleteProcessCommand()
         {
+            // Ask for usre confirmation
             var result = DI.UserDialog.ShowChoiceDialog($"Are you absolutley sure you want to delete this process ?", "Delete process confirmation");
             
+            // If user decides to delete this process
             if(result == UserDialogResult.Yes)
             {
                 var process = (GUIProcess)ProcessVM.Process;
                 var project = ProjectVM.Project;
 
+                // Remove this process from the main list
                 project.ProcessList.Remove(process);
 
-                var projectBytes = DI.Serializer.Serialize(
-                    project.ProcessList
-                    .Select(process =>
-                    {
-                        switch (process)
-                        {
-                            case ConsoleProcess consoleProcess:
-                                return ConsoleProcessAsJsonProcess(consoleProcess);
-
-                            case GUIProcess guiProcess:
-                                return GUIProcessAsJsonProcess(guiProcess);
-
-                            default:
-                            {
-                                Debugger.Break();
-                                return default;
-                            };
-                        };
-                    }));
-
+                // Serialize the list after removing the process
+                var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
+               
+                // Update the project's config file
                 File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
+                // Switch back to the project's view
                 DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
             };
         }
@@ -98,50 +101,6 @@
 
             return (TProcess)process;
         }
-
-
-
-        /// <summary>
-        /// Converts a <see cref="GUIProcess"/> to a <see cref="ConsoleProcess"/> 
-        /// </summary>
-        /// <param name="consoleProcess"></param>
-        /// <returns></returns>
-        private JsonProcessModel ConsoleProcessAsJsonProcess(ConsoleProcess consoleProcess)
-        {
-            return new JsonProcessModel
-            {
-                RunAsConsole = true,
-
-                VisibleOnStartup = consoleProcess.VisibleOnStartup,
-
-                StartInDirectory = consoleProcess.StartupDirectory,
-                ConsoleScript = consoleProcess.ConsoleScript,
-
-                ProcessLabel = consoleProcess.ProcessLabel,
-            };
-        }
-
-        /// <summary>
-        /// Converts a <see cref="GUIProcess"/> to a <see cref="JsonProcessModel"/> 
-        /// </summary>
-        /// <param name="consoleProcess"></param>
-        /// <returns></returns>
-        private JsonProcessModel GUIProcessAsJsonProcess(GUIProcess guiProcess)
-        {
-            return new JsonProcessModel
-            {
-                RunAsConsole = false,
-
-                VisibleOnStartup = guiProcess.VisibleOnStartup,
-
-                ProcessPath = guiProcess.ProcessPath,
-                ProcessArgs = guiProcess.ProcessArgs,
-
-                ProcessLabel = guiProcess.ProcessLabel,
-            };
-        }
-
-
 
     };
 };
