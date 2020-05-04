@@ -9,7 +9,7 @@
     /// </summary>
     public abstract class ProcessBase : IProcessModel
     {
-      
+
         /// <summary>
         /// The name of the dll where the Core functions reside
         /// </summary>
@@ -22,6 +22,8 @@
         /// <param name="process"></param>
         protected delegate void _ProcessClosedCallBack(IntPtr process);
 
+
+        private object _process_run_close_monitor = new object();
 
         #region DLL calls
 
@@ -42,7 +44,7 @@
                                                          string consoleScript, string startupDirectory,
                                                          bool runAsConsole,
                                                          bool visibleOnStartup,
-                                                         _ProcessClosedCallBack processClosedCallback, 
+                                                         _ProcessClosedCallBack processClosedCallback,
                                                          _ProcessClosedCallBack processInitialziedCallback,
                                                          ref IntPtr process);
 
@@ -102,6 +104,7 @@
 
         #endregion
 
+
         /// <summary>
         /// A pointer to unmanged memory contaning the process created in C++
         /// </summary>
@@ -114,9 +117,10 @@
         public ProcessVisibilityState VisibilityState { get; private set; }
 
         public bool VisibleOnStartup { get; set; }
-        
+
         public ProcessType ProcessType { get; set; }
 
+        public bool IsInitialzing { get; private set; }
 
         /// <summary>
         /// A callback that will be called from C++ when this process closes
@@ -138,20 +142,39 @@
 
         public virtual bool RunProcess()
         {
-            // Don't run this process it it's alrady running
-            if (IsRunning == true)
-                return false;
+            lock (_process_run_close_monitor)
+            {
+                // Don't run this process it it's alrady running
+                if (IsRunning == true)
+                    return false;
 
-            // Run this process
-            return RunProcess(ref _processPointer);
+                if (IsInitialzing == true)
+                    return false;
+
+                try
+                {
+                    IsInitialzing = true;
+
+                    // Run this process
+                    return RunProcess(ref _processPointer);
+                }
+                finally
+                {
+                    IsInitialzing = false;
+                };
+            };
         }
 
         public virtual bool CloseProcess()
         {
-            if (IsRunning == false)
-                return false;
+            lock (_process_run_close_monitor)
+            {
+                // Don't close is process isn't running
+                if (IsRunning == false)
+                    return false;
 
-            return CloseProcess(ref _processPointer);
+                return CloseProcess(ref _processPointer);
+            };
         }
 
 
