@@ -41,8 +41,6 @@
         #region Public commands
 
         public ICommand GotoMainPageCommnad { get; }
-        public ICommand CloseProjectCommand { get; }
-        public ICommand RunProjectCommand { get; }
 
         public ICommand AddNewProcessCommand { get; }
         public ICommand AddNewConsoleProcessCommand { get; }
@@ -57,9 +55,6 @@
             Project = project;
 
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
-
-            RunProjectCommand = new RelayCommand(ExecuteRunProjectCommand, singleFire: true);
-            CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand, singleFire: true);
 
             AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
             AddNewConsoleProcessCommand = new RelayCommand(ExecuteAddNewConsoleProcessCommand);
@@ -103,24 +98,6 @@
             DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(this));
         }
 
-        private void ExecuteRunProjectCommand()
-        {
-            foreach (var process in Project.ProcessList)
-            {
-                Task.Run(process.RunProcess);
-            };
-        }
-
-        private void ExecuteCloseProjectCommand()
-        {
-            // Only close running processes 
-            var runningProcesses = Project.ProcessList.Where(process => process.IsRunning == true);
-            
-            foreach (var process in runningProcesses)
-            {
-                Task.Run(process.CloseProcess);
-            };
-        }
 
 
         private void ExecuteGotoMainPageommnad()

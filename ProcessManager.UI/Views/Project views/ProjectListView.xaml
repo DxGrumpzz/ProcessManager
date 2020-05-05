@@ -19,7 +19,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Projects: "/>
+
+        <TextBlock Text="Projects: "
+                   
+                   FontSize="20"/>
 
 
         <ScrollViewer Grid.Row="1"
@@ -37,60 +40,9 @@
 
                         <DataTemplate>
 
-                            <Grid Margin="0,5"
-                                  
-                                  x:Name="MainGrid">
-
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="AUTO" SharedSizeGroup="UniformWidth"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-
-
-                                <!-- A label containing the project's path -->
-                                <TextBlock Text="{Binding Project.ProjectPath}"/>
-
-
-                                <!-- A very simple element that is rendered above the project's path.
-                                     The only reason this is here is because I don't want 'ProjectItemViewModel' to contain a command that switches to itself-->
-                                <Border DataContext="{Binding Path=DataContext, 
-                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
-                                        
-                                        Cursor="Hand"
-                                        
-                                        Background="Transparent">
-
-                                    <Border.InputBindings>
-
-                                        <MouseBinding MouseAction="LeftClick"
-                                                      
-                                                      Command="{Binding SwitchToProjectViewCommand}"
-                                                      CommandParameter="{Binding ElementName=MainGrid, Path=DataContext}"/>
-
-                                    </Border.InputBindings>
-
-                                </Border>
-
-
-                                <!-- Run and close project buttons -->
-                                <StackPanel Orientation="Horizontal"
-                                    
-                                            Grid.Column="1"
-                                            
-                                            local:UniformMargin.Margin="10,0,0,0">
-
-                                    <Button Content="Run project"
-                                    
-                                            Command="{Binding RunProjectCommand}"/>
-
-
-                                    <Button Content="Close project"
-                                    
-                                            Command="{Binding CloseProjectCommand}"/>
-
-                                </StackPanel>
-
-                            </Grid>
+                            <local:ProjectListItemView DataContext="{Binding}"
+                                                       
+                                                       Margin="0,5"/>
 
                         </DataTemplate>
 

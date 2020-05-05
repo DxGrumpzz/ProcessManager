@@ -1,14 +1,11 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Text.Json;
     using System.Windows.Input;
-    using System.Windows.Interop;
 
 
     /// <summary>
@@ -19,19 +16,19 @@
 
         public static ProjectsListViewModel DesignInstance => new ProjectsListViewModel()
         {
-            Projects = new ObservableCollection<ProjectItemViewModel>()
+            Projects = new ObservableCollection<ProjectListItemViewModel>()
             {
-                new ProjectItemViewModel(new Project()
+                new ProjectListItemViewModel(new Project()
                 {
                     ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
                     ProcessList = new List<IProcessModel>(),
                 }),
-                new ProjectItemViewModel(new Project()
+                new ProjectListItemViewModel(new Project()
                 {
                     ProjectPath = $@"D:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
                     ProcessList = new List<IProcessModel>(),
                 }),
-                new ProjectItemViewModel(new Project()
+                new ProjectListItemViewModel(new Project()
                 {
                     ProjectPath = $@"A:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
                     ProcessList = new List<IProcessModel>(),
@@ -43,7 +40,7 @@
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ObservableCollection<ProjectItemViewModel> _projects;
+        private ObservableCollection<ProjectListItemViewModel> _projects;
 
         #endregion
 
@@ -53,7 +50,7 @@
         /// <summary>
         /// A list of projects
         /// </summary>
-        public ObservableCollection<ProjectItemViewModel> Projects
+        public ObservableCollection<ProjectListItemViewModel> Projects
         {
             get => _projects;
             set
@@ -66,13 +63,8 @@
         #endregion
 
 
-        #region Public commands
 
         public ICommand AddNewProjectCommnad { get; }
-
-        public ICommand SwitchToProjectViewCommand { get; }
-
-        #endregion
 
 
 
@@ -83,21 +75,15 @@
 
         public ProjectsListViewModel(IEnumerable<Project> projects)
         {
-            Projects = new ObservableCollection<ProjectItemViewModel>(projects.Select(project =>
+            Projects = new ObservableCollection<ProjectListItemViewModel>(projects.Select(project =>
             {
-                return new ProjectItemViewModel(project);
+                return new ProjectListItemViewModel(project);
             }));
 
             AddNewProjectCommnad = new RelayCommand(ExecuteAddNewProjectCommnad);
-            SwitchToProjectViewCommand = new RelayCommand<ProjectItemViewModel>(ExecuteSwitchToProjectViewCommand);
         }
 
-
-        private void ExecuteSwitchToProjectViewCommand(ProjectItemViewModel project)
-        {
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(project);
-        }
-
+        
         private void ExecuteAddNewProjectCommnad()
         {
             var folderDialog = DI.FolderDialog;
@@ -118,7 +104,7 @@
                 // Ask user if he'd like to add the project to the app
                 var result = DI.UserDialog.ShowChoiceDialog($"Selected folder already contains a \'{Localization.PROJECT_CONFIG_FILE_NAME}\' file.\n" +
                                                             $"Would you like to add it ?");
-            
+
                 // If user clicked yes
                 if (result == UserDialogResult.Yes)
                 {
@@ -169,7 +155,7 @@
             DI.SystemTrayIcon.RebuildIcon(showAfterBuild: true);
 
             // Add the project to this ViewModel's projects list
-            Projects.Add(new ProjectItemViewModel(newProject));
+            Projects.Add(new ProjectListItemViewModel(newProject));
         }
 
 
@@ -185,6 +171,7 @@
             // Write empty json brackets to file
             File.WriteAllText(configPath, "[\n\n]");
         }
+
 
     };
 };

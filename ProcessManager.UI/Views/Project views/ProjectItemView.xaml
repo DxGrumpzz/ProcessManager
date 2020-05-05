@@ -11,8 +11,15 @@
              
              d:DataContext="{x:Static local:ProjectItemViewModel.DesignInstance}">
 
-    <StackPanel Margin="10">
+    <Grid Margin="10">
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        
         <Grid>
             
         <Button Content="Back to main page"
@@ -31,7 +38,9 @@
         </Grid>
 
         <!-- The name of the project -->
-        <StackPanel Margin="0,10">
+        <StackPanel Margin="0,10"
+                    
+                    Grid.Row="1">
 
             <TextBlock Text="Project:"/>
 
@@ -41,9 +50,11 @@
         
 
         <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      FocusVisualStyle="{x:Null}">
+                      FocusVisualStyle="{x:Null}"
+                      
+                      Grid.Row="2">
 
-            <StackPanel >
+            <StackPanel>
 
                 <!-- The list of processes to run -->
                 <ItemsControl ItemsSource="{Binding ProcessList}" 
@@ -55,7 +66,9 @@
 
                         <DataTemplate>
 
-                            <local:ProcessItemView DataContext="{Binding}"/>
+                            <local:ProcessItemView DataContext="{Binding}" 
+                                                   
+                                                   Margin="0,0,0,5"/>
 
                         </DataTemplate>
 
@@ -64,8 +77,8 @@
                 </ItemsControl>
 
                 
-                
-                <Button Content="Add new process"
+                <!-- Add GUI process button -->
+                <Button Content="Add new GUI process"
                         
                         Margin="0,10,0,0"
                         HorizontalAlignment="Left"
@@ -73,7 +86,8 @@
                         Command="{Binding AddNewProcessCommand}"/>
 
 
-                <Button Content="Add console process"
+                <!-- Add console process button -->
+                <Button Content="Add console process "
                         
                         Margin="0,10,0,0"
                         HorizontalAlignment="Left"
@@ -84,6 +98,6 @@
             
         </ScrollViewer>
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>
