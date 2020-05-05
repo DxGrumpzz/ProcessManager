@@ -8,8 +8,12 @@
        
         Title="Process Manager" 
       
-        Height="300" 
+        Height="500" 
         Width="700"
+        
+        FontFamily="{StaticResource IndieFlower}"
+        Background="{StaticResource LightGreyBrush}"
+        FontSize="15"
         
         d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">
 
