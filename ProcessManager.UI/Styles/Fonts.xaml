@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ProcessManager.UI">
+
+    <FontFamily x:Key="LatoRegular">pack://application:,,,/Resources/Fonts/#Lato Regular</FontFamily>
+    <FontFamily x:Key="LatoBold">pack://application:,,,/Resources/Fonts/#Lato Bold</FontFamily>
+
+    <FontFamily x:Key="IndieFlower">pack://application:,,,/Resources/Fonts/#Indie Flower</FontFamily>
+
+</ResourceDictionary>
