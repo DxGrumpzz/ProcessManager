@@ -11,7 +11,7 @@
         Height="500" 
         Width="700"
         
-        FontFamily="{StaticResource IndieFlower}"
+        FontFamily="{StaticResource LatoRegular}"
         Background="{StaticResource LightGreyBrush}"
         FontSize="15"
         
