@@ -101,7 +101,7 @@ namespace ProcessManager.UI
             int index = project.ProcessList.IndexOf(ProcessVM.Process);
 
             // Check if no process found
-            if (index != -1)
+            if (index == -1)
                 return;
 
             // Update process reference directly with the new edits
