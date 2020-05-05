@@ -24,13 +24,7 @@
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _processLabel;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _consoleDirectory;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _consoleScript;
 
         #endregion
 
