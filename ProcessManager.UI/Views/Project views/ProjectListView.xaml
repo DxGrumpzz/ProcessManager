@@ -12,6 +12,13 @@
              d:DataContext="{x:Static local:ProjectsListViewModel.DesignInstance}">
 
 
+    <UserControl.Resources>
+
+        <Duration x:Key="MouseHoverAnimationTiming">0:0:0.15</Duration>
+
+    </UserControl.Resources>
+
+
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -24,44 +31,199 @@
                    
                    FontSize="20"/>
 
+        
+        <DataGrid ItemsSource="{Binding Projects}"
+                  
+                  Margin="0,10,0,0"
+                  
+                  Grid.Row="1">
 
-        <ScrollViewer Grid.Row="1"
-                      
-                      VerticalScrollBarVisibility="Auto">
+            <!-- The datagrid's main style -->
+            <DataGrid.Style>
 
-            <StackPanel>
+                <Style TargetType="{x:Type DataGrid}">
 
-                <!-- The list of processes that will be ran -->
-                <ItemsControl ItemsSource="{Binding Projects}"
-                      
-                              Grid.IsSharedSizeScope="True">
+                    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
 
-                    <ItemsControl.ItemTemplate>
+                    <Setter Property="GridLinesVisibility" Value="None"/>
+
+                    <Setter Property="Background" Value="Transparent"/>
+
+                    <Setter Property="AutoGenerateColumns" Value="False"/>
+
+                    <Setter Property="RowHeaderWidth" Value="0"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+
+                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="SelectionMode" Value="Single"/>
+
+                </Style>
+
+            </DataGrid.Style>
+
+
+            <!-- A style for the header(s)-->
+            <DataGrid.ColumnHeaderStyle>
+
+                <Style TargetType="{x:Type DataGridColumnHeader}">
+
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Margin" Value="0,0,0,5"/>
+
+                </Style>
+
+            </DataGrid.ColumnHeaderStyle>
+
+
+            <!-- A style for the inner items in the rows -->
+            <DataGrid.RowStyle>
+
+                <Style TargetType="{x:Type DataGridRow}">
+
+                    <Setter Property="Background" Value="Transparent"/>
+
+                    <Setter Property="Margin" Value="0"/>
+
+                    <Style.Triggers>
+
+                        <Trigger Property="IsSelected" Value="True">
+
+                            <Setter Property="Background" Value="{StaticResource LightGreyBrush}"/>
+
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="{StaticResource LightgreyColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="Transparent"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+                    </Style.Triggers>
+
+                </Style>
+
+            </DataGrid.RowStyle>
+
+
+            <!-- A style for the items inside the row -->
+            <DataGrid.CellStyle>
+
+                <Style TargetType="{x:Type DataGridCell}">
+
+                    <Style.Triggers>
+
+                        <!-- Override default style and set it so it won't break the custom style I set on the rows -->
+                        <Trigger Property="IsSelected" Value="True">
+
+                            <Setter Property="BorderBrush" Value="{StaticResource LightGreyBrush}"/>
+                            <Setter Property="Background" Value="{StaticResource LightGreyBrush}"/>
+                            <Setter Property="Foreground" Value="Black"/>
+
+                        </Trigger>
+
+                    </Style.Triggers>
+
+                </Style>
+
+            </DataGrid.CellStyle>
+
+
+            <!-- Headers -->
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn Header="Project name" Width="*">
+
+                    <DataGridTemplateColumn.CellTemplate>
 
                         <DataTemplate>
 
-                            <local:ProjectListItemView DataContext="{Binding}"
-                                                       
-                                                       Margin="0,5"/>
+                            <!-- The name of the project -->
+                            <TextBlock Text="{Binding Project.ProjectName}"/>
 
                         </DataTemplate>
 
-                    </ItemsControl.ItemTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
 
-                </ItemsControl>
+                </DataGridTemplateColumn>
 
-                <!--Add new project button-->
-                <Button Content="Add new project"
+                <DataGridTemplateColumn Header="Project settings" 
+                                            Width="AUTO">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <StackPanel Orientation="Horizontal">
+
+
+                                <!--Run project button-->
+                                <Button Content="Run project"
+                                    
+                                            Margin="0,0,10,0"
+                                            Command="{Binding RunProjectCommand}"/>
+
+                                <!--Close project button-->
+                                <Button Content="Close project"
+                                    
+                                            Command="{Binding CloseProjectCommand}"/>
+
+                            </StackPanel>
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+
+            
+        </DataGrid>
+
+
+        <!--Add new project button-->
+        <Button Content="Add new project"
                         
-                        HorizontalAlignment="Left"
-                        
-                        Command="{Binding AddNewProjectCommnad}"
-                        
-                        Margin="0,5,0,0"/>
-
-            </StackPanel>
-
-        </ScrollViewer>
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"        
+                Margin="0,5,0,0"
+                
+                Grid.RowSpan="2"
+                
+                Command="{Binding AddNewProjectCommnad}"/>
 
     </Grid>
 
