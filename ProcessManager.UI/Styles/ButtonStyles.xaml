@@ -1,0 +1,126 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ProcessManager.UI">
+
+
+
+    <!--#region Animation timings -->
+    
+    <Duration x:Key="MouseHoverAnimationTiming">0:0:0.15</Duration>
+
+    <!--#endregion-->
+
+    
+    <!-- A button style that displays 3 dots that animate to a different colour when mouse enter the control -->
+    <Style x:Key="ThreeDotButtonStyle" TargetType="{x:Type Button}">
+
+        <Setter Property="Foreground" Value="Black"/>
+
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+        <Setter Property="Cursor" Value="Hand"/>
+
+        <Setter Property="Template">
+
+            <Setter.Value>
+
+                <ControlTemplate>
+
+                    <!-- The control's main border -->
+                    <Border x:Name="MainBorder"
+                                                            
+                            Background="Transparent">
+
+                        <!-- A stack panel, jus for ease of layout so the dots will be aligned without too much hassle-->
+                        <StackPanel Orientation="Horizontal"
+                                                                    
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+
+                            <!-- The 3 dots, and 1 "main" dot that all other dots "inherit" from -->
+                            <Ellipse x:Name="MainEllipse"
+                                                                 
+                                      Width="5"
+                                      Height="{Binding Path=ActualWidth, 
+                                      RelativeSource={RelativeSource Mode=Self}}"
+                                      
+                                      Fill="{TemplateBinding Foreground}"/>
+
+
+                            <Ellipse Width="{Binding ElementName=MainEllipse, Path=ActualWidth}"
+                                     Height="{Binding ElementName=MainEllipse, Path=ActualHeight}"
+                                                                     
+                                     Margin="2,0"
+                                                                  
+                                     Fill="{TemplateBinding Foreground}"/>
+
+                            <Ellipse Width="{Binding ElementName=MainEllipse, Path=ActualWidth}"
+                                     Height="{Binding ElementName=MainEllipse, Path=ActualHeight}"
+                                                                      
+                                     Fill="{TemplateBinding Foreground}"/>
+
+                        </StackPanel>
+
+                    </Border>
+
+
+                    <ControlTemplate.Triggers>
+
+                        <!-- When mouse enters the control -->
+                        <Trigger Property="IsMouseOver" Value="True">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate to a white colour -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                                        
+                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                        
+                                                        To="{StaticResource WhiteColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+                            <!-- When mouse leave control -->
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate back to original colour -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                                        
+                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                        
+                                                        To="Black"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+
+                </ControlTemplate>
+
+            </Setter.Value>
+
+        </Setter>
+
+    </Style>
+
+
+</ResourceDictionary>

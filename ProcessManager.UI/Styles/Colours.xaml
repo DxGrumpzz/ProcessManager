@@ -3,8 +3,13 @@
                     xmlns:local="clr-namespace:ProcessManager.UI">
 
 
-    
-    <Color x:Key="LightgreyColour"> #DDDDDD </Color>
+
+    <Color x:Key="LightgreyColour">#DDD</Color>
     <SolidColorBrush x:Key="LightGreyBrush" Color="{StaticResource LightgreyColour}"/>
+
+
+    <Color x:Key="WhiteColour">#FFF</Color>
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource LightgreyColour}"/>
+
 
 </ResourceDictionary>
