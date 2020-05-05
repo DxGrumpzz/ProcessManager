@@ -15,8 +15,8 @@
     <Grid>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col0"/>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col1"/>
             <ColumnDefinition Width="AUTO" SharedSizeGroup="Col2"/>
         </Grid.ColumnDefinitions>
 
