@@ -12,13 +12,6 @@
              d:DataContext="{x:Static local:ProjectsListViewModel.DesignInstance}">
 
 
-    <UserControl.Resources>
-
-        <Duration x:Key="MouseHoverAnimationTiming">0:0:0.15</Duration>
-
-    </UserControl.Resources>
-
-
     <Grid Margin="10">
 
         <Grid.RowDefinitions>
@@ -31,7 +24,7 @@
                    
                    FontSize="20"/>
 
-        
+
         <DataGrid ItemsSource="{Binding Projects}"
                   
                   Margin="0,10,0,0"
@@ -164,43 +157,25 @@
             <!-- Headers -->
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="Project name" Width="*">
+                <!-- Project names column -->
+                <DataGridTextColumn Header="Project name" 
+                                    
+                                    Binding="{Binding Project.ProjectName}"
+                                    
+                                    Width="*"/>
 
-                    <DataGridTemplateColumn.CellTemplate>
-
-                        <DataTemplate>
-
-                            <!-- The name of the project -->
-                            <TextBlock Text="{Binding Project.ProjectName}"/>
-
-                        </DataTemplate>
-
-                    </DataGridTemplateColumn.CellTemplate>
-
-                </DataGridTemplateColumn>
-
+                <!-- Project settings column-->
                 <DataGridTemplateColumn Header="Project settings" 
-                                            Width="AUTO">
+                                        Width="AUTO">
 
                     <DataGridTemplateColumn.CellTemplate>
 
                         <DataTemplate>
 
-                            <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding SwitchToProjectViewCommand}"
+                                    Style="{StaticResource ThreeDotButtonStyle}">
 
-
-                                <!--Run project button-->
-                                <Button Content="Run project"
-                                    
-                                            Margin="0,0,10,0"
-                                            Command="{Binding RunProjectCommand}"/>
-
-                                <!--Close project button-->
-                                <Button Content="Close project"
-                                    
-                                            Command="{Binding CloseProjectCommand}"/>
-
-                            </StackPanel>
+                            </Button>
 
                         </DataTemplate>
 
@@ -210,7 +185,6 @@
 
             </DataGrid.Columns>
 
-            
         </DataGrid>
 
 
