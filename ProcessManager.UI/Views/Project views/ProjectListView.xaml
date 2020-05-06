@@ -75,8 +75,6 @@
 
                     <Setter Property="Background" Value="Transparent"/>
 
-                    <Setter Property="Margin" Value="0"/>
-
                     <Style.Triggers>
 
                         <Trigger Property="IsSelected" Value="True">
@@ -85,6 +83,7 @@
 
                         </Trigger>
 
+                        <!-- When mouse is over the row -->
                         <Trigger Property="IsMouseOver" Value="True">
 
                             <Trigger.EnterActions>
@@ -93,6 +92,7 @@
 
                                     <Storyboard>
 
+                                        <!-- Change row to light grey colour-->
                                         <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                     
                                                     Duration="{StaticResource MouseHoverAnimationTiming}"
@@ -110,6 +110,7 @@
 
                                     <Storyboard>
 
+                                        <!-- Change row back to "invisible" -->
                                         <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                     
                                                     Duration="{StaticResource MouseHoverAnimationTiming}"
@@ -136,13 +137,15 @@
 
                 <Style TargetType="{x:Type DataGridCell}">
 
+                    <Setter Property="Margin" Value="0,5"/>
+
                     <Style.Triggers>
 
                         <!-- Override default style and set it so it won't break the custom style I set on the rows -->
                         <Trigger Property="IsSelected" Value="True">
 
-                            <Setter Property="BorderBrush" Value="{StaticResource LightGreyBrush}"/>
-                            <Setter Property="Background" Value="{StaticResource LightGreyBrush}"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="Foreground" Value="Black"/>
 
                         </Trigger>
