@@ -2,7 +2,7 @@
   "profiles": {
     "ProcessManager.UI": {
       "commandName": "Project",
-      "nativeDebugging": true
+      "nativeDebugging": false
     }
   }
 }

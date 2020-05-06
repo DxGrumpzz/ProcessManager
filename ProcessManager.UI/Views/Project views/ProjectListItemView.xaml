@@ -10,13 +10,75 @@
              
              d:DesignWidth="400">
 
-    <Border>
+    <UserControl.Resources>
+
+        <Duration x:Key="MouseHoverAnimationTiming"> 0:0:0.15 </Duration>
+
+    </UserControl.Resources>
+    
+    <Border Padding="0,5">
+
+        <Border.Style>
+            
+            <Style TargetType="{x:Type Border}">
+
+                <Setter Property="Background" Value="Transparent"/>
+
+                <Style.Triggers>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+
+                        <Trigger.EnterActions>
+
+                            <BeginStoryboard>
+
+                                <Storyboard>
+
+                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="{StaticResource LightgreyColour}"/>
+
+                                </Storyboard>
+
+                            </BeginStoryboard>
+                            
+                        </Trigger.EnterActions>
+
+                        
+                        <Trigger.ExitActions>
+
+                            <BeginStoryboard>
+
+                                <Storyboard>
+
+                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="Transparent"/>
+
+                                </Storyboard>
+
+                            </BeginStoryboard>
+
+                        </Trigger.ExitActions>
+
+                    </Trigger>
+
+                </Style.Triggers>
+                
+            </Style>
+
+        </Border.Style>
+
         
-        <Grid Margin="0,5">
+        <Grid>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="AUTO"/>
+                <ColumnDefinition Width="*" SharedSizeGroup="ProjectOptionsColumn"/>
+                <ColumnDefinition Width="AUTO" SharedSizeGroup="ProjectOptionsColumn"/>
             </Grid.ColumnDefinitions>
 
             <!-- A label containing the project's path -->
@@ -35,7 +97,6 @@
             <!-- Run and close project buttons -->
             <StackPanel Orientation="Horizontal"
                                     
-                        HorizontalAlignment="Right"
                         Grid.Column="1"
                         
                         local:UniformMargin.Margin="10,0,0,0">

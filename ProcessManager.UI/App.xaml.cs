@@ -9,6 +9,8 @@ namespace ProcessManager.UI
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text.Json;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
 
@@ -47,6 +49,7 @@ namespace ProcessManager.UI
             DI.Provider = BuildDIProvider(serviceCollection);
 
             // Create and show window
+            
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
@@ -63,11 +66,14 @@ namespace ProcessManager.UI
 
             DI.SystemTrayIcon.RemoveIcon();
 
-            // Close the processes when app exists
-            foreach (var project in DI.Projects)
+            Task.Run(() =>
             {
-                project.CloseProjectTree();
-            };
+                // Close the processes when app exists
+                foreach (var project in DI.Projects)
+                {
+                    Task.Run(project.CloseProject);
+                };
+            });
         }
 
 

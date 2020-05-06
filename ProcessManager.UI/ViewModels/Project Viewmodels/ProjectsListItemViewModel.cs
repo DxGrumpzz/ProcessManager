@@ -1,17 +1,13 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
     /// <summary>
     /// 
     /// </summary>
-    public class ProjectListItemViewModel
+    public class ProjectListItemViewModel : BaseViewModel
     {
         public static ProjectListItemViewModel DesignInstance => new ProjectListItemViewModel(
             new Project()
@@ -19,10 +15,24 @@
                 ProjectPath = @"C:\Software\Secret Project",
             })
         {
+            SettingsButtonVisible = true,
         };
 
 
         public Project Project { get; }
+
+        private bool _settingsButtonVisible;
+
+
+        public bool SettingsButtonVisible
+        {
+            get => _settingsButtonVisible;
+            set
+            {
+                _settingsButtonVisible = value;
+                OnPropertyChanged();
+            }
+        }
 
 
 
@@ -31,6 +41,9 @@
 
         public ICommand RunProjectCommand { get; }
         public ICommand CloseProjectCommand { get; }
+
+        public ICommand MouseEnterCommand { get; }
+        public ICommand MouseLeaveCommand { get; }
 
         public ICommand SwitchToProjectViewCommand { get; }
 
@@ -47,6 +60,16 @@
             CloseProjectCommand = new RelayCommand(ExecuteCloseProjectCommand, singleFire: true);
 
             SwitchToProjectViewCommand = new RelayCommand(ExecuteSwitchToProjectViewCommand);
+
+            MouseEnterCommand = new RelayCommand(() =>
+            {
+                SettingsButtonVisible = true;
+            });
+
+            MouseLeaveCommand = new RelayCommand(() =>
+            {
+                SettingsButtonVisible = false;
+            });
         }
 
 

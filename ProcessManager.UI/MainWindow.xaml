@@ -12,7 +12,6 @@
         Width="700"
         
         FontFamily="{StaticResource LatoRegular}"
-        Background="{StaticResource LightGreyBrush}"
         FontSize="15"
         
         d:DataContext="{x:Static local:MainWindowViewModel.DesignInstance}">

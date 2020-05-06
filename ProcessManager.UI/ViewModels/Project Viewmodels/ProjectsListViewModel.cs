@@ -22,7 +22,10 @@
                 {
                     ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
                     ProcessList = new List<IProcessModel>(),
-                }),
+                })
+                {
+                    SettingsButtonVisible = true,
+                },
                 new ProjectListItemViewModel(new Project()
                 {
                     ProjectPath = $@"D:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",

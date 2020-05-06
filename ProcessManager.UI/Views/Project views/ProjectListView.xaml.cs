@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System.Windows;
     using System.Windows.Controls;
 
     /// <summary>
@@ -17,5 +18,6 @@
         {
             DataContext = viewModel;
         }
+
     }
 }

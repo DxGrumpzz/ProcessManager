@@ -1,6 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
+    using System.Diagnostics;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -46,7 +47,7 @@
                 {
                     // Get the control's current margin
                     var currentContorlMargin = frameworkElement.Margin;
-                    
+
                     // Add the new margin to the current margin
                     currentContorlMargin.Top += newMargin.Top;
                     currentContorlMargin.Left += newMargin.Left;
@@ -64,6 +65,44 @@
             // Hook  the event
             panel.Initialized += eventHandler;
 
+        }
+    };
+
+    public static class DisableDataGridSelection
+    {
+        public static bool GetValue(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(ValueProperty);
+        }
+
+        public static void SetValue(DependencyObject obj, bool value)
+        {
+            obj.SetValue(ValueProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.RegisterAttached(
+                "Value",
+                typeof(bool),
+                typeof(DisableDataGridSelection),
+                new PropertyMetadata(false, ValuePropertyChanged));
+
+        private static void ValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is DataGrid dataGrid))
+            {
+                Debugger.Break();
+                return;
+            };
+
+            bool disableSelection = (bool)e.NewValue;
+
+            if (disableSelection == true)
+                dataGrid.SelectionChanged += (sender, evnt) =>
+                {
+                    evnt.Handled = true;
+                };
         }
     };
 };

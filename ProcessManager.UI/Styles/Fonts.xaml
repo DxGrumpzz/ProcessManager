@@ -4,6 +4,7 @@
 
     <FontFamily x:Key="LatoRegular">pack://application:,,,/Resources/Fonts/#Lato Regular</FontFamily>
     <FontFamily x:Key="LatoBold">pack://application:,,,/Resources/Fonts/#Lato Bold</FontFamily>
+    <FontFamily x:Key="LatoThin">pack://application:,,,/Resources/Fonts/#Lato-Hairline</FontFamily>
 
     <FontFamily x:Key="IndieFlower">pack://application:,,,/Resources/Fonts/#Indie Flower</FontFamily>
 
