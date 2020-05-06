@@ -24,21 +24,37 @@
                    
                    FontSize="20"/>
 
+
+
         <HeaderedItemsControl Grid.Row="1"
-                              
-                              Grid.IsSharedSizeScope="True"
                               
                               ItemsSource="{Binding Projects}">
 
+
+
+            <HeaderedItemsControl.Style>
+
+                <Style TargetType="{x:Type HeaderedItemsControl}">
+
+                    <Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+
+                </Style>
+
+            </HeaderedItemsControl.Style>
+
+
+            <!-- A template for the header and row items -->
             <HeaderedItemsControl.Template>
 
                 <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
 
                     <StackPanel>
 
-                        <ContentPresenter ContentSource="Header" />
+                        <!-- Header -->
+                        <ContentPresenter ContentSource="Header"/>
 
-                        <ItemsPresenter />
+                        <!-- Row items-->
+                        <ItemsPresenter/>
 
                     </StackPanel>
 
@@ -50,25 +66,31 @@
             <!-- Header -->
             <HeaderedItemsControl.Header>
 
-                <Grid Margin="0,0,0,5">
+                <Grid Margin="10,0,0,5">
 
                     <Grid.ColumnDefinitions>
 
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="Column0"/>
+                        <!-- Align 'Project name' header to project names -->
+                        <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
 
-                        <ColumnDefinition Width="*" />
+                        <!-- A very important spacer. 
+                            'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
+                             so I have to use a column that takes the "remaning" space -->
+                        <ColumnDefinition Width="*"/>
 
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="Column2"/>
+                        <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
                     </Grid.ColumnDefinitions>
 
 
+                    <!-- Project name column -->
                     <TextBlock Grid.Column="0" 
                            
                                Text="Project name"/>
 
 
-                    <TextBlock Grid.Column="2" 
+                    <!-- Project settings header -->
+                    <TextBlock Grid.Column="3" 
                            
                                Text="Project settings"/>
 
@@ -77,12 +99,16 @@
             </HeaderedItemsControl.Header>
 
 
+            <!-- Items/rows inside -->
             <HeaderedItemsControl.ItemTemplate>
 
                 <DataTemplate>
 
                     <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
-                            local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
+                            local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
+                            
+                            Padding="10,0,0,0"
+                            Height="30">
 
                         <Border.Style>
 
@@ -136,29 +162,37 @@
 
                             </Style>
 
-
                         </Border.Style>
-
-
 
                         <Grid>
 
                             <Grid.ColumnDefinitions>
 
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Column0"/>
+                                <!-- Align project names to'Project name' header -->
+                                <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
+                                <!--<ColumnDefinition Width="Auto" />-->
 
-                                <ColumnDefinition Width="*" />
+                                <!-- A very important spacer. 
+                                    'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
+                                     so I have to use a column that takes the "remaning" space -->
+                                <ColumnDefinition Width="*"/>
 
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Column2"/>
+                                <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
                             </Grid.ColumnDefinitions>
 
 
-                            <TextBlock Grid.Column="0" 
-                                   
-                                   Text="{Binding Project.ProjectName}"/>
+                            <!-- The name of the project -->
+                            <TextBlock Text="{Binding Project.ProjectName}"
+                                       TextTrimming="CharacterEllipsis"
+                                    
+                                       Grid.Column="0" 
+                                       VerticalAlignment="Center"
+                                       
+                                       MaxWidth="175"/>
 
 
+                            <!-- The three-dot button S-->
                             <Button Grid.Column="2" 
                                     
                                     Command="{Binding SwitchToProjectViewCommand}">
@@ -220,6 +254,7 @@
 
                             </Button>
 
+
                         </Grid>
 
                     </Border>
@@ -228,7 +263,9 @@
 
             </HeaderedItemsControl.ItemTemplate>
 
+
         </HeaderedItemsControl>
+
 
         <!--Add new project button-->
         <Button Content="Add new project"
@@ -244,198 +281,3 @@
     </Grid>
 
 </UserControl>
-
-
-<!--#region NewRegion -->
-
-<!--<DataGrid ItemsSource="{Binding Projects}"
-                  
-                  Margin="0,10,0,0"
-                  
-                  Grid.Row="1">
-
-            -->
-<!-- The datagrid's main style -->
-<!--
-            <DataGrid.Style>
-
-                <Style TargetType="{x:Type DataGrid}">
-
-                    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
-
-                    <Setter Property="GridLinesVisibility" Value="None"/>
-
-                    <Setter Property="Background" Value="Transparent"/>
-
-                    <Setter Property="AutoGenerateColumns" Value="False"/>
-
-                    <Setter Property="RowHeaderWidth" Value="0"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-
-                    <Setter Property="IsReadOnly" Value="True"/>
-                    <Setter Property="SelectionMode" Value="Single"/>
-
-                </Style>
-
-            </DataGrid.Style>
-
-
-            -->
-<!-- A style for the header(s)-->
-<!--
-            <DataGrid.ColumnHeaderStyle>
-
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Margin" Value="0,0,0,5"/>
-
-                </Style>
-
-            </DataGrid.ColumnHeaderStyle>
-
-
-            -->
-<!-- A style for the inner items in the rows -->
-<!--
-            <DataGrid.RowStyle>
-
-                <Style TargetType="{x:Type DataGridRow}">
-
-                    <Setter Property="Background" Value="Transparent"/>
-
-                    <Style.Triggers>
-
-                        <Trigger Property="IsSelected" Value="True">
-
-                            <Setter Property="Background" Value="{StaticResource LightGreyBrush}"/>
-
-                        </Trigger>
-
-                        -->
-<!-- When mouse is over the row -->
-<!--
-                        <Trigger Property="IsMouseOver" Value="True">
-
-                            <Trigger.EnterActions>
-
-                                <BeginStoryboard>
-
-                                    <Storyboard>
-
-                                        -->
-<!-- Change row to light grey colour-->
-<!--
-                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                    
-                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
-                                                    
-                                                    To="{StaticResource LightgreyColour}"/>
-
-                                    </Storyboard>
-
-                                </BeginStoryboard>
-
-                            </Trigger.EnterActions>
-
-                            <Trigger.ExitActions>
-                                <BeginStoryboard>
-
-                                    <Storyboard>
-
-                                        -->
-<!-- Change row back to "invisible" -->
-<!--
-                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                    
-                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
-                                                    
-                                                    To="Transparent"/>
-
-                                    </Storyboard>
-
-                                </BeginStoryboard>
-
-                            </Trigger.ExitActions>
-
-                        </Trigger>
-
-                    </Style.Triggers>
-
-                </Style>
-
-            </DataGrid.RowStyle>
-
-
-            -->
-<!-- A style for the items inside the row -->
-<!--
-            <DataGrid.CellStyle>
-
-                <Style TargetType="{x:Type DataGridCell}">
-
-                    <Setter Property="Margin" Value="0,5"/>
-
-                    <Style.Triggers>
-
-                        -->
-<!-- Override default style and set it so it won't break the custom style I set on the rows -->
-<!--
-                        <Trigger Property="IsSelected" Value="True">
-
-                            <Setter Property="BorderBrush" Value="Transparent"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Foreground" Value="Black"/>
-
-                        </Trigger>
-
-                    </Style.Triggers>
-
-                </Style>
-
-            </DataGrid.CellStyle>
-
-
-            -->
-<!-- Headers -->
-<!--
-            <DataGrid.Columns>
-
-                -->
-<!-- Project names column -->
-<!--
-                <DataGridTextColumn Header="Project name" 
-                                    
-                                    TextBlock.FontFamily="{StaticResource LatoThin}"
-                                    TextBlock.FontWeight="Thin"
-                                    
-                                    Binding="{Binding Project.ProjectName}"
-                                    
-                                    Width="*"/>
-
-                -->
-<!-- Project settings column-->
-<!--
-                <DataGridTemplateColumn Header="Project settings" 
-                                        Width="AUTO">
-
-                    <DataGridTemplateColumn.CellTemplate>
-
-                        <DataTemplate>
-
-                            <Button Command="{Binding SwitchToProjectViewCommand}"
-                                    Style="{StaticResource ThreeDotButtonStyle}">
-
-                            </Button>
-
-                        </DataTemplate>
-
-                    </DataGridTemplateColumn.CellTemplate>
-
-                </DataGridTemplateColumn>
-
-            </DataGrid.Columns>
-
-        </DataGrid>-->
-
-<!--#endregion-->
