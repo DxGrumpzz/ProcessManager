@@ -5,12 +5,12 @@
 
 
     <!--#region Animation timings -->
-    
+
     <Duration x:Key="MouseHoverAnimationTiming">0:0:0.15</Duration>
 
     <!--#endregion-->
 
-    
+
     <!-- A button style that displays 3 dots that animate to a different colour when mouse enter the control -->
     <Style x:Key="ThreeDotButtonStyle" TargetType="{x:Type Button}">
 
@@ -29,7 +29,7 @@
 
                     <!-- The control's main border -->
                     <Border x:Name="MainBorder"
-                                                            
+                            
                             Background="Transparent">
 
                         <!-- A stack panel, jus for ease of layout so the dots will be aligned without too much hassle-->
@@ -63,7 +63,6 @@
                         </StackPanel>
 
                     </Border>
-
 
                     <ControlTemplate.Triggers>
 
@@ -113,7 +112,6 @@
 
                     </ControlTemplate.Triggers>
 
-
                 </ControlTemplate>
 
             </Setter.Value>
@@ -122,5 +120,91 @@
 
     </Style>
 
+
+    <Style x:Key="ProjectListTitleButtonStyle" TargetType="{x:Type Button}">
+
+        <Setter Property="Padding" Value="5"/>
+
+        <Setter Property="Cursor" Value="Hand"/>
+
+        <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+
+        <Setter Property="Template">
+
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type Button}">
+
+                    <!-- The control's main border -->
+                    <Border BorderBrush="{TemplateBinding Foreground}"
+                                                    BorderThickness="1"
+                                                    
+                                                    Background="Transparent"
+                                                    
+                                                    Padding="{TemplateBinding Padding}">
+
+
+                        <!-- The control's main content presenter -->
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                            
+                                          VerticalAlignment="Center"/>
+
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <!-- When mouse is inside the control -->
+                        <Trigger Property="IsMouseOver" Value="True">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Change foreground colour to white -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                            
+                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                            
+                                                                            To="{StaticResource WhiteColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Change foreground colour back to black -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                            
+                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                            
+                                                                            To="{StaticResource BlackColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+
+        </Setter>
+
+    </Style>
 
 </ResourceDictionary>
