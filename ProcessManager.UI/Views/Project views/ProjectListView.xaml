@@ -11,286 +11,316 @@
              
              d:DataContext="{x:Static local:ProjectsListViewModel.DesignInstance}">
 
-    <Grid Margin="10">
-
+    <Grid>
 
         <Grid.RowDefinitions>
+
             <RowDefinition Height="AUTO"/>
             <RowDefinition Height="*"/>
+
         </Grid.RowDefinitions>
 
 
         <TextBlock Text="Projects: "
                    
+                   Margin="10,10,0,0"
+                   
                    FontSize="20"/>
 
 
-        <HeaderedItemsControl Grid.Row="1"
-                              
-                              Margin="0,15,0,0"
-                              
-                              ItemsSource="{Binding Projects}">
+        <!-- The title bar and projects list -->
+        <Grid Grid.Row="1">
 
-            <HeaderedItemsControl.Style>
+            <Grid.RowDefinitions>
 
-                <Style TargetType="{x:Type HeaderedItemsControl}">
+                <RowDefinition Height="AUTO"/>
+                <RowDefinition Height="*"/>
 
-                    <Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+            </Grid.RowDefinitions>
 
-                </Style>
+            
+            <!-- Title bar -->
+            <Border Background="{StaticResource LightGreyBrush}"
+                    
+                    Margin="0,10,0,15"
+                    
+                    Padding="5">
 
-            </HeaderedItemsControl.Style>
-
-
-            <!-- A template for the header and row items -->
-            <HeaderedItemsControl.Template>
-
-                <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
-
-                    <StackPanel>
-
-                        <!-- Header -->
-                        <ContentPresenter ContentSource="Header"/>
-
-                        <!-- Row items-->
-                        <ItemsPresenter/>
-
-                    </StackPanel>
-
-                </ControlTemplate>
-
-            </HeaderedItemsControl.Template>
-
-
-            <!-- Headers -->
-            <HeaderedItemsControl.Header>
-
-                <Grid Margin="10,0,0,5">
+                <Grid>
 
                     <Grid.ColumnDefinitions>
 
-                        <!-- Align 'Project name' header to project names -->
-                        <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
-
-                        <!-- A very important spacer. 
-                            'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
-                             so I have to use a column that takes the "remaning" space -->
-                        <ColumnDefinition Width="*"/>
-
-                        <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
-
+                        <ColumnDefinition Width="AUTO"/>
+                        <ColumnDefinition/>
 
                     </Grid.ColumnDefinitions>
 
-
-                    <!-- Project name column -->
-                    <TextBlock Grid.Column="0" 
-                           
-                               Text="Project name"/>
-
-                    <TextBlock Grid.Column="2" 
-                           
-                               Margin="10,0"
-                               
-                               Text="Process count"/>
-
+                    <!--Add new project button-->
+                    <Button Content="Add project"
+                        
+                            Command="{Binding AddNewProjectCommnad}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
                 </Grid>
 
-            </HeaderedItemsControl.Header>
+            </Border>
 
 
-            <!-- Items/rows inside -->
-            <HeaderedItemsControl.ItemTemplate>
+            <!-- Projects list -->
+            <HeaderedItemsControl Grid.Row="1"
+                              
+                                    ItemsSource="{Binding Projects}">
 
-                <DataTemplate>
+                <HeaderedItemsControl.Style>
 
-                    <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
+                    <Style TargetType="{x:Type HeaderedItemsControl}">
+
+                        <Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+
+                    </Style>
+
+                </HeaderedItemsControl.Style>
+
+
+                <!-- A template for the header and row items -->
+                <HeaderedItemsControl.Template>
+
+                    <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
+
+                        <StackPanel>
+
+                            <!-- Header -->
+                            <ContentPresenter ContentSource="Header"/>
+
+                            <!-- Row items-->
+                            <ItemsPresenter/>
+
+                        </StackPanel>
+
+                    </ControlTemplate>
+
+                </HeaderedItemsControl.Template>
+
+
+                <!-- Headers -->
+                <HeaderedItemsControl.Header>
+
+                    <Grid Margin="10,0,0,5">
+
+                        <Grid.ColumnDefinitions>
+
+                            <!-- Align 'Project name' header to project names -->
+                            <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
+
+                            <!-- A very important spacer. 
+                            'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
+                                so I have to use a column that takes the "remaning" space -->
+                            <ColumnDefinition Width="*"/>
+
+                            <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
+
+
+                        </Grid.ColumnDefinitions>
+
+
+                        <!-- Project name column -->
+                        <TextBlock Grid.Column="0" 
+                           
+                                Text="Project name"/>
+
+                        <TextBlock Grid.Column="2" 
+                           
+                                Margin="10,0"
+                               
+                                Text="Process count"/>
+
+                    </Grid>
+
+                </HeaderedItemsControl.Header>
+
+
+                <!-- Items/rows inside -->
+                <HeaderedItemsControl.ItemTemplate>
+
+                    <DataTemplate>
+
+                        <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
                             local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
                             
                             Padding="10,0,0,0"
                             Height="30">
 
-                        <Border.Style>
+                            <Border.Style>
 
-                            <Style TargetType="{x:Type Border}">
+                                <Style TargetType="{x:Type Border}">
 
-                                <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Background" Value="Transparent"/>
 
-                                <Style.Triggers>
+                                    <Style.Triggers>
 
-                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger Property="IsMouseOver" Value="True">
 
-                                        <Trigger.EnterActions>
+                                            <Trigger.EnterActions>
 
-                                            <BeginStoryboard>
+                                                <BeginStoryboard>
 
-                                                <Storyboard>
+                                                    <Storyboard>
 
-                                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                                              
                                                                     Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
                                                                     To="{StaticResource LightgreyColour}"/>
 
-                                                </Storyboard>
+                                                    </Storyboard>
 
-                                            </BeginStoryboard>
+                                                </BeginStoryboard>
 
-                                        </Trigger.EnterActions>
+                                            </Trigger.EnterActions>
 
-                                        <Trigger.ExitActions>
+                                            <Trigger.ExitActions>
 
-                                            <BeginStoryboard>
+                                                <BeginStoryboard>
 
-                                                <Storyboard>
+                                                    <Storyboard>
 
-                                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                                              
                                                                     Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
                                                                     To="{StaticResource WhiteColour}"/>
 
-                                                </Storyboard>
+                                                    </Storyboard>
 
-                                            </BeginStoryboard>
+                                                </BeginStoryboard>
 
-                                        </Trigger.ExitActions>
+                                            </Trigger.ExitActions>
 
-                                    </Trigger>
+                                        </Trigger>
 
-                                </Style.Triggers>
+                                    </Style.Triggers>
 
-                            </Style>
+                                </Style>
 
-                        </Border.Style>
+                            </Border.Style>
 
-                        <Grid>
+                            <Grid>
 
-                            <Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
 
-                                <!-- Align project names to'Project name' header -->
-                                <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
+                                    <!-- Align project names to'Project name' header -->
+                                    <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
 
-                                <!-- A very important spacer. 
+                                    <!-- A very important spacer. 
                                     'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
-                                     so I have to use a column that takes the "remaning" space -->
-                                <ColumnDefinition Width="*"/>
+                                        so I have to use a column that takes the "remaning" space -->
+                                    <ColumnDefinition Width="*"/>
 
-                                <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
+                                    <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
-                            </Grid.ColumnDefinitions>
+                                </Grid.ColumnDefinitions>
 
 
-                            <!-- The name of the project -->
-                            <TextBlock Text="{Binding Project.ProjectName}"
-                                       FontFamily="{StaticResource LatoThin}"
-                                       TextTrimming="CharacterEllipsis"
-                                       FontWeight="Thin"
+                                <!-- The name of the project -->
+                                <TextBlock Text="{Binding Project.ProjectName}"
+                                        FontFamily="{StaticResource LatoThin}"
+                                        TextTrimming="CharacterEllipsis"
+                                        FontWeight="Thin"
                                        
-                                       MaxWidth="160"
+                                        MaxWidth="160"
                                        
-                                       ToolTip="{Binding Project.ProjectName}"
+                                        ToolTip="{Binding Project.ProjectName}"
                                        
-                                       Grid.Column="0" 
+                                        Grid.Column="0" 
                                        
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"/>
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"/>
 
 
-                            <!-- The three-dot button S-->
-                            <Button Grid.Column="1" 
+                                <!-- The three-dot button S-->
+                                <Button Grid.Column="1" 
                                     
                                     HorizontalAlignment="Right"
                                     Command="{Binding SwitchToProjectViewCommand}">
 
-                                <Button.Style>
+                                    <Button.Style>
 
-                                    <Style TargetType="{x:Type Button}" 
-                                           BasedOn="{StaticResource ThreeDotButtonStyle}">
+                                        <Style TargetType="{x:Type Button}" 
+                                            BasedOn="{StaticResource ThreeDotButtonStyle}">
 
-                                        <Setter Property="Opacity" Value="0"/>
+                                            <Setter Property="Opacity" Value="0"/>
 
-                                        <Style.Triggers>
+                                            <Style.Triggers>
 
-                                            <DataTrigger Binding="{Binding SettingsButtonVisible}" Value="False">
+                                                <DataTrigger Binding="{Binding SettingsButtonVisible}" Value="False">
 
-                                                <DataTrigger.EnterActions>
+                                                    <DataTrigger.EnterActions>
 
-                                                    <BeginStoryboard>
+                                                        <BeginStoryboard>
 
-                                                        <Storyboard>
+                                                            <Storyboard>
 
-                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                              
-                                                                             Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
-                                                                             To="0"/>
+                                                                                To="0"/>
 
-                                                        </Storyboard>
+                                                            </Storyboard>
 
-                                                    </BeginStoryboard>
+                                                        </BeginStoryboard>
 
-                                                </DataTrigger.EnterActions>
+                                                    </DataTrigger.EnterActions>
 
-                                                <DataTrigger.ExitActions>
+                                                    <DataTrigger.ExitActions>
 
-                                                    <BeginStoryboard>
+                                                        <BeginStoryboard>
 
-                                                        <Storyboard>
+                                                            <Storyboard>
 
-                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                                              
-                                                                             Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
-                                                                             To="1"/>
+                                                                                To="1"/>
 
-                                                        </Storyboard>
+                                                            </Storyboard>
 
-                                                    </BeginStoryboard>
+                                                        </BeginStoryboard>
 
-                                                </DataTrigger.ExitActions>
+                                                    </DataTrigger.ExitActions>
 
-                                            </DataTrigger>
+                                                </DataTrigger>
 
-                                        </Style.Triggers>
+                                            </Style.Triggers>
 
-                                    </Style>
+                                        </Style>
 
-                                </Button.Style>
+                                    </Button.Style>
 
-                            </Button>
+                                </Button>
 
-                            
-                            <TextBlock Text="{Binding Project.ProcessList.Count}" 
-                                       FontFamily="{StaticResource LatoThin}"
-                                       FontWeight="Thin"
+
+                                <TextBlock Text="{Binding Project.ProcessList.Count}" 
+                                        FontFamily="{StaticResource LatoThin}"
+                                        FontWeight="Thin"
                                        
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Grid.Column="2"/>
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Grid.Column="2"/>
 
-                        </Grid>
+                            </Grid>
 
-                    </Border>
+                        </Border>
 
-                </DataTemplate>
+                    </DataTemplate>
 
-            </HeaderedItemsControl.ItemTemplate>
-
-
-        </HeaderedItemsControl>
+                </HeaderedItemsControl.ItemTemplate>
 
 
-        <!--Add new project button-->
-        <Button Content="Add new project"
-                        
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"        
-                Margin="0,5,0,0"
-                
-                Grid.RowSpan="2"
-                
-                Command="{Binding AddNewProjectCommnad}"/>
+            </HeaderedItemsControl>
+
+
+        </Grid>
 
     </Grid>
 
