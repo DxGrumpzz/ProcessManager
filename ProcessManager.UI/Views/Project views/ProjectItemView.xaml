@@ -11,16 +11,103 @@
              
              d:DataContext="{x:Static local:ProjectItemViewModel.DesignInstance}">
 
-    <Grid Margin="10">
+
+    <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="AUTO"/>
-            <RowDefinition Height="AUTO"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        
-        <Grid>
+
+
+        <!-- Project name title, and titlebar-->
+        <StackPanel>
+
+            <!-- The name of the project -->
+            <TextBlock Text="{Binding Project.ProjectName}"
+                   
+                       Margin="10,10,0,10"
+                       
+                       FontSize="20"/>
+
+            <!-- Title bar -->
+            <Border Background="{StaticResource LightGreyBrush}"
+                    
+                    Padding="5">
+
+                <DockPanel>
+
+                    <!--Add new project button-->
+                    <Button Content="Back"
+                        
+                            Command="{Binding GotoMainPageCommnad}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                    <!-- Add console process button -->
+                    <Button Content="New process "
+                        
+                            Margin="10,0,0,0"
+                            
+                            Command="{Binding AddNewProcessCommand}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+
+                    <!--Add new project button-->
+                    <Button Content="Delete project"
+                        
+                            HorizontalAlignment="Right"
+                            
+                            Command="{Binding DeleteProjectCommand}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+                </DockPanel>
+
+            </Border>
+
+        </StackPanel>
+
+
+        <!-- The list of processes to run -->
+        <ItemsControl ItemsSource="{Binding ProcessList}" 
+                      
+                      Margin="0,15,0,0"
+                      
+                      Grid.Row="1">
+
+            <ItemsControl.Style>
+
+                <Style TargetType="{x:Type ItemsControl}">
+
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+                    <Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+
+                </Style>
+
+            </ItemsControl.Style>
+
+            <ItemsControl.ItemTemplate>
+
+                <DataTemplate>
+
+                    <local:ProcessItemView DataContext="{Binding}" 
+                                                   
+                                            Margin="0,0,0,5"/>
+
+                </DataTemplate>
+
+            </ItemsControl.ItemTemplate>
+
+        </ItemsControl>
+
+    </Grid>
+
+</UserControl>
+
+
+<!--<Grid>
             
         <Button Content="Back to main page"
                 
@@ -37,7 +124,9 @@
 
         </Grid>
 
-        <!-- The name of the project -->
+        -->
+<!-- The name of the project -->
+<!--
         <StackPanel Margin="0,10"
                     
                     Grid.Row="1">
@@ -56,7 +145,9 @@
 
             <StackPanel>
 
-                <!-- The list of processes to run -->
+                -->
+<!-- The list of processes to run -->
+<!--
                 <ItemsControl ItemsSource="{Binding ProcessList}" 
                               FocusVisualStyle="{x:Null}"
                               
@@ -77,7 +168,9 @@
                 </ItemsControl>
 
                 
-                <!-- Add GUI process button -->
+                -->
+<!-- Add GUI process button -->
+<!--
                 <Button Content="Add new GUI process"
                         
                         Margin="0,10,0,0"
@@ -86,7 +179,9 @@
                         Command="{Binding AddNewProcessCommand}"/>
 
 
-                <!-- Add console process button -->
+                -->
+<!-- Add console process button -->
+<!--
                 <Button Content="Add console process "
                         
                         Margin="0,10,0,0"
@@ -96,8 +191,4 @@
                 
             </StackPanel>
             
-        </ScrollViewer>
-
-    </Grid>
-
-</UserControl>
+        </ScrollViewer>-->
