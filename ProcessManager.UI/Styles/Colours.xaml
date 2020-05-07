@@ -9,7 +9,13 @@
 
 
     <Color x:Key="WhiteColour">#FFF</Color>
-    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource LightgreyColour}"/>
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColour}"/>
+
+
+
+    <Color x:Key="BlackColour">#111</Color>
+    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColour}"/>
+
 
 
 </ResourceDictionary>
