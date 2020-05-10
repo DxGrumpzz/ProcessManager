@@ -38,13 +38,13 @@
 
             </Grid.RowDefinitions>
 
-            
+
             <!-- Title bar -->
             <Border Background="{StaticResource LightGreyBrush}"
                     
-                    Margin="0,10,0,15"
+                    Margin="0,10,0,0"
                     
-                    Padding="5">
+                    Padding="10,5">
 
                 <Grid>
 
@@ -68,7 +68,7 @@
             <!-- Projects list -->
             <HeaderedItemsControl Grid.Row="1"
                               
-                                    ItemsSource="{Binding Projects}">
+                                  ItemsSource="{Binding Projects}">
 
                 <HeaderedItemsControl.Style>
 
@@ -86,15 +86,21 @@
 
                     <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
 
-                        <StackPanel>
+                        <Border Padding="10">
 
-                            <!-- Header -->
-                            <ContentPresenter ContentSource="Header"/>
+                            <StackPanel>
 
-                            <!-- Row items-->
-                            <ItemsPresenter/>
+                                <!-- Header -->
+                                <ContentPresenter ContentSource="Header"
+                                                  
+                                                  Margin="0,0,0,5"/>
 
-                        </StackPanel>
+                                <!-- Row items-->
+                                <ItemsPresenter/>
+
+                            </StackPanel>
+
+                        </Border>
 
                     </ControlTemplate>
 
@@ -104,7 +110,7 @@
                 <!-- Headers -->
                 <HeaderedItemsControl.Header>
 
-                    <Grid Margin="10,0,0,5">
+                    <Grid>
 
                         <Grid.ColumnDefinitions>
 
@@ -129,8 +135,6 @@
 
                         <TextBlock Grid.Column="2" 
                            
-                                Margin="10,0"
-                               
                                 Text="Process count"/>
 
                     </Grid>
@@ -144,10 +148,11 @@
                     <DataTemplate>
 
                         <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
-                            local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
+                                local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
                             
-                            Padding="10,0,0,0"
-                            Height="30">
+                                Margin="-10,0"
+                                Padding="10,0"
+                                Height="30">
 
                             <Border.Style>
 
@@ -167,9 +172,9 @@
 
                                                         <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                                              
-                                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
-                                                                    To="{StaticResource LightgreyColour}"/>
+                                                                        To="{StaticResource LightgreyColour}"/>
 
                                                     </Storyboard>
 
@@ -185,9 +190,9 @@
 
                                                         <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                                              
-                                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                              
-                                                                    To="{StaticResource WhiteColour}"/>
+                                                                        To="{StaticResource WhiteColour}"/>
 
                                                     </Storyboard>
 
@@ -219,94 +224,40 @@
 
                                 </Grid.ColumnDefinitions>
 
-
+                                
                                 <!-- The name of the project -->
                                 <TextBlock Text="{Binding Project.ProjectName}"
-                                        FontFamily="{StaticResource LatoThin}"
-                                        TextTrimming="CharacterEllipsis"
-                                        FontWeight="Thin"
+                                           FontFamily="{StaticResource LatoThin}"
+                                           TextTrimming="CharacterEllipsis"
+                                           FontWeight="Thin"
                                        
-                                        MaxWidth="160"
+                                           MaxWidth="160"
+
+                                           ToolTip="{Binding Project.ProjectName}"
                                        
-                                        ToolTip="{Binding Project.ProjectName}"
-                                       
-                                        Grid.Column="0" 
-                                       
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center"/>
+                                           VerticalAlignment="Center"/>
 
 
                                 <!-- The three-dot button S-->
                                 <Button Grid.Column="1" 
                                     
-                                    HorizontalAlignment="Right"
-                                    Command="{Binding SwitchToProjectViewCommand}">
-
-                                    <Button.Style>
-
-                                        <Style TargetType="{x:Type Button}" 
-                                            BasedOn="{StaticResource ThreeDotButtonStyle}">
-
-                                            <Setter Property="Opacity" Value="0"/>
-
-                                            <Style.Triggers>
-
-                                                <DataTrigger Binding="{Binding SettingsButtonVisible}" Value="False">
-
-                                                    <DataTrigger.EnterActions>
-
-                                                        <BeginStoryboard>
-
-                                                            <Storyboard>
-
-                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                             
-                                                                                Duration="{StaticResource MouseHoverAnimationTiming}"
-                                                                             
-                                                                                To="0"/>
-
-                                                            </Storyboard>
-
-                                                        </BeginStoryboard>
-
-                                                    </DataTrigger.EnterActions>
-
-                                                    <DataTrigger.ExitActions>
-
-                                                        <BeginStoryboard>
-
-                                                            <Storyboard>
-
-                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                             
-                                                                                Duration="{StaticResource MouseHoverAnimationTiming}"
-                                                                             
-                                                                                To="1"/>
-
-                                                            </Storyboard>
-
-                                                        </BeginStoryboard>
-
-                                                    </DataTrigger.ExitActions>
-
-                                                </DataTrigger>
-
-                                            </Style.Triggers>
-
-                                        </Style>
-
-                                    </Button.Style>
-
-                                </Button>
+                                        IsEnabled="{Binding SettingsButtonVisible}"
+                                        
+                                        HorizontalAlignment="Right"
+                                        
+                                        Command="{Binding SwitchToProjectViewCommand}"
+                                        
+                                        Style="{StaticResource ThreeDotButtonStyle}"/>
 
 
+                                <!-- A text block containing the number of processes in this project -->
                                 <TextBlock Text="{Binding Project.ProcessList.Count}" 
-                                        FontFamily="{StaticResource LatoThin}"
-                                        FontWeight="Thin"
+                                           FontFamily="{StaticResource LatoThin}"
+                                           FontWeight="Thin"
                                        
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        Grid.Column="2"/>
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Grid.Column="2"/>
 
                             </Grid>
 
@@ -318,7 +269,6 @@
 
 
             </HeaderedItemsControl>
-
 
         </Grid>
 
