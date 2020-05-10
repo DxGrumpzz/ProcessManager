@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ProcessManager.UI.ProcessItemView"
+<UserControl x:Class="ProcessManager.UI.ProcessItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -21,13 +21,25 @@
         </Grid.ColumnDefinitions>
 
 
-        <Grid local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}" 
-              local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
+        <!-- Process name and label -->
+        <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
+              TextBlock.FontWeight="Thin"
+              
+              Background="Transparent"
+              
+              x:Name="ProcessNameGrid">
+
+            <Grid.InputBindings>
+
+                <MouseBinding MouseAction="LeftClick"
+                              Command="{Binding TextClickedCommand}"/>
+
+            </Grid.InputBindings>
 
             <!-- The name of this process -->
             <TextBlock Text="{Binding ProcessPath}"
 
-                       Visibility="{Binding ProcessLabelVisible,
+                       Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
                        Converter={local:BooleanToVisibilityValueConverter}, 
                        ConverterParameter='True'}"
 
@@ -38,7 +50,7 @@
             <!-- The process label -->
             <TextBlock Text="{Binding Process.ProcessLabel}"
                        
-                       Visibility="{Binding ProcessLabelVisible,
+                       Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
                        Converter={local:BooleanToVisibilityValueConverter}}"
                        
                        TextTrimming="CharacterEllipsis"
