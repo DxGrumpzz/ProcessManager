@@ -59,13 +59,24 @@
         </Grid>
 
 
+        <!-- Eidt process button -->
+        <Button Grid.Column="1" 
+                
+                Command="{Binding EditProcessCommand}"
+                
+                IsEnabled="{Binding EditProcessButtonVisible}"
+                
+                
+                Style="{StaticResource ThreeDotButtonStyle}"/>
+
+        
         <!-- Run and close buttons container -->
         <StackPanel Orientation="Horizontal"
                     
                     HorizontalAlignment="Right"
                     local:UniformMargin.Margin="5,0,0,0"
                     
-                    Grid.Column="1">
+                    Grid.Column="2">
 
 
             <!-- Process Run buttons -->
@@ -159,16 +170,6 @@
 
         </StackPanel>
 
-
-        <!-- Eidt process button -->
-        <Button Grid.Column="2" 
-                
-                Content="{Binding Process.ProcessType, 
-                Converter={local:ProcessTypeToEditTextConverter}}"
-                
-                Margin="10,0,0,0"
-                
-                Command="{Binding EditProcessCommand}"/>
 
     </Grid>
 
