@@ -21,6 +21,9 @@
 
         <Setter Property="Cursor" Value="Hand"/>
 
+        <Setter Property="Opacity" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsEnabled}"/>
+
+
         <Setter Property="Template">
 
             <Setter.Value>
@@ -28,9 +31,7 @@
                 <ControlTemplate>
 
                     <!-- The control's main border -->
-                    <Border x:Name="MainBorder"
-                            
-                            Background="Transparent">
+                    <Border Background="Transparent">
 
                         <!-- A stack panel, jus for ease of layout so the dots will be aligned without too much hassle-->
                         <StackPanel Orientation="Horizontal"
@@ -110,6 +111,54 @@
 
                         </Trigger>
 
+
+                        <!-- Because visibility ironically doesn't work well with fade-in/out I use IsEnabled -->
+                        <Trigger Property="IsEnabled" Value="False">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Fade out when control is disabled -->
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                                 
+                                                                                 To="0" 
+                                                                                 
+                                                                                 Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                 />
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+                            
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Fade in when control is enabled -->
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                                 
+                                                                                 To="1" 
+                                                                                 
+                                                                                 Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                 />
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+
                     </ControlTemplate.Triggers>
 
                 </ControlTemplate>
@@ -123,7 +172,7 @@
 
     <Style x:Key="ProjectListTitleButtonStyle" TargetType="{x:Type Button}">
 
-        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Padding" Value="10,5"/>
 
         <Setter Property="Cursor" Value="Hand"/>
 
@@ -137,11 +186,11 @@
 
                     <!-- The control's main border -->
                     <Border BorderBrush="{TemplateBinding Foreground}"
-                                                    BorderThickness="1"
+                            BorderThickness="1"
                                                     
-                                                    Background="Transparent"
-                                                    
-                                                    Padding="{TemplateBinding Padding}">
+                            Background="Transparent"
+                            
+                            Padding="{TemplateBinding Padding}">
 
 
                         <!-- The control's main content presenter -->
