@@ -47,6 +47,38 @@ static std::string GetLastErrorAsStringA()
 }
 
 
+// Formats a COM error to a "readable" string 
+static std::wstring FormatCOMError(HRESULT error, int line)
+{
+    _com_error comError = _com_error(error);
+
+    std::wstring errorString;
+    errorString.append(L"A COM error has occured.\n");
+
+    // Append the eror string/message
+    errorString.append(L"Error: ");
+    errorString.append(comError.ErrorMessage());
+
+    // Append the error code
+    errorString.append(L"Error code: ");
+    errorString.append(std::to_wstring(error));
+
+    // Append on which line the error occured
+    errorString.append(L"\n");
+    errorString.append(L"Line: ");
+    errorString.append(std::to_wstring(line));
+
+    // Append the file where the error has occured
+    errorString.append(L"\n");
+    errorString.append(L"File: ");
+    errorString.append(__FILEW__);
+
+    return errorString;
+}
+
+
+#define FORMAT_COM_ERRORW(error) FormatCOMError((HRESULT)error, __LINE__)
+
 // Simple macro used to "debug" WinApi calls. displays an Ansi MessageBox with error details 
 #define WINCALL(wincall) if(!wincall) { auto error = GetLastErrorAsStringA(); MessageBoxA(NULL, error.c_str(), "Error", NULL); throw std::exception(error.c_str()); }
 
