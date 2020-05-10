@@ -2,7 +2,7 @@
 {
     using System;
     using System.Diagnostics;
-    using System.Runtime.CompilerServices;
+    using System.IO;
     using System.Runtime.InteropServices;
 
 
@@ -30,7 +30,7 @@
         /// <returns></returns>
         [DllImport("ProcessManager.Core.dll", CharSet = CharSet.Unicode)]
         private static extern bool FreeOutErrorString(ref IntPtr stringErrorOut);
-        
+
 
         public string SelectedPath { get; private set; }
 
@@ -113,6 +113,30 @@
                 Marshal.FreeCoTaskMem(pathPointer);
                 FreeOutErrorString(ref outErrorStringPointer);
             };
+        }
+
+
+        /// <summary>
+        /// Opens a folder 
+        /// </summary>
+        /// <param name="projectPath"> A directory path to open </param>
+        public bool OpenFolder(string folderPath)
+        {
+            // Check if folder actually exists
+            if (Directory.Exists(folderPath) == false)
+            {
+                ErrorString = $"Folder \'{folderPath}\' doesn't exist, or it isn't a valid folder path";
+                return false;
+            };
+
+            // Run the windows explorer with the given folder path
+            Process.Start(new ProcessStartInfo()
+            {
+                Arguments = folderPath,
+                FileName = "explorer.exe",
+            });
+
+            return true;
         }
 
     };

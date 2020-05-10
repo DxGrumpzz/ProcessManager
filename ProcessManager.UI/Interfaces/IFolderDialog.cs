@@ -44,5 +44,11 @@
         public bool ShowDialogFrom(string directoryPath);
 
 
+        /// <summary>
+        /// Opens a folder 
+        /// </summary>
+        /// <param name="projectPath"> A directory path to open </param>
+        bool OpenFolder(string projectPath);
+
     };
 };
