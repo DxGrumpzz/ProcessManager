@@ -9,11 +9,14 @@
              d:DesignHeight="450" 
              d:DesignWidth="800"
              
+             UseLayoutRounding="True"
+             
              d:DataContext="{x:Static local:ProjectItemViewModel.DesignInstance}">
 
 
-    <Grid>
+    <Grid Margin="10">
 
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="AUTO"/>
             <RowDefinition Height="*"/>
@@ -26,16 +29,34 @@
             <!-- The name of the project -->
             <TextBlock Text="{Binding Project.ProjectName}"
                    
-                       Margin="10,10,0,10"
-                       
                        FontSize="20"/>
+
+            <!-- Project path -->
+            <TextBlock Text="{Binding Project.ProjectPath}"
+                   
+                       FontFamily="{StaticResource LatoThin}"
+                       FontWeight="Thin"
+                       FontSize="15"
+                
+                       Cursor="Hand"
+                       
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,10">
+
+                <TextBlock.InputBindings>
+                    <MouseBinding MouseAction="LeftClick"
+                                  Command="{Binding OpenProjectDirectoryCommand}"/>
+                </TextBlock.InputBindings>
+
+            </TextBlock>
 
             <!-- Title bar -->
             <Border Background="{StaticResource LightGreyBrush}"
                     
-                    Padding="5">
+                    Padding="10,5"
+                    Margin="-10,0">
 
-                <DockPanel>
+                <DockPanel LastChildFill="False">
 
                     <!--Add new project button-->
                     <Button Content="Back"
@@ -53,15 +74,16 @@
                             Style="{StaticResource ProjectListTitleButtonStyle}"/>
 
 
-
                     <!--Add new project button-->
                     <Button Content="Delete project"
                         
-                            HorizontalAlignment="Right"
+                            Margin="10,0,0,0"
+                            
+                            DockPanel.Dock="Right"
                             
                             Command="{Binding DeleteProjectCommand}"
                             Style="{StaticResource ProjectListTitleButtonStyle}"/>
-
+    
                 </DockPanel>
 
             </Border>
@@ -92,10 +114,10 @@
 
                 <DataTemplate>
 
-                    <local:ProcessItemView DataContext="{Binding}" 
-                                                   
-                                            Margin="0,0,0,5"/>
-
+                    <local:ProcessItemView DataContext="{Binding}"
+                                           
+                                           Margin="-10,0"/>
+                    
                 </DataTemplate>
 
             </ItemsControl.ItemTemplate>
@@ -105,90 +127,3 @@
     </Grid>
 
 </UserControl>
-
-
-<!--<Grid>
-            
-        <Button Content="Back to main page"
-                
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                
-                Command="{Binding GotoMainPageCommnad}"/>
-
-            <Button Content="Delete project"
-                    
-                    HorizontalAlignment="Right"
-                    
-                    Command="{Binding DeleteProjectCommand}"/>
-
-        </Grid>
-
-        -->
-<!-- The name of the project -->
-<!--
-        <StackPanel Margin="0,10"
-                    
-                    Grid.Row="1">
-
-            <TextBlock Text="Project:"/>
-
-            <TextBlock Text="{Binding Project.ProjectName}"/>
-
-        </StackPanel>
-        
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      FocusVisualStyle="{x:Null}"
-                      
-                      Grid.Row="2">
-
-            <StackPanel>
-
-                -->
-<!-- The list of processes to run -->
-<!--
-                <ItemsControl ItemsSource="{Binding ProcessList}" 
-                              FocusVisualStyle="{x:Null}"
-                              
-                              Grid.IsSharedSizeScope="True">
-
-                    <ItemsControl.ItemTemplate>
-
-                        <DataTemplate>
-
-                            <local:ProcessItemView DataContext="{Binding}" 
-                                                   
-                                                   Margin="0,0,0,5"/>
-
-                        </DataTemplate>
-
-                    </ItemsControl.ItemTemplate>
-
-                </ItemsControl>
-
-                
-                -->
-<!-- Add GUI process button -->
-<!--
-                <Button Content="Add new GUI process"
-                        
-                        Margin="0,10,0,0"
-                        HorizontalAlignment="Left"
-                        
-                        Command="{Binding AddNewProcessCommand}"/>
-
-
-                -->
-<!-- Add console process button -->
-<!--
-                <Button Content="Add console process "
-                        
-                        Margin="0,10,0,0"
-                        HorizontalAlignment="Left"
-                        
-                        Command="{Binding AddNewConsoleProcessCommand}"/>
-                
-            </StackPanel>
-            
-        </ScrollViewer>-->

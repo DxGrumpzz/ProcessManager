@@ -1,4 +1,4 @@
-<UserControl x:Class="ProcessManager.UI.ProcessItemView"
+﻿<UserControl x:Class="ProcessManager.UI.ProcessItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,44 +11,102 @@
              
              d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
 
+    <Border Background="Transparent">
 
-    <Grid>
+        <Border.Style>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col1"/>
-            <ColumnDefinition Width="AUTO" SharedSizeGroup="Col2"/>
-        </Grid.ColumnDefinitions>
+            <Style TargetType="{x:Type Border}">
+
+                <Style.Triggers>
+
+                    <Trigger Property="IsMouseOver" Value="True">
+
+                        <Trigger.EnterActions>
+
+                            <BeginStoryboard>
+
+                                <Storyboard>
+
+                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="{StaticResource LightgreyColour}"/>
+
+                                </Storyboard>
+
+                            </BeginStoryboard>
+
+                        </Trigger.EnterActions>
 
 
-        <!-- Process name and label -->
-        <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
-              TextBlock.FontWeight="Thin"
+                        <Trigger.ExitActions>
+
+                            <BeginStoryboard>
+
+                                <Storyboard>
+
+                                    <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                    
+                                                    Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                    
+                                                    To="{StaticResource WhiteColour}"/>
+
+                                </Storyboard>
+
+                            </BeginStoryboard>
+
+                        </Trigger.ExitActions>
+
+                    </Trigger>
+
+                </Style.Triggers>
+
+            </Style>
+
+        </Border.Style>
+
+        <Grid x:Name="MainGrid" 
+          
+              Height="30"
               
-              Background="Transparent"
-              
-              x:Name="ProcessNameGrid">
+              Margin="10,0">
 
-            <Grid.InputBindings>
 
-                <MouseBinding MouseAction="LeftClick"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="AUTO" SharedSizeGroup="Col1"/>
+                <ColumnDefinition Width="AUTO" SharedSizeGroup="Col2"/>
+            </Grid.ColumnDefinitions>
+
+
+            <!-- Process name and label -->
+            <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
+                  TextBlock.FontWeight="Thin"
+             
+                  Background="Transparent"
+                  
+                  x:Name="ProcessNameGrid">
+
+                <Grid.InputBindings>
+
+                    <MouseBinding MouseAction="LeftClick"
                               Command="{Binding TextClickedCommand}"/>
 
-            </Grid.InputBindings>
+                </Grid.InputBindings>
 
-            <!-- The name of this process -->
-            <TextBlock Text="{Binding ProcessPath}"
+                <!-- The name of this process -->
+                <TextBlock Text="{Binding ProcessName}"
 
                        Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
-                       Converter={local:BooleanToVisibilityValueConverter}, 
+                       Converter={local:BooleanToVisibilityValueConverter},
                        ConverterParameter='True'}"
 
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Center"/>
 
-
-            <!-- The process label -->
-            <TextBlock Text="{Binding Process.ProcessLabel}"
+                <!-- The process label -->
+                <TextBlock Text="{Binding Process.ProcessLabel}"
                        
                        Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
                        Converter={local:BooleanToVisibilityValueConverter}}"
@@ -56,121 +114,125 @@
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Center"/>
 
-        </Grid>
+            </Grid>
 
 
-        <!-- Eidt process button -->
-        <Button Grid.Column="1" 
-                
-                Command="{Binding EditProcessCommand}"
-                
-                IsEnabled="{Binding EditProcessButtonVisible}"
-                
-                
-                Style="{StaticResource ThreeDotButtonStyle}"/>
-
-        
-        <!-- Run and close buttons container -->
-        <StackPanel Orientation="Horizontal"
-                    
+            <!-- Eidt process button -->
+            <Button Grid.Column="1" 
+                                    
+                    IsEnabled="{Binding ElementName=MainGrid, Path=IsMouseOver}"
+                                        
                     HorizontalAlignment="Right"
-                    local:UniformMargin.Margin="5,0,0,0"
+                                        
+                    Command="{Binding SwitchToProjectViewCommand}"
+                                    
+                    Margin="-10,0,0,0"    
                     
-                    Grid.Column="2">
+                    Style="{StaticResource ThreeDotButtonStyle}"/>
 
 
-            <!-- Process Run buttons -->
-            <Button Content="Run"
+            <Border Grid.Column="2">
+
+                <!-- Run and close buttons container -->
+                <StackPanel Orientation="Horizontal"
                     
-                    IsEnabled="{Binding ProcessRunning,
-                    Converter={local:InvertBooleanValueConverter}}"
+                            local:UniformMargin.Margin="5,0,0,0">
+
+
+                    <!-- Process Run buttons -->
+                    <Button Content="Run"
                     
-                    Command="{Binding RunProcessCommand}"/>
-
-
-            <!-- Close Process buttons -->
-            <Button Content="Close" 
+                            IsEnabled="{Binding ProcessRunning,
+                            Converter={local:InvertBooleanValueConverter}}"
                     
-                    IsEnabled="{Binding ProcessRunning}"
+                            Command="{Binding RunProcessCommand}"/>
+
+
+                    <!-- Close Process buttons -->
+                    <Button Content="Close" 
                     
-                    Command="{Binding CloseProcessCommand}"/>
-
-
-
-            <!-- Show a process buttons -->
-            <Button Content="Show"
+                            IsEnabled="{Binding ProcessRunning}"
                     
-                    Margin="10,0,0,0"
+                            Command="{Binding CloseProcessCommand}"/>
+
+
+
+                    <!-- Show a process buttons -->
+                    <Button Content="Show"
                     
-                    Command="{Binding ShowProcessCommand}">
+                            Margin="5,0,0,0"
+                            Command="{Binding ShowProcessCommand}">
 
-                <Button.Style>
+                        <Button.Style>
 
-                    <Style TargetType="{x:Type Button}">
+                            <Style TargetType="{x:Type Button}">
 
-                        <Style.Triggers>
+                                <Style.Triggers>
 
-                            <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+                                    <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
 
-                                <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
 
-                            </DataTrigger>
-
-
-                            <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
-
-                                <Setter Property="IsEnabled" Value="False"/>
-
-                            </DataTrigger>
-
-                        </Style.Triggers>
-
-                    </Style>
-
-                </Button.Style>
-
-            </Button>
+                                    </DataTrigger>
 
 
-            <!-- Hide a process buttons -->
-            <Button Content="Hide" 
+                                    <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
+
+                                        <Setter Property="IsEnabled" Value="False"/>
+
+                                    </DataTrigger>
+
+                                </Style.Triggers>
+
+                            </Style>
+
+                        </Button.Style>
+
+                    </Button>
+
+
+                    <!-- Hide a process buttons -->
+                    <Button Content="Hide" 
                     
-                    Command="{Binding HideProcessCommand}">
+                            Command="{Binding HideProcessCommand}">
 
-                <Button.Style>
+                        <Button.Style>
 
-                    <Style TargetType="{x:Type Button}">
+                            <Style TargetType="{x:Type Button}">
 
-                        <Style.Triggers>
+                                <Style.Triggers>
 
-                            <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+                                    <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
 
-                                <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
 
-                            </DataTrigger>
+                                    </DataTrigger>
 
 
-                            <DataTrigger Binding="{Binding ProcessVisible, 
+                                    <DataTrigger Binding="{Binding ProcessVisible, 
                                          Converter={local:InvertBooleanValueConverter}}" 
                                          
                                          Value="True">
 
-                                <Setter Property="IsEnabled" Value="False"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
 
-                            </DataTrigger>
+                                    </DataTrigger>
 
-                        </Style.Triggers>
+                                </Style.Triggers>
 
-                    </Style>
+                            </Style>
 
-                </Button.Style>
+                        </Button.Style>
 
-            </Button>
-
-
-        </StackPanel>
+                    </Button>
 
 
-    </Grid>
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+
+    </Border>
 
 </UserControl>
