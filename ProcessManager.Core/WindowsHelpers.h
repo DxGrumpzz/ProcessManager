@@ -86,40 +86,38 @@ static std::wstring FormatCOMError(HRESULT error, int line)
 
 // Calls the windows Directory dialog using COM.
 // Returns the path to the opened folder
-extern "C" _declspec(dllexport) inline bool OpenDirectoryDialog(wchar_t*& path)
+extern "C" _declspec(dllexport) bool OpenDirectoryDialog(wchar_t*& path)
 {
     // The file dialog modal window 
-    IFileDialog* fileDialog;
+    CComPtr<IFileDialog> fileDialog;
     bool result = false;
 
     // Create an instance of IFileDialog
-    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
-    {
+    if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+        return false;
+
+
         // Set the file dialog to only browse folders
         fileDialog->SetOptions(FOS_PICKFOLDERS);
 
         // Show the file dialog
-        if (SUCCEEDED(fileDialog->Show(GetActiveWindow())))
-        {
+    if (FAILED(fileDialog->Show(GetActiveWindow())))
+        return false;
+
+
             // Get result
-            IShellItem* psi;
-            if (SUCCEEDED(fileDialog->GetResult(&psi)))
-            {
-                // Convert result to a readable string
-                psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path);
-                psi->Release();
+    CComPtr<IShellItem> psi;
+    if (FAILED(fileDialog->GetResult(&psi)))
+        return false;
 
-                result = true;
-            };
-        }
-        else
-            result = false;
 
-        fileDialog->Release();
+    // Convert result to a readable string
+    if (FAILED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
+        return false;
+    else
+        return true;
     };
 
-    return result;
-};
 
 
 // Opens the IFileDialog from an existing path
@@ -128,14 +126,10 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, con
     // The file dialog modal window 
     CComPtr<IFileDialog> fileDialog;
 
-    // Result of the modal window
-    // True, User has chose a folder.
-    // False, User has closed the modal without choosing
-    bool result = false;
-
     // Create an instance of IFileDialog
-    if (SUCCEEDED(CoCreateInstance(__uuidof(FileOpenDialog), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
-    {
+    if (FAILED(CoCreateInstance(__uuidof(FileOpenDialog), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+        return false;
+
         // Set the file dialog to only browse folders
         fileDialog->SetOptions(FOS_PICKFOLDERS);
 
@@ -143,32 +137,36 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, con
         CComPtr<IShellItem> openFromOption;
 
         // Set openFromOption value to 'openFrom'
-        if (SUCCEEDED(SHCreateItemFromParsingName(openFrom, NULL, IID_PPV_ARGS(&openFromOption))))
+    if (FAILED(SHCreateItemFromParsingName(openFrom, NULL, IID_PPV_ARGS(&openFromOption))))
         {
-            // Set starting folder
-            if (SUCCEEDED(fileDialog->SetFolder(openFromOption)))
-            {
-                // Show the file dialog
-                if (SUCCEEDED(fileDialog->Show(GetActiveWindow())))
-                {
-                    // Get result
-                    CComPtr<IShellItem> psi;
-                    if (SUCCEEDED(fileDialog->GetResult(&psi)))
-                    {
-                        // Convert result to a readable string
-                        if (SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
-                        {
-                            result = true;
-                        };
-                    };
-                }
-                else
-                    result = false;
-            };
-        };
+
+        return false;
     };
 
-    return result;
+
+            // Set starting folder
+    if (FAILED(fileDialog->SetFolder(openFromOption)))
+        return false;
+
+
+                // Show the file dialog
+    if (FAILED(fileDialog->Show(GetActiveWindow())))
+        return false;
+
+
+                    // Get result
+    CComPtr<IShellItem> dialogResult;
+
+    // Insert dialog dialog result into pist
+    if (FAILED(fileDialog->GetResult(&dialogResult)))
+        return false;
+
+
+                        // Convert result to a readable string
+    if (FAILED(dialogResult->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
+        return false;
+                else
+        return true;
 }
 
 
