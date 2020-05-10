@@ -97,15 +97,15 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialog(wchar_t*& path)
         return false;
 
 
-        // Set the file dialog to only browse folders
-        fileDialog->SetOptions(FOS_PICKFOLDERS);
+    // Set the file dialog to only browse folders
+    fileDialog->SetOptions(FOS_PICKFOLDERS);
 
-        // Show the file dialog
+    // Show the file dialog
     if (FAILED(fileDialog->Show(GetActiveWindow())))
         return false;
 
 
-            // Get result
+    // Get result
     CComPtr<IShellItem> psi;
     if (FAILED(fileDialog->GetResult(&psi)))
         return false;
@@ -116,12 +116,11 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialog(wchar_t*& path)
         return false;
     else
         return true;
-    };
-
+};
 
 
 // Opens the IFileDialog from an existing path
-extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, const wchar_t* openFrom)
+extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, const wchar_t* openFrom, wchar_t*& errorStringOut)
 {
     // The file dialog modal window 
     CComPtr<IFileDialog> fileDialog;
@@ -130,31 +129,38 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, con
     if (FAILED(CoCreateInstance(__uuidof(FileOpenDialog), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
         return false;
 
-        // Set the file dialog to only browse folders
-        fileDialog->SetOptions(FOS_PICKFOLDERS);
+    // Set the file dialog to only browse folders
+    fileDialog->SetOptions(FOS_PICKFOLDERS);
 
-        // An option that will store the 'openFrom' value
-        CComPtr<IShellItem> openFromOption;
+    // An option that will store the 'openFrom' value
+    CComPtr<IShellItem> openFromOption;
 
-        // Set openFromOption value to 'openFrom'
+    // Set openFromOption value to 'openFrom'
     if (FAILED(SHCreateItemFromParsingName(openFrom, NULL, IID_PPV_ARGS(&openFromOption))))
-        {
+    {
+        HRESULT lastError = GetLastError();
+
+        std::wstring errorString = FORMAT_COM_ERRORW(lastError);
+
+        errorStringOut = new wchar_t[errorString.size() + 1] { 0 };
+
+        wcscpy_s(errorStringOut, errorString.size() + 1, errorString.c_str());
 
         return false;
     };
 
 
-            // Set starting folder
+    // Set starting folder
     if (FAILED(fileDialog->SetFolder(openFromOption)))
         return false;
 
 
-                // Show the file dialog
+    // Show the file dialog
     if (FAILED(fileDialog->Show(GetActiveWindow())))
         return false;
 
 
-                    // Get result
+    // Get result
     CComPtr<IShellItem> dialogResult;
 
     // Insert dialog dialog result into pist
@@ -162,10 +168,10 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, con
         return false;
 
 
-                        // Convert result to a readable string
+    // Convert result to a readable string
     if (FAILED(dialogResult->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
         return false;
-                else
+    else
         return true;
 }
 
@@ -276,4 +282,11 @@ static std::vector<HWND> GetProcessHWNDs(DWORD processID)
     }, reinterpret_cast<LPARAM>(&param));
 
     return param.first;
+}
+
+
+extern "C" _declspec(dllexport) void FreeOutErrorString(wchar_t*& errorStringOut)
+{
+    delete[] errorStringOut;
+    errorStringOut = nullptr;
 }
