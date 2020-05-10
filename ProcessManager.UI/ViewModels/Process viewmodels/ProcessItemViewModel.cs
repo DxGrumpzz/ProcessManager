@@ -1,6 +1,5 @@
 namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
@@ -11,6 +10,7 @@ namespace ProcessManager.UI
     /// </summary>
     public class ProcessItemViewModel : BaseViewModel
     {
+
         public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(null,
             new GUIProcess(Path.GetRandomFileName()));
 
@@ -39,6 +39,7 @@ namespace ProcessManager.UI
         /// </summary>
         public IProcessModel Process { get; set; }
 
+
         /// <summary>
         /// The process path, Formatted
         /// </summary>
@@ -60,6 +61,26 @@ namespace ProcessManager.UI
         }
 
         /// <summary>
+        /// The name of the process without path
+        /// </summary>
+        public string ProcessName
+        {
+            get
+            {
+                if (Process is ConsoleProcess consoleProcess)
+                    return Path.GetFileName(consoleProcess.StartupDirectory);
+                else if (Process is GUIProcess guiProcess)
+                    return Path.GetFileName(guiProcess.ProcessPath);
+                else
+                {
+                    Debugger.Break();
+                    return null;
+                };
+            }
+        }
+
+
+        /// <summary>
         /// A boolean flag that indicates if this process is currently running
         /// </summary>
         public bool ProcessRunning
@@ -71,6 +92,7 @@ namespace ProcessManager.UI
                 OnPropertyChanged();
             }
         }
+
 
         /// <summary>
         /// A boolean flag that indicates if the current process is shown
@@ -98,6 +120,7 @@ namespace ProcessManager.UI
                 OnPropertyChanged();
             }
         }
+
 
         /// <summary>
         /// A boolean flag that indicates if the associated process has a label
