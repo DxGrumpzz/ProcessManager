@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:ProcessManager.UI"
              mc:Ignorable="d" 
              
-             d:DesignHeight="25" 
              d:DesignWidth="400"
              
              d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
@@ -86,7 +85,10 @@
              
                   Background="Transparent"
                   
-                  x:Name="ProcessNameGrid">
+                  x:Name="ProcessNameGrid"
+                  
+                  local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
+                  local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
 
                 <Grid.InputBindings>
 
@@ -98,7 +100,7 @@
                 <!-- The name of this process -->
                 <TextBlock Text="{Binding ProcessName}"
 
-                       Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
+                       Visibility="{Binding ProcessLabelVisible, 
                        Converter={local:BooleanToVisibilityValueConverter},
                        ConverterParameter='True'}"
 
@@ -108,7 +110,7 @@
                 <!-- The process label -->
                 <TextBlock Text="{Binding Process.ProcessLabel}"
                        
-                       Visibility="{Binding ElementName=ProcessNameGrid, Path=IsMouseOver, 
+                       Visibility="{Binding ProcessLabelVisible, 
                        Converter={local:BooleanToVisibilityValueConverter}}"
                        
                        TextTrimming="CharacterEllipsis"
@@ -124,7 +126,7 @@
                                         
                     HorizontalAlignment="Right"
                                         
-                    Command="{Binding SwitchToProjectViewCommand}"
+                    Command="{Binding EditProcessCommand}"
                                     
                     Margin="-10,0,0,0"    
                     
