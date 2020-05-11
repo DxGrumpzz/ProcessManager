@@ -8,8 +8,6 @@ namespace ProcessManager.UI
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Text.Json;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Interop;
@@ -49,7 +47,6 @@ namespace ProcessManager.UI
             DI.Provider = BuildDIProvider(serviceCollection);
 
             // Create and show window
-            
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
 
@@ -89,15 +86,13 @@ namespace ProcessManager.UI
         private IServiceCollection SetupDI(IServiceCollection serviceCollection)
         {
             // Setup serializer
-            serviceCollection.AddTransient<ISerializer>((ServiceProvider) =>
-            new JsonSerializer());
-
+            serviceCollection.AddTransient<ISerializer, JsonSerializer>();
 
             // Add folder dialog 
-            serviceCollection.AddScoped<IFolderDialog>((serviceProvider) => new WindowsFolderDialog());
+            serviceCollection.AddScoped<IFolderDialog, WindowsFolderDialog>();
 
             // Add file dialog
-            serviceCollection.AddScoped<IFileDialog>((serviceProvider) => new WindowsFileDialog());
+            serviceCollection.AddScoped<IFileDialog, WindowsFileDialog>();
 
             // Create a process loader
             serviceCollection.AddScoped<IProcessLoader>((serviceProvider) => new ProcessLoader(serviceProvider.GetService<ISerializer>()));
@@ -139,40 +134,40 @@ namespace ProcessManager.UI
             new SystemTrayIcon(
                 () => serviceProvider.GetService<IList<Project>>()
                 .Select(project =>
-            {
-                // The data which will be passed to the tray icon
-                var trayIconData = new SystemTrayIconData(project);
-
-                // A local function that will take a handle and "convert" it to a usable object
-                static T HandleToObj<T>(IntPtr handle)
                 {
-                    // Take the handle and convert it to a *safe handle
-                    if (GCHandle.FromIntPtr(handle).Target is T obj)
-                        return obj;
-                    else
+                    // The data which will be passed to the tray icon
+                    var trayIconData = new SystemTrayIconData(project);
+
+                    // A local function that will take a handle and "convert" it to a usable object
+                    static T HandleToObj<T>(IntPtr handle)
                     {
-                        Debugger.Break();
-                        throw new Exception("Critical error occured. Unable to read returned TrayIcon data");
+                        // Take the handle and convert it to a *safe handle
+                        if (GCHandle.FromIntPtr(handle).Target is T obj)
+                            return obj;
+                        else
+                        {
+                            Debugger.Break();
+                            throw new Exception("Critical error occured. Unable to read returned TrayIcon data");
+                        };
                     };
-                };
 
 
-                // A callback that will be called when the user decided to close the project
-                trayIconData.CloseProjectCallBack += (data) =>
-                {
-                    Project project = HandleToObj<Project>(data);
-                    project.CloseProjectTree();
-                };
+                    // A callback that will be called when the user decided to close the project
+                    trayIconData.CloseProjectCallBack += (data) =>
+                    {
+                        Project project = HandleToObj<Project>(data);
+                        project.CloseProjectTree();
+                    };
 
-                // A callback that will be called when the user decided to run the project
-                trayIconData.RunProjectCallBack += (data) =>
-                {
-                    Project project = HandleToObj<Project>(data);
-                    project.RunProject();
-                };
+                    // A callback that will be called when the user decided to run the project
+                    trayIconData.RunProjectCallBack += (data) =>
+                    {
+                        Project project = HandleToObj<Project>(data);
+                        project.RunProject();
+                    };
 
-                return trayIconData;
-            })
+                    return trayIconData;
+                })
                 // Convert to an array Because
                 .ToArray()));
 
