@@ -14,9 +14,9 @@
             InitializeComponent();
         }
 
-        public AddConsoleProcessView(AddConsoleProcessViewModel projectVM) : 
-            this()
+        public AddConsoleProcessView(AddConsoleProcessViewModel projectVM)
         {
+            InitializeComponent();
             DataContext = projectVM;
         }
 

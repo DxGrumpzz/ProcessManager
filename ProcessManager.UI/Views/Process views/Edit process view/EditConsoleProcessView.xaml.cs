@@ -13,9 +13,9 @@
             InitializeComponent();
         }
 
-        public EditConsoleProcessView(EditConsoleProcessViewModel editProcessVM) :
-            this()
+        public EditConsoleProcessView(EditConsoleProcessViewModel editProcessVM)
         {
+            InitializeComponent();
             DataContext = editProcessVM;
         }
 

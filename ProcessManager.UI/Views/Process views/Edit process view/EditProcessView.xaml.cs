@@ -13,9 +13,9 @@
             InitializeComponent();
         }
 
-        public EditGUIProcessView(EditGUIProcessViewModel editProcessVM) :
-            this()
+        public EditGUIProcessView(EditGUIProcessViewModel editProcessVM)
         {
+            InitializeComponent();
             DataContext = editProcessVM;
         }
 

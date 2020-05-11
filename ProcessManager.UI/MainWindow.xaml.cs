@@ -12,11 +12,10 @@
             InitializeComponent();
         }
 
-        public MainWindow(MainWindowViewModel viewModel) :
-            this()
+        public MainWindow(MainWindowViewModel viewModel) 
         {
             DataContext = viewModel;
+            InitializeComponent();
         }
-
     };
 };

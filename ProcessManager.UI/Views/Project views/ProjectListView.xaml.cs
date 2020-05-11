@@ -13,9 +13,9 @@
             InitializeComponent();
         }
 
-        public ProjectListView(ProjectsListViewModel viewModel) :
-            this()
+        public ProjectListView(ProjectsListViewModel viewModel)
         {
+            InitializeComponent();
             DataContext = viewModel;
         }
 

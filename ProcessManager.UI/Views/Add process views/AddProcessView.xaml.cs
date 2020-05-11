@@ -12,9 +12,9 @@
             InitializeComponent();
         }
 
-        public AddProcessView(AddProcessViewModel viewModel) : 
-            this()
+        public AddProcessView(AddProcessViewModel viewModel) 
         {
+            InitializeComponent();
             DataContext = viewModel;
         }
     }
