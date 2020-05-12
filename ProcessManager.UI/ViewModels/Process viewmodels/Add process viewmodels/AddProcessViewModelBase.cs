@@ -6,7 +6,7 @@
 
 
     /// <summary>
-    /// A base class for <see cref="AddProcessViewModel"/>, and <see cref="AddConsoleProcessViewModel"/> to extend functionality
+    /// A base class for <see cref="AddGUIProcessViewModel"/>, and <see cref="AddConsoleProcessViewModel"/> to extend functionality
     /// </summary>
     public class AddProcessViewModelBase : BaseViewModel
     {

@@ -7,9 +7,9 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AddProcessViewModel : AddProcessViewModelBase
+    public class AddGUIProcessViewModel : AddProcessViewModelBase
     {
-        public static AddProcessViewModel DesignInstance => new AddProcessViewModel()
+        public static AddGUIProcessViewModel DesignInstance => new AddGUIProcessViewModel()
         {
             SelectedProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetRandomFileName()}",
         };
@@ -85,8 +85,8 @@
         #endregion
 
 
-        private AddProcessViewModel() { }
-        public AddProcessViewModel(ProjectItemViewModel projectVM)
+        private AddGUIProcessViewModel() { }
+        public AddGUIProcessViewModel(ProjectItemViewModel projectVM)
         {
             ProjectVM = projectVM;
 

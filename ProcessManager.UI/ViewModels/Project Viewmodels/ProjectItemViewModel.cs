@@ -95,7 +95,7 @@
 
         private void ExecuteAddNewProcessCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(this));
+            DI.MainWindowViewModel.CurrentView = new AddGUIProcessView(new AddGUIProcessViewModel(this));
         }
 
 
