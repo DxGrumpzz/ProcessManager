@@ -112,7 +112,7 @@
 
         public string ProcessLabel { get; set; }
 
-        public virtual bool IsRunning => ProcessRunning(_processPointer);
+        public bool IsRunning => ProcessRunning(_processPointer);
 
         public ProcessVisibilityState VisibilityState { get; private set; }
 

@@ -8,8 +8,6 @@
     /// </summary>
     public class ConsoleProcess : ProcessBase
     {
-        public override bool IsRunning => ProcessRunning(_processPointer);
-
 
         /// <summary>
         /// If user decides to run as CMD this will store the console script

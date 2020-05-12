@@ -8,8 +8,6 @@
     /// </summary>
     public class GUIProcess : ProcessBase
     {
-        public override bool IsRunning => ProcessRunning(_processPointer);
-
         public override event Action<IProcessModel> ProcessClosedCallback;
         public override event Action<IProcessModel> ProcessInitializedCallback;
 
