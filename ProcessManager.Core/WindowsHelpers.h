@@ -6,6 +6,7 @@
 #include <comdef.h>
 #include <iostream>
 #include <atlbase.h>
+#include <vector>
 
 // Takes a DWORD error code and returns its string message 
 static std::wstring GetLastErrorAsStringW()
@@ -86,7 +87,7 @@ static std::wstring FormatCOMError(HRESULT error, int line)
 
 // Calls the windows Directory dialog using COM.
 // Returns the path to the opened folder
-extern "C" _declspec(dllexport) bool OpenDirectoryDialog(wchar_t*& path)
+extern "C" _declspec(dllexport) inline bool OpenDirectoryDialog(wchar_t*& path)
 {
     // The file dialog modal window 
     CComPtr<IFileDialog> fileDialog;
@@ -120,7 +121,7 @@ extern "C" _declspec(dllexport) bool OpenDirectoryDialog(wchar_t*& path)
 
 
 // Opens the IFileDialog from an existing path
-extern "C" _declspec(dllexport) bool OpenDirectoryDialogFrom(wchar_t*& path, const wchar_t* openFrom, wchar_t*& errorStringOut)
+extern "C" _declspec(dllexport) inline bool OpenDirectoryDialogFrom(wchar_t*& path, const wchar_t* openFrom, wchar_t*& errorStringOut)
 {
     // The file dialog modal window 
     CComPtr<IFileDialog> fileDialog;
@@ -285,7 +286,7 @@ static std::vector<HWND> GetProcessHWNDs(DWORD processID)
 }
 
 
-extern "C" _declspec(dllexport) void FreeOutErrorString(wchar_t*& errorStringOut)
+extern "C" _declspec(dllexport) inline void FreeOutErrorString(wchar_t*& errorStringOut)
 {
     delete[] errorStringOut;
     errorStringOut = nullptr;

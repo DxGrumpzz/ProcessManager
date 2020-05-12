@@ -4,6 +4,8 @@
 #include <chrono>
 #include <mutex>
 
+#include "WindowsHelpers.h"
+
 typedef void(*ProcessClosedCallBack)(class ProcessModel*);
 
 
@@ -13,24 +15,6 @@ class ProcessModel
 
 private:
 
-    // A struct that stores information about a process in-between WNDENUMPROC calls
-    struct EnumProcParam
-    {
-        // The process' PID
-        DWORD ProcessID = NULL;
-
-        // An "out" variable that will contain the process' main window HWND
-        HWND HwndOut = NULL;
-
-        // A timing varialbe used to keep track of when the process HWND search has started
-        std::chrono::steady_clock::time_point StartTime = std::chrono::steady_clock::now();
-
-        // How long to keep searching for 
-        int TimeoutMS = 0;
-
-        // A boolean flag that indicates if the search has timed out
-        bool TimedOut = false;
-    };
 
     // A handle used in RegisterWaitForSingleObject function 
     HANDLE _registerCallbackHandle;
@@ -229,7 +213,7 @@ private:
         ResumeProcess();
 
         // Find the process main WindowHandle
-        MainWindowHandle = GetProcessHWND();
+        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId);
 
         return true;
     };
@@ -270,7 +254,7 @@ private:
         ResumeProcess();
 
         // Find main window HWND
-        MainWindowHandle = GetProcessHWND();
+        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId);
 
         return true;
     };
@@ -309,73 +293,6 @@ private:
 
         return false;
     };
-
-
-    // Returns a process' MainWindow handle
-    HWND GetProcessHWND(int msTimeout = 3000)
-    {
-        // Create a WndEnumProcParam struct to hold the data
-        EnumProcParam wndEnumProcParam;
-        wndEnumProcParam.ProcessID = ProcessInfo.dwProcessId;
-        wndEnumProcParam.HwndOut = NULL;
-        wndEnumProcParam.StartTime = std::chrono::steady_clock::now();
-        wndEnumProcParam.TimeoutMS = msTimeout;
-
-
-        // Continue iteration while the out HWND variable is null
-        while (wndEnumProcParam.HwndOut == NULL)
-        {
-            // This function iterates through every top-level window,
-            EnumWindows([](HWND handle, LPARAM lParam) -> BOOL
-            {
-                // Only if the current window is visible to the user
-                if (IsWindowVisible(handle) == TRUE)
-                {
-                    // Convert the LPARAM to WndEnumProcParam
-                    EnumProcParam& enumProcParam = *reinterpret_cast<EnumProcParam*>(lParam);
-
-                    // Get the current time 
-                    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-
-                    // Get elapsed time 
-                    auto elapsedTimeInMS = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - enumProcParam.StartTime).count();
-
-                    // Check if we didn't timeout
-                    if (elapsedTimeInMS >= enumProcParam.TimeoutMS)
-                    {
-                        enumProcParam.TimedOut = true;
-                        return FALSE;
-                    };
-
-                    // Get the process PID
-                    DWORD currentProcess = 0;
-                    GetWindowThreadProcessId(handle, &currentProcess);
-
-                    // Compare the id's, 
-                    // if they match
-                    if (enumProcParam.ProcessID == currentProcess)
-                    {
-                        // Set the HWND out variable 
-                        enumProcParam.HwndOut = handle;
-
-                        // Return false(0) to stop the window iteration 
-                        return FALSE;
-                    };
-                };
-
-                return TRUE;
-            }, reinterpret_cast<LPARAM>(&wndEnumProcParam));
-
-            if (wndEnumProcParam.TimedOut == true)
-            {
-                return NULL;
-            };
-        };
-
-
-        return wndEnumProcParam.HwndOut;
-    }
-
 
     // A function that will be called when the process closes
     static void __stdcall ProcessHandleClosed(PVOID lpParameter, BOOLEAN timerOrWaitFired)
