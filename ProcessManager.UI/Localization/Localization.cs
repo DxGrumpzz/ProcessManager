@@ -23,7 +23,6 @@
         /// <summary>
         /// Path to app TrayIcon
         /// </summary>
-        public const string APP_ICON_LOCATION = "Resources\\Icon\\" + APP_ICON_WHITE;
-
+        public const string APP_ICON_LOCATION = "Resources\\Images\\Icon\\" + APP_ICON_WHITE;
     };
 };

@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <StartupObject></StartupObject>
-    <ApplicationIcon>Kiwi_White.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Images\Icon\Kiwi_White.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,6 +30,7 @@
     <None Remove="Resources\Fonts\Lato-Regular.ttf" />
     <None Remove="Resources\Fonts\Lato-Thin.ttf" />
     <None Remove="Resources\Fonts\Lato-ThinItalic.ttf" />
+    <None Remove="Resources\Images\Process Type\GUI_APP.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
     <Resource Include="Resources\Fonts\IndieFlower-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Thin.ttf" />
+    <Resource Include="Resources\Images\Process Type\GUI_APP.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,7 +54,7 @@
     <None Update="Projects.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Icon\Kiwi_White.ico">
+    <None Update="Resources\Images\Icon\Kiwi_White.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
