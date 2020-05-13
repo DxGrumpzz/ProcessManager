@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.Windows;
+    using System.Linq;
     using System.Windows.Controls;
 
 
@@ -68,41 +69,63 @@
         }
     };
 
-    public static class DisableDataGridSelection
+    /// <summary>
+    /// An attached property that sets the width of every element in a panel to a set width dictated by the largest control
+    /// </summary>
+    public class UniformWidth
     {
-        public static bool GetValue(DependencyObject obj)
+        public static bool GetUniformWidth(DependencyObject obj)
         {
-            return (bool)obj.GetValue(ValueProperty);
+            return (bool)obj.GetValue(UniformWidthProperty);
         }
 
-        public static void SetValue(DependencyObject obj, bool value)
+        public static void SetUniformWidth(DependencyObject obj, bool value)
         {
-            obj.SetValue(ValueProperty, value);
+            obj.SetValue(UniformWidthProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ValueProperty =
+        // Using a DependencyProperty as the backing store for UniformWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UniformWidthProperty =
             DependencyProperty.RegisterAttached(
-                "Value",
+                "UniformWidth",
                 typeof(bool),
-                typeof(DisableDataGridSelection),
-                new PropertyMetadata(false, ValuePropertyChanged));
+                typeof(UniformWidth),
+                new PropertyMetadata(false, UniformWidthPropertyChanged));
 
-        private static void ValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void UniformWidthPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is DataGrid dataGrid))
+            // Don't do anything if the calling object isn't a panel
+            if (!(d is Panel panel))
             {
                 Debugger.Break();
                 return;
             };
 
-            bool disableSelection = (bool)e.NewValue;
-
-            if (disableSelection == true)
-                dataGrid.SelectionChanged += (sender, evnt) =>
+            // If uniform width is requested
+            if ((bool)e.NewValue == true)
+            {
+                // An event handler that will be called when the control is loaded
+                void loadedHandler(object sender, RoutedEventArgs e)
                 {
-                    evnt.Handled = true;
+                    // Get the panel's children as an enumerable of FrameworkElement
+                    var children = panel.Children.Cast<FrameworkElement>();
+
+                    // Find child widest child
+                    double biggestWidth = children.Max(child => child.ActualWidth);
+
+                    // Set uniform width to all panel children
+                    foreach (var child in children)
+                    {
+                        child.Width = biggestWidth;
+                    };
                 };
+
+                // Bing loaded event
+                panel.Loaded -= loadedHandler;
+                panel.Loaded += loadedHandler;
+            };
+
         }
+
     };
 };
