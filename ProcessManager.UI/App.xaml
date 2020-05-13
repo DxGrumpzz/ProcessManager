@@ -17,9 +17,12 @@
                 <ResourceDictionary Source="Styles/TextStyles.xaml"/>
 
                 <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
+                
+                <ResourceDictionary Source="Styles/Icons.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>
-            
+
+
         </ResourceDictionary>
         
     </Application.Resources>
