@@ -8,17 +8,17 @@
     /// <summary>
     /// A value converter that takes a <see cref="ProcessType"/> and returns a string based on it's value
     /// </summary>
-    public class ProcessTypeToEditTextConverter : BaseValueConverter<ProcessTypeToEditTextConverter>
+    public class ProcessTypeToTextConverter : BaseValueConverter<ProcessTypeToTextConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             switch ((ProcessType)value)
             {
                 case ProcessType.Console:
-                    return "Edit as console";
+                    return "Console process";
 
                 case ProcessType.GUI:
-                    return "Edit as GUI";
+                    return "GUI process";
 
                 default:
                 {
