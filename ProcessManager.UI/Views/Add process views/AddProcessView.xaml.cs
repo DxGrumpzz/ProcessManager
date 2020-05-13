@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System;
     using System.Windows.Controls;
 
     /// <summary>
@@ -7,15 +8,17 @@
     /// </summary>
     public partial class AddProcessView : UserControl
     {
+
         public AddProcessView()
         {
             InitializeComponent();
         }
 
-        public AddProcessView(AddProcessViewModel viewModel) 
+        public AddProcessView(AddProcessViewModel viewModel)
         {
-            InitializeComponent();
             DataContext = viewModel;
+            InitializeComponent();
         }
-    }
-}
+
+    };
+};

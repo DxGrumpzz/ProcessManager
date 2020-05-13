@@ -5,92 +5,150 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ProcessManager.UI"
              mc:Ignorable="d" 
-             
-             d:DesignHeight="250" 
-             d:DesignWidth="500"
+
+             d:DesignHeight="450" 
+             d:DesignWidth="705"
              
              d:DataContext="{x:Static local:AddProcessViewModel.DesignInstance}">
 
 
-    <StackPanel Margin="10" 
-                local:UniformMargin.Margin="0,0,0,10">
+    <Grid Margin="10">
 
-        <!-- Back to Main page or project buttons -->
-        <StackPanel HorizontalAlignment="Left"
-                    
-                    Orientation="Horizontal">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-            <Button Content="Back to project page" 
-                    
-                    Command="{Binding BackToProjectPageCommand}"/>
 
-            <Button Content="Back to main page" 
+        <!-- Project name title, and titlebar-->
+        <StackPanel>
+
+            <!-- The name of the project -->
+            <TextBlock Text="{Binding Project.Project.ProjectName}"
+                   
+                       FontSize="20"/>
+
+            <!-- Project path -->
+            <TextBlock Text="{Binding Project.Project.ProjectPath}"
+                   
+                       FontFamily="{StaticResource LatoThin}"
+                       FontWeight="Thin"
+                       FontSize="15"
+                
+                       Cursor="Hand"
+                       
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,10">
+
+                <TextBlock.InputBindings>
+                    <MouseBinding MouseAction="LeftClick"
+                                  Command="{Binding OpenProjectDirectoryCommand}"/>
+                </TextBlock.InputBindings>
+
+            </TextBlock>
+
+            <!-- Title bar -->
+            <Border Background="{StaticResource LightGreyBrush}"
                     
-                    Margin="5,0,0,0"
-                    
-                    Command="{Binding BackToMainPageCommand}"/>
+                    Padding="10,5"
+                    Margin="-10,0">
+
+                <DockPanel LastChildFill="False">
+
+                    <!--Add new project button-->
+                    <Button Content="Back"
+                        
+                            Command="{Binding SwitchToProjectPageCommand}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                    <!-- Add console process button -->
+                    <Button Content="Back to main page "
+                        
+                            Margin="10,0,0,0"
+                            
+                            Command="{Binding SwitchToMainPageCommand}"
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                </DockPanel>
+
+            </Border>
 
         </StackPanel>
 
 
-        <TextBlock Text="Run a process as a GUI application"/>
+
+        <ItemsControl ItemsSource="{Binding ProcessTypes}"
+                      
+                      HorizontalAlignment="Center"
+                      
+                      Margin="-5,10,-5,0"
+                      
+                      Grid.Row="1">
+
+            <ItemsControl.ItemTemplate>
+
+                <DataTemplate>
+
+                    <Border CornerRadius="8"
+                            
+                            MinHeight="40"
+                            MaxHeight="90"
+                            
+                            Margin="5,0,5,10"
+                            Padding="5"
+                            
+                            BorderThickness="1"
+                            Background="Transparent"
+                            BorderBrush="Black">
 
 
-        <!-- Select process button and text -->
-        <StackPanel Margin="0,10,0,0">
+                        <Grid>
 
-            <Button Content="Select process"
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="AUTO"/>
+                            </Grid.RowDefinitions>
+
+
+                            <Image Source="{Binding
+                                   Converter={local:ProcessTypeToImageValueConverter}}"
+                                RenderOptions.BitmapScalingMode="Fant">
+                                
+                            </Image>
+
+
+                            <TextBlock Text="{Binding
+                                       Converter={local:ProcessTypeToTextConverter}}"
+                                  
+                                       TextAlignment="Center"
+                                       
+                                       Grid.Row="1"/>
+
+                        </Grid>
                     
-                    HorizontalAlignment="Left"
+                    </Border>
                     
-                    Command="{Binding SelectProcessCommand}"/>
+                </DataTemplate>
 
-            <TextBox x:Name="ProcessPathTextBox" 
-                     
-                     Text="{Binding SelectedProcessPath, UpdateSourceTrigger=PropertyChanged}"
-                     
-                     local:PlaceHolder.Text="A path to the process"
-                     
-                     Style="{StaticResource PlaceholderTextbox}"/>
+            </ItemsControl.ItemTemplate>
 
-        </StackPanel>
-
-
-        <!-- Process args -->
-        <TextBox local:PlaceHolder.Text="Process args (space separated, Optional)"
-                 
-                 Text="{Binding ProcessAgs}"
-                 
-                 Style="{StaticResource PlaceholderTextbox}"/>
-
-        <!-- Process label -->
-        <TextBox local:PlaceHolder.Text="Process label (Optional)"
-                 
-                 Text="{Binding ProcessLabel}"
-                 
-                 Style="{StaticResource PlaceholderTextbox}"/>
-
-
-
-        <!-- Process visible on startup -->
-        <CheckBox Content="Process visible onstartup"
-                  
-                  
-                  IsChecked="{Binding ProcessVisibleOnStartup}"/>
-
-
-        <!-- Add process button -->
-        <Button Content="Add process"
+            
+            <ItemsControl.ItemsPanel>
                 
-                Padding="5,0"
+                <ItemsPanelTemplate>
+
+                    <WrapPanel Orientation="Horizontal"
+                               local:UniformWidth.UniformWidth="True"/>
+
+                </ItemsPanelTemplate>
                 
-                Margin="0,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                
-                Command="{Binding AddProcessCommand}"/>
+            </ItemsControl.ItemsPanel>
+
+        </ItemsControl>
 
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>
