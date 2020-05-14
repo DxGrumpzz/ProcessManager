@@ -1,0 +1,13 @@
+{
+    "ProjectNamespace": "ProcessManager.UI",
+
+    "NamespaceIncludes":
+    [
+        "System.Windows"
+    ],
+
+    "ExtensionClassName": "ResourcesExtensions",
+
+    "ResourcesFilePath": "C:\\Development\\Projects\\ProcessManager\\ProcessManager.UI\\Styles\\Icons.xaml",
+    "OutputFilePath": "C:\\Development\\Projects\\ProcessManager\\ProcessManager.UI\\Extension methods\\ResourcesExtensions.cs"
+}
