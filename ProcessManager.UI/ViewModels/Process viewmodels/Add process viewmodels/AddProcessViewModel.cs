@@ -51,18 +51,10 @@
             var processTypes = Enum.GetValues(typeof(ProcessType));
             ProcessTypes = new List<ProcessType>(processTypes.Length);
 
-            for (int a = 0; a < 25; a++)
+            foreach (ProcessType processType in processTypes)
             {
-                if(a % 2 == 0)
-                    ProcessTypes.Add(ProcessType.Console);
-                else
-                    ProcessTypes.Add(ProcessType.GUI);
+                ProcessTypes.Add(processType);
             };
-
-            //foreach(ProcessType processType in processTypes)
-            //{
-            //    ProcessTypes.Add(processType);
-            //};
 
         }
 
