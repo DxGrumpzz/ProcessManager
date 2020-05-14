@@ -92,8 +92,7 @@
 
                 <Grid.InputBindings>
 
-                    <MouseBinding MouseAction="LeftClick"
-                              Command="{Binding TextClickedCommand}"/>
+                    <MouseBinding MouseAction="LeftClick"/>
 
                 </Grid.InputBindings>
 
