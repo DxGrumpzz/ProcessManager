@@ -20,6 +20,16 @@ private:
     // A handle used in RegisterWaitForSingleObject function 
     HANDLE _registerCallbackHandle;
 
+
+    // A boolean flag that indicates that this process is initializing
+    bool _isInitializing = false;
+
+    // A boolean flag that indicates that this process is closing
+    bool _isClosing = false;
+
+    // A mutex that is shared between the close and run calls
+    std::mutex _processInitializationCloseMutex;
+
 public:
 
     // A struct that contains information about this process
@@ -40,7 +50,7 @@ public:
 
     // A boolean flag that indicates if this process is to run as a console script
     bool RunAsConsole;
-    
+
     // A boolean flag that indicates if this process will be visible when it's initialized
     bool VisibleOnStartup;
 
@@ -73,7 +83,7 @@ public:
         ProcessArgs(L""),
 
         RunAsConsole(false),
-        
+
         VisibleOnStartup(true),
 
         ConsoleScript(L""),
@@ -85,12 +95,6 @@ public:
         StartupInfo.cb = sizeof(StartupInfo);
     };
 
-private:
-
-    bool _isInitializing = false;
-    bool _isClosing = false;
-
-        std::mutex _mutex;
 
 public:
 
@@ -98,7 +102,7 @@ public:
     // Run the process and return boolean result
     bool RunProcess()
     {
-        std::lock_guard< std::mutex>lock(_mutex);
+        std::lock_guard< std::mutex>lock(_processInitializationCloseMutex);
 
         if (_isInitializing == true || _isClosing == true)
             return false;
@@ -133,7 +137,7 @@ public:
     // Closes the process
     bool CloseProcess()
     {
-        std::lock_guard< std::mutex>lock(_mutex);
+        std::lock_guard< std::mutex>lock(_processInitializationCloseMutex);
 
         if (_isInitializing == true || _isClosing == true)
             return false;
@@ -157,7 +161,7 @@ public:
             _isClosing = false;
             return false;
         };
-    
+
     };
 
     void ForceCloseProcess()
