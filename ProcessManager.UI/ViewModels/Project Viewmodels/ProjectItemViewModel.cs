@@ -47,6 +47,8 @@
 
         public ICommand DeleteProjectCommand { get; }
 
+        public ICommand OpenProjectDirectoryCommand { get; }
+
         #endregion
 
 
@@ -60,6 +62,9 @@
             AddNewConsoleProcessCommand = new RelayCommand(ExecuteAddNewConsoleProcessCommand);
 
             DeleteProjectCommand = new RelayCommand(ExecuteDeleteProjectCommand);
+
+            OpenProjectDirectoryCommand = new RelayCommand(() =>
+            DI.FolderDialog.OpenFolder(Project.ProjectPath));
         }
 
 
