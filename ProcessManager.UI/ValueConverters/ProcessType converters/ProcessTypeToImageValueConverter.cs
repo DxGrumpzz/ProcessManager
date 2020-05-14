@@ -15,12 +15,12 @@
             {
                 case ProcessType.Console:
                 {
-                    return App.Current.Resources["GUIProcessImage"];
+                    return App.Current.Resources.GetConsoleProcessImage();
                 };
 
                 case ProcessType.GUI:
                 {
-                    return App.Current.Resources["ConsoleProcessImage"];
+                    return App.Current.Resources.GetGUIProcessImage();
                 };
 
                 default:
