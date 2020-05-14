@@ -9,7 +9,9 @@
              d:DesignHeight="450" 
              d:DesignWidth="705"
              
-             d:DataContext="{x:Static local:AddProcessViewModel.DesignInstance}">
+             d:DataContext="{x:Static local:AddProcessViewModel.DesignInstance}"
+             
+             x:Name="MainUserControl">
 
 
     <Grid Margin="10">
@@ -77,8 +79,8 @@
 
         </StackPanel>
 
-
-
+        
+        <!-- A list of process types the user can choose from -->
         <ItemsControl ItemsSource="{Binding ProcessTypes}"
                       
                       HorizontalAlignment="Center"
@@ -91,40 +93,67 @@
 
                 <DataTemplate>
 
-                    <Border CornerRadius="8"
+                    
+                    <Border x:Name="MainBorder" 
                             
+                            CornerRadius="8"
+                                    
                             MinHeight="40"
                             MaxHeight="90"
                             
                             Margin="5,0,5,10"
-                            Padding="5"
                             
                             BorderThickness="1"
                             Background="Transparent"
                             BorderBrush="Black">
 
 
-                        <Grid>
+                        <Grid local:UniformMargin.Margin="5">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="AUTO"/>
                             </Grid.RowDefinitions>
 
-
+                            <!-- An image for the process type -->
                             <Image Source="{Binding
                                    Converter={local:ProcessTypeToImageValueConverter}}"
-                                RenderOptions.BitmapScalingMode="Fant">
-                                
-                            </Image>
+                                    
+                                   RenderOptions.BitmapScalingMode="Fant"/>
 
 
+
+                            <!-- A textblock describing the process -->
                             <TextBlock Text="{Binding
                                        Converter={local:ProcessTypeToTextConverter}}"
                                   
                                        TextAlignment="Center"
                                        
                                        Grid.Row="1"/>
+
+
+                            <!-- An invisible control used for intercepting user click and switch to the actuall ad process view-->
+                            <Border Grid.RowSpan="2"
+                                    
+                                    Cursor="Hand"
+                                    
+                                    Background="Transparent"
+                                    
+                                    DataContext="{Binding ElementName=MainUserControl, 
+                                    Path=DataContext}"
+                                    
+                                    Margin="-5">
+
+                                <Border.InputBindings>
+
+                                    <MouseBinding MouseAction="LeftClick"
+                                              
+                                                  Command="{Binding SwitchToAddProcessViewCommand}"
+                                                  CommandParameter="{Binding ElementName=MainBorder, Path=DataContext}"/>
+
+                                </Border.InputBindings>
+
+                            </Border>
 
                         </Grid>
                     

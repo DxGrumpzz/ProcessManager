@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Windows.Input;
 
 
@@ -28,6 +27,7 @@
         public ICommand SwitchToMainPageCommand { get; }
         public ICommand OpenProjectDirectoryCommand { get; }
 
+        public ICommand SwitchToAddProcessViewCommand { get; }
 
         public AddProcessViewModel(ProjectItemViewModel project)
         {
@@ -37,14 +37,36 @@
 
             SwitchToProjectPageCommand = new RelayCommand(() =>
             DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
-            
+
             SwitchToMainPageCommand = new RelayCommand(() =>
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects)));
 
             OpenProjectDirectoryCommand = new RelayCommand(() =>
             DI.FolderDialog.OpenFolder(Project.Project.ProjectPath));
+
+            SwitchToAddProcessViewCommand = new RelayCommand<ProcessType>(ExecuteSwitchToAddProcessViewCommand);
         }
 
+
+        private void ExecuteSwitchToAddProcessViewCommand(ProcessType processType)
+        {
+            // Switch to the appropriate "Add(processType)View 
+            switch (processType)
+            {
+                case ProcessType.Console:
+                {
+                    DI.MainWindowViewModel.CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(Project));
+                    break;
+                };
+
+                case ProcessType.GUI:
+                {
+                    DI.MainWindowViewModel.CurrentView = new AddGUIProcessView(new AddGUIProcessViewModel(Project));
+                    break;
+                };
+            };
+
+        }
 
         private void SetupProcessTypes()
         {

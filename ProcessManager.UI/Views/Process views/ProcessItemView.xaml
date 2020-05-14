@@ -85,8 +85,6 @@
              
                   Background="Transparent"
                   
-                  x:Name="ProcessNameGrid"
-                  
                   local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
                   local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
 
