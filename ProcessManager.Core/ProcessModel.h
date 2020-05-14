@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <mutex>
+#include <filesystem>
 
 #include "WindowsHelpers.h"
 
@@ -84,13 +85,27 @@ public:
         StartupInfo.cb = sizeof(StartupInfo);
     };
 
+private:
+
+    bool _isInitializing = false;
+    bool _isClosing = false;
+
+        std::mutex _mutex;
 
 public:
+
 
     // Run the process and return boolean result
     bool RunProcess()
     {
-        // In windows, process initialization is different depending if the "process" is a cmd script or a GUI process
+        std::lock_guard< std::mutex>lock(_mutex);
+
+        if (_isInitializing == true || _isClosing == true)
+            return false;
+
+        _isInitializing = true;
+
+        // In Windows, process initialization is different depending if the "process" is a cmd script or a GUI process
         // So we run different functions depending on the "type" of process
 
         bool result = false;
@@ -111,13 +126,21 @@ public:
             ProcessInitializedCallback(this);
         };
 
-
+        _isInitializing = false;
         return result;
     };
 
     // Closes the process
     bool CloseProcess()
     {
+        std::lock_guard< std::mutex>lock(_mutex);
+
+        if (_isInitializing == true || _isClosing == true)
+            return false;
+
+
+        _isClosing = true;
+
         if (IsRunning() == true)
         {
             // Send a close message to the process window and wait for response
@@ -126,12 +149,16 @@ public:
             // Close process handles
             CleanProcessHandles();
 
+            _isClosing = false;
             return true;
         }
         else
+        {
+            _isClosing = false;
             return false;
+        };
+    
     };
-
 
     void ForceCloseProcess()
     {
