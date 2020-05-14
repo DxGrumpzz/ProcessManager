@@ -17,6 +17,8 @@
 ProcessManager/Processes.txt
 *Processes.txt
 *ProcessList.json
+/ProcessManager.UI/Extension methods/ResourcesExtensions.cs
+
 
 # Build results
 [Dd]ebug/
