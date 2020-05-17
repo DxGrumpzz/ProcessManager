@@ -30,7 +30,9 @@
     <None Remove="Resources\Fonts\Lato-Regular.ttf" />
     <None Remove="Resources\Fonts\Lato-Thin.ttf" />
     <None Remove="Resources\Fonts\Lato-ThinItalic.ttf" />
+    <None Remove="Resources\Images\Process Type\Console_Process.png" />
     <None Remove="Resources\Images\Process Type\GUI_APP.png" />
+    <None Remove="Resources\Images\Process Type\GUI_Process.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +43,8 @@
     <Resource Include="Resources\Fonts\IndieFlower-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Thin.ttf" />
-    <Resource Include="Resources\Images\Process Type\GUI_APP.png" />
+    <Resource Include="Resources\Images\Process Type\Console_Process.png" />
+    <Resource Include="Resources\Images\Process Type\GUI_Process.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,5 +67,9 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;C:\Development\Projects\ProcessManager\BuildResourceExtensionsFile\bin\Debug\netcoreapp3.1\BuildResourceExtensionsFile.exe&quot;" />
+  </Target>
 
 </Project>
