@@ -8,7 +8,7 @@ namespace ProcessManager.UI
     /// <summary>
     /// 
     /// </summary>
-    public class AddConsoleProcessViewModel : AddProcessViewModelBase
+    public class AddConsoleProcessViewModel : BaseViewModel
     {
         public static AddConsoleProcessViewModel DesignInstance => new AddConsoleProcessViewModel()
         {

@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
@@ -7,7 +7,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AddGUIProcessViewModel : AddProcessViewModelBase
+    public class AddGUIProcessViewModel : BaseViewModel
     {
         public static AddGUIProcessViewModel DesignInstance => new AddGUIProcessViewModel()
         {
