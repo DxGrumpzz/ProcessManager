@@ -117,7 +117,7 @@ namespace ProcessManager.UI
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
             // Switch back to the 
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
+            DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
         }
     };
 };

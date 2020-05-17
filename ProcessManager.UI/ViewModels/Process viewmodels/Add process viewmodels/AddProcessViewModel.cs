@@ -9,7 +9,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AddProcessViewModel
+    public class AddProcessViewModel : BaseViewModel
     {
         public static AddProcessViewModel DesignInstance => new AddProcessViewModel(
             new ProjectItemViewModel(new Project()
@@ -36,10 +36,10 @@
             SetupProcessTypes();
 
             SwitchToProjectPageCommand = new RelayCommand(() =>
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
+            DI.UI.ChangeView(View.ProjectItemView, Project));
 
             SwitchToMainPageCommand = new RelayCommand(() =>
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects)));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects)));
 
             OpenProjectDirectoryCommand = new RelayCommand(() =>
             DI.FolderDialog.OpenFolder(Project.Project.ProjectPath));
@@ -55,13 +55,13 @@
             {
                 case ProcessType.Console:
                 {
-                    DI.MainWindowViewModel.CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(Project));
+                    DI.UI.ChangeView(View.AddConsoleProcessView, new AddConsoleProcessViewModel(Project));
                     break;
                 };
 
                 case ProcessType.GUI:
                 {
-                    DI.MainWindowViewModel.CurrentView = new AddGUIProcessView(new AddGUIProcessViewModel(Project));
+                    DI.UI.ChangeView(View.AddGUIProcessView, new AddGUIProcessViewModel(Project));
                     break;
                 };
             };

@@ -47,10 +47,11 @@
 
 
             BackToProjectPageCommand = new RelayCommand(() =>
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM));
+            DI.UI.ChangeView(View.ProjectItemView, ProjectVM));
 
             BackToMainPageCommand = new RelayCommand(() =>
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects)));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects)));
+
         }
 
 
@@ -75,7 +76,7 @@
                 File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
                 // Switch back to the project's view
-                DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
+                DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
             };
         }
 

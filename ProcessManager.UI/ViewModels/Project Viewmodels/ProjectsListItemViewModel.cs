@@ -94,7 +94,7 @@
 
         private void ExecuteSwitchToProjectViewCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(new ProjectItemViewModel(Project));
+            DI.UI.ChangeView(View.ProjectItemView, new ProjectItemViewModel(Project));
         }
 
     };

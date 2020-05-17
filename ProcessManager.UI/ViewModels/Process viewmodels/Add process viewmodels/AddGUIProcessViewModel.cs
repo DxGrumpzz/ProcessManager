@@ -104,7 +104,7 @@
             SwitchToProcessSelectionViewCommand = new RelayCommand(ExecuteSwitchToProcessSelectionViewCommand);
 
             SwitchToProjectViewCommand = new RelayCommand(() =>
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
+            DI.UI.ChangeView(View.ProjectItemView, Project));
 
 
             AddProcessCommand = new RelayCommand(
@@ -159,12 +159,12 @@
 
         private void ExecuteBackToMainPageCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
         }
 
         private void ExecuteSwitchToProcessSelectionViewCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(Project));
+            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(Project));
         }
 
     };

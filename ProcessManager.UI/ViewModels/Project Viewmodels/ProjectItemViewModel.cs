@@ -3,13 +3,12 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
     using System.Windows.Input;
 
     /// <summary>
     /// 
     /// </summary>
-    public class ProjectItemViewModel
+    public class ProjectItemViewModel : BaseViewModel
     {
         public static ProjectItemViewModel DesignInstance => new ProjectItemViewModel(new Project()
         {
@@ -95,24 +94,24 @@
 
         private void ExecuteAddNewConsoleProcessCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(this));
+            DI.UI.ChangeView(View.AddConsoleProcessView, new AddConsoleProcessViewModel(this));
         }
 
         private void ExecuteAddNewProcessCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(this));
+            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(this));
         }
 
 
 
         private void ExecuteGotoMainPageommnad()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
         }
 
         private void SwitchToProjectListView()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
         }
 
     };

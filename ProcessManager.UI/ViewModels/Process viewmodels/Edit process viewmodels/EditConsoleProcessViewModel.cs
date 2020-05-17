@@ -107,7 +107,7 @@
 
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
+            DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
         }
     };
 };

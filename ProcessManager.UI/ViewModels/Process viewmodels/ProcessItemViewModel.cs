@@ -206,14 +206,14 @@ namespace ProcessManager.UI
 
         private void ExecuteEditProcessCommand()
         {
-            switch (Process)
+            switch (Process.ProcessType)
             {
-                case ConsoleProcess _:
-                    DI.MainWindowViewModel.CurrentView = new EditConsoleProcessView(new EditConsoleProcessViewModel(Project, this));
+                case ProcessType.Console:
+                    DI.UI.ChangeView(View.EditConsoleProcessView, new EditConsoleProcessViewModel(Project, this));
                     break;
 
-                case GUIProcess _:
-                    DI.MainWindowViewModel.CurrentView = new EditGUIProcessView(new EditGUIProcessViewModel(Project, this));
+                case ProcessType.GUI:
+                    DI.UI.ChangeView(View.EditConsoleProcessView, new EditGUIProcessViewModel(Project, this));
                     break;
 
             };

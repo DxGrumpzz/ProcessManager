@@ -99,11 +99,12 @@ namespace ProcessManager.UI
             
             SwitchToProcessSelectionViewCommand = new RelayCommand(() =>
             // Go back to process type selection view
-            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(Project)));
+            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(Project)));
+
 
             BackToProjectPageCommand = new RelayCommand(() =>
             // Go back to the project item view
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
+            DI.UI.ChangeView(View.ProjectItemView, Project));
 
 
             AddProcessCommand = new RelayCommand(
@@ -147,7 +148,7 @@ namespace ProcessManager.UI
         private void ExecuteBackToMainPageCommand()
         {
             // Go back to to the projects list view
-            DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
         }
 
 
@@ -182,7 +183,7 @@ namespace ProcessManager.UI
             // Write the json to the project's config file
             File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project);
+            DI.UI.ChangeView(View.ProjectItemView, Project);
         }
 
     };
