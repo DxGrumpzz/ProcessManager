@@ -213,7 +213,7 @@ namespace ProcessManager.UI
                     break;
 
                 case ProcessType.GUI:
-                    DI.UI.ChangeView(View.EditConsoleProcessView, new EditGUIProcessViewModel(Project, this));
+                    DI.UI.ChangeView(View.EditGUIProcessView, new EditGUIProcessViewModel(Project, this));
                     break;
 
             };
