@@ -21,6 +21,8 @@
 
         <Setter Property="Cursor" Value="Hand"/>
 
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+
         <Setter Property="Opacity" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsEnabled}"/>
 
 
@@ -42,12 +44,11 @@
                             <!-- The 3 dots, and 1 "main" dot that all other dots "inherit" from -->
                             <Ellipse x:Name="MainEllipse"
                                                                  
-                                      Width="5"
+                                      Width="7"
                                       Height="{Binding Path=ActualWidth, 
                                       RelativeSource={RelativeSource Mode=Self}}"
                                       
                                       Fill="{TemplateBinding Foreground}"/>
-
 
                             <Ellipse Width="{Binding ElementName=MainEllipse, Path=ActualWidth}"
                                      Height="{Binding ElementName=MainEllipse, Path=ActualHeight}"
@@ -199,6 +200,7 @@
                                           VerticalAlignment="Center"/>
 
                     </Border>
+                    
 
                     <ControlTemplate.Triggers>
 
@@ -282,7 +284,7 @@
                                         
                             Background="{StaticResource LightGreyBrush}"
                             CornerRadius="4"
-                                        
+                            
                             Padding="10,5">
 
                         <!-- A content presenter -->
@@ -374,6 +376,125 @@
         </Setter>
 
     </Style>
+
+    
+    <Style x:Key="AppButtonDarkGrey" TargetType="{x:Type Button}">
+
+        <Setter Property="FontFamily" Value="{StaticResource LatoRegular}"/>
+
+        <Setter Property="Cursor" Value="Hand"/>
+
+        <Setter Property="Foreground" Value="{StaticResource WhiteBrush}"/>
+        <Setter Property="Background" Value="{StaticResource GreyBrush}"/>
+
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+
+        <Setter Property="Template">
+
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type Button}">
+
+                    <!-- The main border about the control -->
+                    <Border x:Name="MainBorder" 
+                                        
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            
+                            Padding="10,5">
+
+                        <!-- A content presenter -->
+                        <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+
+
+                            <!-- When mouse enters the control -->
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate the background to a grey colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetName="MainBorder"
+                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource WhiteColour}"/>
+
+
+                                        <!-- Animate the foreground(text) to a white colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource BlackColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+
+                            <!-- When mouse exists the control -->
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate the background to a light grey colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetName="MainBorder"
+                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource GreyColour}"/>
+
+
+                                        <!-- Animate the foreground(text) to a black colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource WhiteColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+                        <!-- When IsEnaled is true-->
+                        <Trigger Property="IsEnabled" Value="False">
+
+                            <!-- Set the control's opacity to half -->
+                            <Setter Property="Opacity" Value="0.5"/>
+
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+
+        </Setter>
+
+    </Style>
+
 
 
 </ResourceDictionary>
