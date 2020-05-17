@@ -12,32 +12,182 @@
              d:DataContext="{x:Static local:AddConsoleProcessViewModel.DesignInstance}">
 
 
-    <StackPanel Margin="10"
-                local:UniformMargin.Margin="0,0,0,10">
+    <Grid Margin="10">
 
-        <!-- Back to Main page or project buttons -->
-        <StackPanel HorizontalAlignment="Left"
-                    
-                    Orientation="Horizontal">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-            <Button Content="Back to project page" 
-                    
-                    Command="{Binding BackToProjectPageCommand}"/>
+        <!-- Project name title, and titlebar-->
+        <StackPanel>
 
-            <Button Content="Back to main page" 
+            <!-- The name of the project -->
+            <TextBlock Text="{Binding Project.Project.ProjectName}"
+                   
+                       FontSize="20"/>
+
+            <!-- Project path -->
+            <TextBlock Text="{Binding Project.Project.ProjectPath}"
+                   
+                       FontFamily="{StaticResource LatoThin}"
+                       FontWeight="Thin"
+                       FontSize="15"
+                
+                       Cursor="Hand"
+                       
+                       HorizontalAlignment="Left">
+
+                <TextBlock.InputBindings>
+                    <MouseBinding MouseAction="LeftClick"
+                                  Command="{Binding OpenProjectDirectoryCommand}"/>
+                </TextBlock.InputBindings>
+
+            </TextBlock>
+
+
+            <TextBlock Text="Add a process that will run directly from the cmd such as; a batch script, npm, etc.. directly from the console"
+                       
+                       FontWeight="Thin"
+                       FontFamily="{StaticResource LatoThin}"
+                       
+                       Margin="0,10,0,5"/>
+
+            <!-- Title bar -->
+            <Border Background="{StaticResource LightGreyBrush}"
                     
-                    Margin="5,0,0,0"
-                    
-                    Command="{Binding BackToMainPageCommand}"/>
+                    Padding="10,5"
+                    Margin="-10,0">
+
+                <StackPanel Orientation="Horizontal"
+                            
+                            local:UniformMargin.Margin="0,0,10,0">
+
+                    <!-- Back to process type selection view -->
+                    <Button Content="Back"
+                        
+                            Command="{Binding SwitchToProcessSelectionViewCommand}"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                    <!-- Back to project page (Projects list view) -->
+                    <Button Content="Back to project page"
+                        
+                            Command="{Binding BackToProjectPageCommand}"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                    <!-- Back to main page (Projects list view) -->
+                    <Button Content="Back to main page "
+                            
+                            Command="{Binding BackToMainPageCommand}"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
+
+
+                </StackPanel>
+
+            </Border>
 
         </StackPanel>
 
+        <!-- Console process settings -->
+        <StackPanel Grid.Row="1"
+                    
+                    Margin="0,10,0,0"
+                    
+                    local:UniformMargin.Margin="0,5">
 
-        <!-- Select process button and text -->
-        <TextBlock Text="Runs a process such as; batch script, npm, etc.. directly from the console"/>
+
+            <!-- Console directory, Select directory, and Select current directory options -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="AUTO"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox local:PlaceHolder.Text="The directory where the console will run from"
+                     
+                        Text="{Binding ConsoleDirectory, UpdateSourceTrigger=PropertyChanged}"
+                     
+                         Margin="0,0,10,0"
+                          
+                         Style="{StaticResource UnderlineTextbox}"/>
 
 
-        <!-- Select process button and text -->
+                <StackPanel Orientation="Horizontal"
+                            
+                            
+                            Grid.Column="1">
+                    
+                    <StackPanel.Resources>
+
+                        <!-- Apply uniform style for every button -->
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource DefaultAppButtonGrey}"/>
+
+                    </StackPanel.Resources>
+
+                    <Button Content="Select directory"
+                    
+                            Focusable="False"
+                            
+                            Margin="0,0,5,0"
+                            
+                            Command="{Binding SelectDirectoryCommand}"/>
+
+                    <Button Content="Select current directory"
+                            Focusable="False"
+                        
+                            Command="{Binding SelectCurrentDirectoryCommand}"/>
+
+                </StackPanel>
+
+            </Grid>
+
+
+            <!-- Process args -->
+            <TextBox local:PlaceHolder.Text="Console script" 
+                 
+                     Text="{Binding ConsoleScript}" 
+                 
+                     Style="{StaticResource UnderlineTextbox}"/>
+
+            <!-- Process label -->
+            <TextBox local:PlaceHolder.Text="Process label (Optional)"
+                 
+                    Text="{Binding ProcessLabel}"
+                 
+                    Style="{StaticResource UnderlineTextbox}"/>
+
+
+            <!-- Process visible on startup -->
+            <CheckBox Content="Process visible onstartup"
+                  
+                      IsChecked="{Binding ProcessVisibleOnStartup}"/>
+
+
+            <!-- Add process button -->
+            <Button Content="Add process"
+                
+                    Padding="5,0"
+                
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" 
+                
+                    Command="{Binding AddProcessCommand}"
+                    
+                    Style="{StaticResource DefaultAppButtonGrey}"/>
+
+        </StackPanel>
+
+    </Grid>
+
+    <!-- Select process button and text -->
+    <!--
         <StackPanel Margin="0,10,0,0">
 
             <StackPanel Orientation="Horizontal">
@@ -54,7 +204,9 @@
 
             </StackPanel>
 
-            <!-- Console directory -->
+            -->
+    <!-- Console directory -->
+    <!--
             <TextBox x:Name="ConsoleDirectoryTextBox" 
                      
                      local:PlaceHolder.Text="The directory where the console will run from"
@@ -66,27 +218,35 @@
         </StackPanel>
 
 
-        <!-- Console script -->
+        -->
+    <!-- Console script -->
+    <!--
         <TextBox local:PlaceHolder.Text="Console script" 
                  
                  Text="{Binding ConsoleScript}" 
                  
                  Style="{StaticResource PlaceholderTextbox}"/>
 
-        <!-- Process label -->
+        -->
+    <!-- Process label -->
+    <!--
         <TextBox local:PlaceHolder.Text="Process label (Optional)" 
                  Text="{Binding ProcessLabel}" 
                  Style="{StaticResource PlaceholderTextbox}"/>
 
 
-        <!-- Process visible on startup -->
+        -->
+    <!-- Process visible on startup -->
+    <!--
         <CheckBox Content="Process visible onstartup"
                   
                   
                   IsChecked="{Binding ProcessVisibleOnStartup}"/>
 
 
-        <!-- Add process button -->
+        -->
+    <!-- Add process button -->
+    <!--
         <Button Content="Add process"
                 
                 Padding="5,0"
@@ -97,6 +257,6 @@
                 
                 Command="{Binding AddProcessCommand}"/>
 
-    </StackPanel>
+    </StackPanel>-->
 
 </UserControl>
