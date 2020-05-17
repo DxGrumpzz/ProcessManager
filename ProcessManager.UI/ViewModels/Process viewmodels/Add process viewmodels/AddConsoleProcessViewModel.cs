@@ -167,11 +167,10 @@ namespace ProcessManager.UI
             });
 
             // Serialize the process list after adding the project
-            string jsonString = SerializeProcessList(project);
+            byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
 
             // Write the json to the project's config file
-            File.WriteAllText(project.ProjectPathWithConfig, jsonString);
-
+            File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
             ExecuteBackToProjectPageCommand();
         }

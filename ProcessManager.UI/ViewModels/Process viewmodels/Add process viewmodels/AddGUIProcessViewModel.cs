@@ -119,10 +119,10 @@ namespace ProcessManager.UI
                 ProcessLabel = ProcessLabel,
             });
 
-            string jsonString = SerializeProcessList(project);
+            byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
 
             // Write the json to the project's config file
-            File.WriteAllText(project.ProjectPathWithConfig, jsonString);
+            File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
             // Return back to the Project's view
             ExecuteBackToProjectPageCommand();
