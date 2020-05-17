@@ -20,11 +20,11 @@
         /// </summary>
         public static IProcessLoader ProcessLoader => GetService<IProcessLoader>();
         
+
         /// <summary>
         /// A project loader, Used to load project data from file
         /// </summary>
         public static IProjectLoader ProjectLoader => GetService<IProjectLoader>();
-
 
 
         /// <summary>
@@ -50,21 +50,27 @@
         /// </summary>
         public static IFolderDialog FolderDialog => GetService<IFolderDialog>(); 
 
+
         /// <summary>
         /// An OS file dialog, Used to select processes to run, and such
         /// </summary>
         public static IFileDialog FileDialog => GetService<IFileDialog>(); 
         
+
         /// <summary>
         /// A User dialog. Used for: asking auser to make a decision, Such as; 
         /// if to include an existing project directory to app
         /// </summary>
         public static IUserDialog UserDialog => GetService<IUserDialog>();
 
+
         /// <summary>
         /// The app's serializer
         /// </summary>
         public static ISerializer Serializer => GetService<ISerializer>();
+        
+
+        public static IUIManager UI => GetService<IUIManager>();
 
 
         /// <summary>
