@@ -31,7 +31,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
-        public ProjectItemViewModel ProjectVM { get; }
+        public ProjectItemViewModel Project { get; }
 
         /// <summary>
         /// A path to the process
