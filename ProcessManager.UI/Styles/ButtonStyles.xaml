@@ -135,7 +135,7 @@
 
                             </Trigger.EnterActions>
 
-                            
+
                             <Trigger.ExitActions>
 
                                 <BeginStoryboard>
@@ -255,5 +255,117 @@
         </Setter>
 
     </Style>
+
+
+    <!-- A default button for the app -->
+    <Style x:Key="DefaultAppButtonGrey" TargetType="{x:Type Button}">
+
+        <Setter Property="FontFamily" Value="{StaticResource LatoRegular}"/>
+
+        <Setter Property="Cursor" Value="Hand"/>
+
+        <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+        <Setter Property="Background" Value="{StaticResource LightGreyBrush}"/>
+
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+
+        <Setter Property="Template">
+
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type Button}">
+
+                    <!-- The main border about the control -->
+                    <Border x:Name="MainBorder" 
+                                        
+                            Background="{StaticResource LightGreyBrush}"
+                            CornerRadius="4"
+                                        
+                            Padding="10,5">
+
+                        <!-- A content presenter -->
+                        <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+
+
+                            <!-- When mouse enters the control -->
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate the background to a grey colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetName="MainBorder"
+                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource GreyColour}"/>
+
+
+                                        <!-- Animate the foreground(text) to a white colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource WhiteColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+
+                            <!-- When mouse exists the control -->
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate the background to a light grey colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetName="MainBorder"
+                                                                    Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource LightgreyColour}"/>
+
+
+                                        <!-- Animate the foreground(text) to a black colour -->
+                                        <ColorAnimation Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                    
+                                                                    Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
+                                                                    
+                                                                    To="{StaticResource BlackColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+
+        </Setter>
+
+    </Style>
+
 
 </ResourceDictionary>
