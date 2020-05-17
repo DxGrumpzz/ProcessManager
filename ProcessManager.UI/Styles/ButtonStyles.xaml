@@ -357,6 +357,14 @@
 
                         </Trigger>
 
+                        <!-- When IsEnaled is true-->
+                        <Trigger Property="IsEnabled" Value="False">
+
+                            <!-- Set the control's opacity to half -->
+                            <Setter Property="Opacity" Value="0.5"/>
+
+                        </Trigger>
+                        
                     </ControlTemplate.Triggers>
 
                 </ControlTemplate>
