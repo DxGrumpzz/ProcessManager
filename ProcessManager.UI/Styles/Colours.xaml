@@ -8,6 +8,10 @@
     <SolidColorBrush x:Key="LightGreyBrush" Color="{StaticResource LightgreyColour}"/>
 
 
+    <Color x:Key="GreyColour">#AAA</Color>
+    <SolidColorBrush x:Key="GreyBrush" Color="{StaticResource GreyColour}"/>
+
+
     <Color x:Key="WhiteColour">#FFF</Color>
     <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColour}"/>
 
