@@ -78,22 +78,30 @@ namespace ProcessManager.UI
         #region Commands
 
         public ICommand SelectProcessCommand { get; }
+        
         public ICommand BackToMainPageCommand { get; }
-        public ICommand BackToProjectPageCommand { get; }
+        public ICommand SwitchToProjectViewCommand { get; }
+        public ICommand SwitchToProcessSelectionViewCommand { get; }
+
         public ICommand AddProcessCommand { get; }
 
         #endregion
 
 
-        private AddGUIProcessViewModel() { }
         public AddGUIProcessViewModel(ProjectItemViewModel projectVM)
         {
-            ProjectVM = projectVM;
+            Project = projectVM;
 
             SelectProcessCommand = new RelayCommand(ExecuteSelectProcessCommand);
 
+
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
-            BackToProjectPageCommand = new RelayCommand(ExecuteBackToProjectPageCommand);
+            
+            SwitchToProcessSelectionViewCommand = new RelayCommand(ExecuteSwitchToProcessSelectionViewCommand);
+
+            SwitchToProjectViewCommand = new RelayCommand(() =>
+            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
+
 
             AddProcessCommand = new RelayCommand(
                 ExecuteAddProcessCommand, 
