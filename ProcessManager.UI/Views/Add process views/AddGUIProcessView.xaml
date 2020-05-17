@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ProcessManager.UI.AddGUIProcessView"
+<UserControl x:Class="ProcessManager.UI.AddGUIProcessView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ProcessManager.UI"
              mc:Ignorable="d" 
              
-             d:DesignHeight="250" 
+             d:DesignHeight="300" 
              d:DesignWidth="500"
              
              d:DataContext="{x:Static local:AddGUIProcessViewModel.DesignInstance}">
@@ -43,15 +43,17 @@
                     
                     HorizontalAlignment="Left"
                     
-                    Command="{Binding SelectProcessCommand}"/>
+                        Command="{Binding SelectProcessCommand}"
+                        
+                        Style="{StaticResource DefaultAppButtonGrey}"/>
 
             <TextBox x:Name="ProcessPathTextBox" 
                      
                      Text="{Binding SelectedProcessPath, UpdateSourceTrigger=PropertyChanged}"
                      
-                     local:PlaceHolder.Text="A path to the process"
+                         local:PlaceHolder.Text="Process path"
                      
-                     Style="{StaticResource PlaceholderTextbox}"/>
+                         Style="{StaticResource UnderlineTextbox}"/>
 
         </StackPanel>
 
@@ -61,14 +63,14 @@
                  
                  Text="{Binding ProcessAgs}"
                  
-                 Style="{StaticResource PlaceholderTextbox}"/>
+                     Style="{StaticResource UnderlineTextbox}"/>    
 
         <!-- Process label -->
         <TextBox local:PlaceHolder.Text="Process label (Optional)"
                  
                  Text="{Binding ProcessLabel}"
                  
-                 Style="{StaticResource PlaceholderTextbox}"/>
+                    Style="{StaticResource UnderlineTextbox}"/>
 
 
 
