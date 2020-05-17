@@ -24,41 +24,42 @@
 
                 case View.ProjectItemView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, ProjectItemViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new ProjectItemView(viewmodel as ProjectItemViewModel);
                     break;
                 };
 
                 case View.EditGUIProcessView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, EditGUIProcessViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new EditGUIProcessView(viewmodel as EditGUIProcessViewModel);
                     break;
                 };
+
                 case View.EditConsoleProcessView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, EditConsoleProcessViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new EditConsoleProcessView(viewmodel as EditConsoleProcessViewModel);
                     break;
                 };
 
                 case View.AddGUIProcessView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, AddGUIProcessViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new AddGUIProcessView(viewmodel as AddGUIProcessViewModel);
                     break;
                 };
 
                 case View.AddConsoleProcessView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, AddConsoleProcessViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new AddConsoleProcessView(viewmodel as AddConsoleProcessViewModel);
                     break;
                 };
 
                 case View.AddProcessView:
                 {
-                    ValidateViewModelType<TViewModel, ProjectsListViewModel>(viewmodel);
+                    ValidateViewModelType<TViewModel, AddProcessViewModel>(viewmodel);
                     DI.MainWindowViewModel.CurrentView = new AddProcessView(viewmodel as AddProcessViewModel);
                     break;
                 };
