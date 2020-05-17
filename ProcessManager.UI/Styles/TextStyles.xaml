@@ -52,13 +52,23 @@
 
     </Style>
 
-    
+
     <!-- A textbox style that displays a line under the text and allows a placeholder -->
     <Style x:Key="UnderlineTextbox" TargetType="{x:Type TextBox}">
 
-        <Setter Property="FontWeight" Value="Thin"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="BorderThickness" Value="0,0,0,2"/>
+
         <Setter Property="FontFamily" Value="{StaticResource LatoThin}"/>
-        <Setter Property="FontSize" Value="15.5"/>
+        <Setter Property="FontWeight" Value="Light"/>
+        <Setter Property="FontSize" Value="15"/>
+
+        <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+
+        <Setter Property="AllowDrop" Value="true"/>
 
         <Setter Property="Template">
 
@@ -66,41 +76,49 @@
 
                 <ControlTemplate TargetType="{x:Type TextBox}">
 
-                    <Border Background="Transparent">
+                    <!-- The main border around the control -->
+                    <Border x:Name="MainBorder" 
+                            
+                            Background="{TemplateBinding Background}" 
+                            
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            
+                            CornerRadius="1">
 
-                        <StackPanel>
+                        <Grid>
 
-                            <Grid Margin="0,0,0,1">
 
-                                <!-- A content host. Necessary  to "store" the value when data binding -->
-                                <Decorator x:Name="PART_ContentHost"/>
+                            <!-- A text presenter -->
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                   
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          
+                                          Focusable="false" />
 
-                                <!-- Watermark/placeholder text presenter -->
-                                <ContentPresenter Content="{Binding Path=(local:PlaceHolder.Text),
-                                                  RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                                  
-                                                  Opacity="0.5"
-                                                  
-                                                  Margin="2,0,0,0"
-                                                  
-                                                  Focusable="False"
-                                                  IsHitTestVisible="False"
-                                                  
-                                                  Visibility="{Binding Path=Text.Length,
-                                                  RelativeSource={RelativeSource Mode=TemplatedParent},
-                                                  UpdateSourceTrigger=PropertyChanged,
-                                                  Converter={local:BooleanToVisibilityValueConverter},
-                                                  ConverterParameter=True}" />
+                            
+                            <!-- Watermark/placeholder text presenter -->
+                            <ContentPresenter Content="{Binding Path=(local:PlaceHolder.Text),
+                                              RelativeSource={RelativeSource Mode=TemplatedParent}}" 
+                                              
+                                              Opacity="0.5"
+                                              
+                                              Margin="2,0,0,0"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              
+                                              Focusable="False"
+                                              IsHitTestVisible="False"
+                                              
+                                              Visibility="{Binding Path=Text.Length,
+                                              RelativeSource={RelativeSource Mode=TemplatedParent},
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={local:BooleanToVisibilityValueConverter},
+                                              ConverterParameter=True}" />
 
-                            </Grid>
-
-                            <!-- The line under the text -->
-                            <Rectangle Height="2"
-                                       
-                                       Fill="{StaticResource BlackBrush}"/>
-
-                        </StackPanel>
-
+                        </Grid>
                     </Border>
 
                 </ControlTemplate>
@@ -108,7 +126,7 @@
             </Setter.Value>
 
         </Setter>
-
+        
     </Style>
 
 </ResourceDictionary>
