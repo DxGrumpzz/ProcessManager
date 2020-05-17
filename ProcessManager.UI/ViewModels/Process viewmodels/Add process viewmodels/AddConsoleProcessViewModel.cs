@@ -10,9 +10,13 @@ namespace ProcessManager.UI
     /// </summary>
     public class AddConsoleProcessViewModel : BaseViewModel
     {
-        public static AddConsoleProcessViewModel DesignInstance => new AddConsoleProcessViewModel()
+        public static AddConsoleProcessViewModel DesignInstance => new AddConsoleProcessViewModel(
+        new ProjectItemViewModel(new Project()
         {
-
+            ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+        }))
+        {
+            ConsoleDirectory = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
         };
 
 
@@ -30,7 +34,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
-        public ProjectItemViewModel ProjectVM { get; }
+        public ProjectItemViewModel Project { get; }
 
 
         /// <summary>
@@ -73,29 +77,41 @@ namespace ProcessManager.UI
         public ICommand BackToMainPageCommand { get; }
         public ICommand BackToProjectPageCommand { get; }
 
+        public ICommand SwitchToProcessSelectionViewCommand { get; }
+        public ICommand SwitchToProjectViewCommand { get; }
 
         public ICommand AddProcessCommand { get; }
 
-
         #endregion
-
 
 
         private AddConsoleProcessViewModel() { }
         public AddConsoleProcessViewModel(ProjectItemViewModel projectVM)
         {
-            ProjectVM = projectVM;
+            Project = projectVM;
 
             SelectDirectoryCommand = new RelayCommand(ExecuteSelectDirectoryCommand);
             SelectCurrentDirectoryCommand = new RelayCommand(() =>
-                ConsoleDirectory = ProjectVM.Project.ProjectPath);
+                ConsoleDirectory = Project.Project.ProjectPath);
 
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
-            BackToProjectPageCommand = new RelayCommand(ExecuteBackToProjectPageCommand);
+
+            
+            SwitchToProcessSelectionViewCommand = new RelayCommand(() =>
+            // Go back to process type selection view
+            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(Project)));
+
+            BackToProjectPageCommand = new RelayCommand(() =>
+            // Go back to the project item view
+            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project));
+
 
             AddProcessCommand = new RelayCommand(
                 ExecuteAddProcessCommand,
-                () => ConsoleDirectory?.Length >= 3);
+                // Don't execute command if the directory's length is  less than three charactes
+                () => ConsoleDirectory?.Length >= 3 &&
+                // And isn't a valid directory
+                Directory.Exists(ConsoleDirectory));
         }
 
 
@@ -134,12 +150,6 @@ namespace ProcessManager.UI
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
         }
 
-        private void ExecuteBackToProjectPageCommand()
-        {
-            // Go back to the project item view
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
-        }
-
 
         private void ExecuteAddProcessCommand()
         {
@@ -158,7 +168,7 @@ namespace ProcessManager.UI
                 return;
             };
 
-            var project = ProjectVM.Project;
+            var project = Project.Project;
 
             // Add the new process to the project's process list
             project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory, ProcessVisibleOnStartup)
@@ -172,7 +182,7 @@ namespace ProcessManager.UI
             // Write the json to the project's config file
             File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
-            ExecuteBackToProjectPageCommand();
+            DI.MainWindowViewModel.CurrentView = new ProjectItemView(Project);
         }
 
     };
