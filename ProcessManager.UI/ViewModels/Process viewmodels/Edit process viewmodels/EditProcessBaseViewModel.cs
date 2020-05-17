@@ -62,7 +62,7 @@
             // If user decides to delete this process
             if(result == UserDialogResult.Yes)
             {
-                var process = (GUIProcess)ProcessVM.Process;
+                var process = ProcessVM.Process;
                 var project = ProjectVM.Project;
 
                 // Remove this process from the main list
