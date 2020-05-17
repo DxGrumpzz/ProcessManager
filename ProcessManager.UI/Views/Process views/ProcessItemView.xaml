@@ -67,7 +67,7 @@
 
         <Grid x:Name="MainGrid" 
           
-              Height="30"
+              Height="35"
               
               Margin="10,0">
 
@@ -83,6 +83,8 @@
             <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
                   TextBlock.FontWeight="Thin"
              
+                  TextBlock.FontSize="17"
+                  
                   Background="Transparent"
                   
                   local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
@@ -121,114 +123,117 @@
                                     
                     IsEnabled="{Binding ElementName=MainGrid, Path=IsMouseOver}"
                                         
-                    HorizontalAlignment="Right"
-                                        
+                    Margin="0,0,10,0"
+                    
                     Command="{Binding EditProcessCommand}"
-                                    
-                    Margin="-10,0,0,0"    
                     
                     Style="{StaticResource ThreeDotButtonStyle}"/>
 
 
-            <Border Grid.Column="2">
+            <!-- Run and close buttons container -->
+            <StackPanel Orientation="Horizontal"
+                        
+                        Grid.Column="2" 
+                        
+                        Margin="0,1"
+                        local:UniformMargin.Margin="5,0,0,0">
 
-                <!-- Run and close buttons container -->
-                <StackPanel Orientation="Horizontal"
+                <StackPanel.Resources>
+
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AppButtonDarkGrey}"/>
+
+                </StackPanel.Resources>
+
+
+                <!-- Process Run buttons -->
+                <Button Content="Run"
                     
-                            local:UniformMargin.Margin="5,0,0,0">
-
-
-                    <!-- Process Run buttons -->
-                    <Button Content="Run"
+                        IsEnabled="{Binding ProcessRunning,
+                        Converter={local:InvertBooleanValueConverter}}"
                     
-                            IsEnabled="{Binding ProcessRunning,
-                            Converter={local:InvertBooleanValueConverter}}"
+                        Command="{Binding RunProcessCommand}"/>
+
+
+                <!-- Close Process buttons -->
+                <Button Content="Close" 
                     
-                            Command="{Binding RunProcessCommand}"/>
-
-
-                    <!-- Close Process buttons -->
-                    <Button Content="Close" 
+                        
+                        IsEnabled="{Binding ProcessRunning}"
                     
-                            IsEnabled="{Binding ProcessRunning}"
+                        Command="{Binding CloseProcessCommand}"/>
+
+
+
+                <!-- Show a process buttons -->
+                <Button Content="Show"
                     
-                            Command="{Binding CloseProcessCommand}"/>
+                        Margin="5,0,0,0"
+                        Command="{Binding ShowProcessCommand}">
+
+                    <Button.Style>
+
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AppButtonDarkGrey}">
+
+                            <Style.Triggers>
+
+                                <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+
+                                    <Setter Property="IsEnabled" Value="False"/>
+
+                                </DataTrigger>
 
 
+                                <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
 
-                    <!-- Show a process buttons -->
-                    <Button Content="Show"
+                                    <Setter Property="IsEnabled" Value="False"/>
+
+                                </DataTrigger>
+
+                            </Style.Triggers>
+
+                        </Style>
+
+                    </Button.Style>
+
+                </Button>
+
+
+                <!-- Hide a process buttons -->
+                <Button Content="Hide" 
                     
-                            Margin="5,0,0,0"
-                            Command="{Binding ShowProcessCommand}">
+                        Command="{Binding HideProcessCommand}">
 
-                        <Button.Style>
+                    <Button.Style>
 
-                            <Style TargetType="{x:Type Button}">
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AppButtonDarkGrey}">
 
-                                <Style.Triggers>
+                            <Style.Triggers>
 
-                                    <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
+                                <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
 
-                                        <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="IsEnabled" Value="False"/>
 
-                                    </DataTrigger>
-
-
-                                    <DataTrigger Binding="{Binding ProcessVisible}" Value="True">
-
-                                        <Setter Property="IsEnabled" Value="False"/>
-
-                                    </DataTrigger>
-
-                                </Style.Triggers>
-
-                            </Style>
-
-                        </Button.Style>
-
-                    </Button>
+                                </DataTrigger>
 
 
-                    <!-- Hide a process buttons -->
-                    <Button Content="Hide" 
-                    
-                            Command="{Binding HideProcessCommand}">
-
-                        <Button.Style>
-
-                            <Style TargetType="{x:Type Button}">
-
-                                <Style.Triggers>
-
-                                    <DataTrigger Binding="{Binding ProcessRunning}" Value="False">
-
-                                        <Setter Property="IsEnabled" Value="False"/>
-
-                                    </DataTrigger>
-
-
-                                    <DataTrigger Binding="{Binding ProcessVisible, 
-                                         Converter={local:InvertBooleanValueConverter}}" 
+                                <DataTrigger Binding="{Binding ProcessVisible, 
+                                        Converter={local:InvertBooleanValueConverter}}" 
                                          
-                                         Value="True">
+                                        Value="True">
 
-                                        <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="IsEnabled" Value="False"/>
 
-                                    </DataTrigger>
+                                </DataTrigger>
 
-                                </Style.Triggers>
+                            </Style.Triggers>
 
-                            </Style>
+                        </Style>
 
-                        </Button.Style>
+                    </Button.Style>
 
-                    </Button>
+                </Button>
 
-
-                </StackPanel>
-
-            </Border>
+            </StackPanel>
 
         </Grid>
 
