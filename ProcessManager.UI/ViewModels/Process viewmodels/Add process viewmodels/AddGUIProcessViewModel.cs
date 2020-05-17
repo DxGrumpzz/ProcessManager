@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
@@ -9,7 +9,11 @@ namespace ProcessManager.UI
     /// </summary>
     public class AddGUIProcessViewModel : BaseViewModel
     {
-        public static AddGUIProcessViewModel DesignInstance => new AddGUIProcessViewModel()
+        public static AddGUIProcessViewModel DesignInstance => new AddGUIProcessViewModel(
+            new ProjectItemViewModel(new Project()
+            {
+                ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetRandomFileName()}",
+            }))
         {
             SelectedProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetRandomFileName()}",
         };
@@ -104,9 +108,11 @@ namespace ProcessManager.UI
 
 
             AddProcessCommand = new RelayCommand(
-                ExecuteAddProcessCommand, 
+                ExecuteAddProcessCommand,
                 // Don't enable the button until the user chose a valid process path
-                () => SelectedProcessPath?.Length >= 6);
+                () => SelectedProcessPath?.Length >= 6 && 
+                // And make sure the file actually exists
+                File.Exists(SelectedProcessPath));
         }
 
 
@@ -119,7 +125,7 @@ namespace ProcessManager.UI
                 return;
             };
 
-            var project = ProjectVM.Project;
+            var project = Project.Project;
 
             // Add the process  to the projets' process list
             project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs, ProcessVisibleOnStartup)
@@ -133,7 +139,7 @@ namespace ProcessManager.UI
             File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
             // Return back to the Project's view
-            ExecuteBackToProjectPageCommand();
+            ExecuteSwitchToProcessSelectionViewCommand();
         }
 
         private void ExecuteSelectProcessCommand()
@@ -156,9 +162,9 @@ namespace ProcessManager.UI
             DI.MainWindowViewModel.CurrentView = new ProjectListView(new ProjectsListViewModel(DI.Projects));
         }
 
-        private void ExecuteBackToProjectPageCommand()
+        private void ExecuteSwitchToProcessSelectionViewCommand()
         {
-            DI.MainWindowViewModel.CurrentView = new ProjectItemView(ProjectVM);
+            DI.MainWindowViewModel.CurrentView = new AddProcessView(new AddProcessViewModel(Project));
         }
 
     };
