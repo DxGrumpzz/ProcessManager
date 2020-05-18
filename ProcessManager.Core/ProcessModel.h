@@ -244,7 +244,7 @@ private:
         ResumeProcess();
 
         // Find the process main WindowHandle
-        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId);
+        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId, 10000);
 
         return true;
     };
@@ -287,7 +287,7 @@ private:
         ResumeProcess();
 
         // Find main window HWND
-        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId);
+        MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId, 10000);
 
         return true;
     };
