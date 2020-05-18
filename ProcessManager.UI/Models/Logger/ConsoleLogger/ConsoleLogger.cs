@@ -34,12 +34,12 @@
         /// <param name="callerOrigin"> Where the logger was called from </param>
         /// <param name="filePath"> The path where the log came from </param>
         /// <param name="lineNumber"> The line number where the log was called </param>
-        public void Log(string logMessage, LogLevel logLevel = LogLevel.Normal, [CallerMemberName] string callerOrigin = "", [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
+        public void Log(string logMessage, LogLevel logLevel = LogLevel.Info, [CallerMemberName] string callerOrigin = "", [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             lock (_synchronizatingObject)
             {
                 // Writes the LogLevel in a format I like
-                var writeLogLevel = new Action<LogLevel, ConsoleColor>((logLevel, colour) =>
+                var  writeLogLevel = new Action<LogLevel, ConsoleColor>((logLevel, colour) =>
                 {
                     // Write first character
                     Console.Write('[');
@@ -57,27 +57,27 @@
                 // Setup message format
                 switch (logLevel)
                 {
-                    case LogLevel.Verbose:
-                    {
-                        writeLogLevel(logLevel, ConsoleColor.Yellow);
-                        break;
-                    };
-
-                    case LogLevel.Informative:
+                    case LogLevel.Info:
                     {
                         writeLogLevel(logLevel, ConsoleColor.Gray);
                         break;
                     };
 
-                    case LogLevel.Critical:
+                    case LogLevel.Warning:
+                    {
+                        writeLogLevel(logLevel, ConsoleColor.Yellow);
+                        break;
+                    };
+
+                    case LogLevel.Error:
                     {
                         writeLogLevel(logLevel, ConsoleColor.Red);
                         break;
                     };
 
-                    case LogLevel.Debug:
+                    case LogLevel.Critical:
                     {
-                        writeLogLevel(logLevel, ConsoleColor.Magenta);
+                        writeLogLevel(logLevel, ConsoleColor.DarkRed);
                         break;
                     };
 

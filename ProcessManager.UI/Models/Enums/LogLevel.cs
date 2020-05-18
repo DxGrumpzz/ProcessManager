@@ -6,28 +6,24 @@ namespace ProcessManager.UI
 	public enum LogLevel
 	{
 		/// <summary>
-		/// Log all information
+		/// A generic info log
 		/// </summary>
-		Debug = 0,
+		Info = 0,
 
 		/// <summary>
-		/// Log most information
+		/// Warnings, a process creation failed, unable to read project data from file, and such
 		/// </summary>
-		Verbose = 1,
+		Warning = 1,
 
 		/// <summary>
-		/// Log all informative information
+		/// An error has occured, unexpected return value, expcetions, and such
 		/// </summary>
-		Informative = 2,
-
-		/// <summary>
-		/// Logs wanring, errors, and standard messages
-		/// </summary>
-		Normal = 3,
+		Error = 2,
 
 		/// <summary>
 		/// Log only critical errors and warnings
 		/// </summary>
 		Critical = 4,
 	};
+
 };
