@@ -267,7 +267,9 @@ private:
             cmdlines,
             NULL, NULL,
             FALSE,
-            CREATE_SUSPENDED,
+            // Create suspended so we can attach a closed callback,
+            // Create new console beause I'm using a console logger and I don't want std handles to use the logger window to output their messages
+            CREATE_SUSPENDED | CREATE_NEW_CONSOLE,
             NULL,
             // Start the cmd from this directory
             StartupDirectory.c_str(),
