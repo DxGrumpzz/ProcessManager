@@ -149,10 +149,10 @@
 
                         <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
                                 local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
-                            
+                    
                                 Margin="-10,0"
                                 Padding="10,0"
-                                Height="30">
+                                Height="35">
 
                             <Border.Style>
 
@@ -230,7 +230,8 @@
                                            FontFamily="{StaticResource LatoThin}"
                                            TextTrimming="CharacterEllipsis"
                                            FontWeight="Thin"
-                                       
+                                           FontSize="17"
+                                        
                                            MaxWidth="160"
 
                                            ToolTip="{Binding Project.ProjectName}"
@@ -244,6 +245,7 @@
                                         IsEnabled="{Binding SettingsButtonVisible}"
                                         
                                         HorizontalAlignment="Right"
+                                        Margin="0,0,10,0"
                                         
                                         Command="{Binding SwitchToProjectViewCommand}"
                                         
