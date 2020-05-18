@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI.Models.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.Diagnostics;
