@@ -18,12 +18,23 @@ namespace ProcessManager.UI
     /// </summary>
     public partial class App : Application
     {
+
+#if DEBUG
+        /// <summary>
+        /// A console that will be displayed 
+        /// </summary>
+        [DllImport("Kernel32.dll")]
+        private static extern void AllocConsole();
+#endif
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             // Pre load DI stuff necessary to do validation, error check, and such
-            var serviceCollection = PreLoadDI();
+            var serviceCollection = SetupDI();
+
+            DI.Provider = BuildDIProvider(serviceCollection);
 
 
             // Check if the processes file exists
@@ -41,14 +52,14 @@ namespace ProcessManager.UI
             };
 
 
-            // Setup DI stuff
-            serviceCollection = SetupDI(serviceCollection);
-
-            DI.Provider = BuildDIProvider(serviceCollection);
+            DI.Logger.Log("Creating MainWindow...");
 
             // Create and show window
             (Current.MainWindow = new MainWindow(DI.MainWindowViewModel))
             .Show();
+
+
+            DI.Logger.Log("Building tray icon...");
 
             // Build the icon
             var hwnd = new WindowInteropHelper(Current.MainWindow).Handle;
@@ -73,18 +84,22 @@ namespace ProcessManager.UI
             });
         }
 
-
-        private IServiceCollection PreLoadDI()
+        private IServiceCollection SetupDI()
         {
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddTransient<IUserDialog>((ServiceProvider) => new WindowsUserDialog());
 
-            return serviceCollection;
-        }
+            serviceCollection.AddTransient<IUserDialog, WindowsUserDialog>();
 
-        private IServiceCollection SetupDI(IServiceCollection serviceCollection)
-        {
+#if DEBUG
+            AllocConsole();
+            Console.Title = "ProcessManager.UI console logger";
+
+            serviceCollection.AddTransient<ILogger, ConsoleLogger>();
+#else
+            serviceCollection.AddTransient<ILogger, FileLogger>();
+#endif
+
             // Setup serializer
             serviceCollection.AddTransient<ISerializer, JsonSerializer>();
 
@@ -101,9 +116,9 @@ namespace ProcessManager.UI
             // Setup project loader
             serviceCollection.AddScoped<IProjectLoader>((serviceProvider) =>
             new ProjectLoader(
-                    processLoader:         serviceProvider.GetService<IProcessLoader>(),
-                    serializer:            serviceProvider.GetService<ISerializer>(),
-                    projectsFilename:      Localization.PROJECTS_FILE_NAME,
+                    processLoader: serviceProvider.GetService<IProcessLoader>(),
+                    serializer: serviceProvider.GetService<ISerializer>(),
+                    projectsFilename: Localization.PROJECTS_FILE_NAME,
                     projectConfigFilename: Localization.PROJECT_CONFIG_FILE_NAME));
 
 
@@ -126,8 +141,10 @@ namespace ProcessManager.UI
             {
                 CurrentView = new ProjectListView(
                   new ProjectsListViewModel(DI.Projects)),
+                //CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(new ProjectItemViewModel(DI.Projects[0]))),
             });
 
+            serviceCollection.AddTransient<IUIManager, UImanager>();
 
             // Setup TrayIcon 
             serviceCollection.AddSingleton((serviceProvider) =>
