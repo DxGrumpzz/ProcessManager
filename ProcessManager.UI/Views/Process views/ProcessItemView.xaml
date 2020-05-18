@@ -10,7 +10,8 @@
              
              d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
 
-    <Border Background="Transparent">
+    <Border Background="Transparent"
+            x:Name="MainBorder">
 
         <Border.Style>
 
@@ -65,9 +66,7 @@
 
         </Border.Style>
 
-        <Grid x:Name="MainGrid" 
-          
-              Height="35"
+        <Grid Height="35"
               
               Margin="10,0">
 
@@ -117,18 +116,16 @@
 
             </Grid>
 
-
             <!-- Eidt process button -->
             <Button Grid.Column="1" 
                                     
-                    IsEnabled="{Binding ElementName=MainGrid, Path=IsMouseOver}"
+                    IsEnabled="{Binding ElementName=MainBorder, Path=IsMouseOver}"
                                         
                     Margin="0,0,10,0"
                     
                     Command="{Binding EditProcessCommand}"
                     
                     Style="{StaticResource ThreeDotButtonStyle}"/>
-
 
             <!-- Run and close buttons container -->
             <StackPanel Orientation="Horizontal"
@@ -157,7 +154,6 @@
                 <!-- Close Process buttons -->
                 <Button Content="Close" 
                     
-                        
                         IsEnabled="{Binding ProcessRunning}"
                     
                         Command="{Binding CloseProcessCommand}"/>

@@ -3,13 +3,11 @@
                     xmlns:local="clr-namespace:ProcessManager.UI">
 
 
-
     <!--#region Animation timings -->
 
     <Duration x:Key="MouseHoverAnimationTiming">0:0:0.15</Duration>
-
+    
     <!--#endregion-->
-
 
     <!-- A button style that displays 3 dots that animate to a different colour when mouse enter the control -->
     <Style x:Key="ThreeDotButtonStyle" TargetType="{x:Type Button}">
@@ -171,6 +169,7 @@
     </Style>
 
 
+    <!-- A button style used in the title bars -->
     <Style x:Key="ProjectListTitleButtonStyle" TargetType="{x:Type Button}">
 
         <Setter Property="Padding" Value="10,5"/>
@@ -178,6 +177,8 @@
         <Setter Property="Cursor" Value="Hand"/>
 
         <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>
+        
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
 
         <Setter Property="Template">
 
@@ -188,11 +189,14 @@
                     <!-- The control's main border -->
                     <Border BorderBrush="{TemplateBinding Foreground}"
                             BorderThickness="1"
-                                                    
+
+                            UseLayoutRounding="True"
+                            
+                            CornerRadius="2"
+                            
                             Background="Transparent"
                             
                             Padding="{TemplateBinding Padding}">
-
 
                         <!-- The control's main content presenter -->
                         <ContentPresenter Content="{TemplateBinding Content}"
@@ -200,7 +204,6 @@
                                           VerticalAlignment="Center"/>
 
                     </Border>
-                    
 
                     <ControlTemplate.Triggers>
 
