@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -23,18 +23,18 @@ namespace ProcessManager.UI
         /// The name of the file contaning the projects
         /// </summary>
         private readonly string _projectsFilename;
-        
+
         /// <summary>
         /// The name of the Project config file
         /// </summary>
         private readonly string _projectConfigFilename;
 
-
         /// <summary>
         /// An enumerable of loaded projects
         /// </summary>
-        private IEnumerable<Project> _projects;
+        private IEnumerable<Project> _projectsFromFile;
 
+        private List<Project> _projectsLoaded;
 
 
 
@@ -47,12 +47,15 @@ namespace ProcessManager.UI
             _projectConfigFilename = projectConfigFilename;
         }
 
+
+
         public void LoadProjectsDirectories()
         {
             try
             {
                 // Using a json serializer, deserialzie the data inside the Projects file into C# objects
-                _projects = _serializer.DeserializerProjects(File.ReadAllBytes(_projectsFilename));
+                _projectsFromFile = _serializer.DeserializerProjects(File.ReadAllBytes(_projectsFilename));
+                _projectsLoaded = new List<Project>();
             }
             // Projects file contains invalid json
             catch (JsonException jsonException)
@@ -68,21 +71,24 @@ namespace ProcessManager.UI
 
         public void ValidateLoadedProjects()
         {
-                try
+            foreach (var project in _projectsFromFile)
             {
-                // Check if project directory exists
-                if (Directory.Exists(project.ProjectPath) == false)
+                try
                 {
-                    throw new Exception($"{project.ProjectPath} is not a valid directory or it doesn't exist");
-                };
+                    // Check if project directory exists
+                    if (Directory.Exists(project.ProjectPath) == false)
+                    {
+                        throw new Exception($"{project.ProjectPath} is not a valid directory or it doesn't exist");
+                    };
 
-                // Check if project contains project config file
-                if (File.Exists(Path.Combine(project.ProjectPath, _projectConfigFilename)) == false)
-                {
-                    throw new Exception($"{project.ProjectPath} doesn't contain a \"ProcessManger.Config.Json\" file");
-                };
+                    // Check if project contains project config file
+                    if (File.Exists(Path.Combine(project.ProjectPath, _projectConfigFilename)) == false)
+                    {
+                        throw new Exception($"{project.ProjectPath} doesn't contain a \"ProcessManger.Config.Json\" file");
+                    };
 
 
+                    _projectsLoaded.Add(project);
                 }
                 catch (Exception exception)
                 {
@@ -110,7 +116,7 @@ namespace ProcessManager.UI
 
                     // Check if project contains project config file
                     if (File.Exists(Path.Combine(project.ProjectPath, _projectConfigFilename)) == false)
-            {
+                    {
                         string errorString = $"{project.ProjectName} doesn't contain a \"ProcessManger.Config.Json\" file";
                         _logger.Log(errorString);
 
@@ -118,10 +124,10 @@ namespace ProcessManager.UI
                     };
 
 
-                // Load the process list inside the project
-                project.ProcessList = new List<IProcessModel>(
-                    // Read Project config file and deserialize
-                    _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
+                    // Load the process list inside the project
+                    project.ProcessList = new List<IProcessModel>(
+                        // Read Project config file and deserialize
+                        _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
 
                 }
                 catch (Exception exception)
@@ -135,7 +141,7 @@ namespace ProcessManager.UI
 
         public IEnumerable<Project> GetProjectsList()
         {
-            return _projects;
+            return _projectsLoaded;
         }
 
     };
