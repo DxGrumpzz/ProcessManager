@@ -8,8 +8,8 @@
        
         Title="Process Manager" 
       
-        Height="500" 
-        Width="700"
+        Height="550" 
+        Width="900"
         
         FontFamily="{StaticResource LatoRegular}"
         FontSize="15"
