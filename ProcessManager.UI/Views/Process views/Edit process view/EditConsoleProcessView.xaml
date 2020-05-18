@@ -8,107 +8,171 @@
              mc:Ignorable="d" 
              
              d:DesignHeight="350" 
-             d:DesignWidth="500"
+             d:DesignWidth="600"
              
              d:DataContext="{x:Static local:EditConsoleProcessViewModel.DesignInstance}">
 
 
+    <Grid Margin="10">
 
-    <StackPanel Margin="10"
-                local:UniformMargin.Margin="0,0,0,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-        
-        <!-- Back to Main page or project buttons -->
-        <Grid>
+        <!-- Project name title, and titlebar-->
+        <StackPanel>
 
-            <Grid.ColumnDefinitions>
+            <!-- The name of the project -->
+            <TextBlock Text="{Binding Project.Project.ProjectName}"
+                   
+                       FontSize="20"/>
+
+            <!-- Project path -->
+            <TextBlock Text="{Binding Project.Project.ProjectPath}"
+                   
+                       FontFamily="{StaticResource LatoThin}"
+                       FontWeight="Thin"
+                       FontSize="15"
                 
-                <ColumnDefinition Width="AUTO"/>
-                <ColumnDefinition Width="AUTO"/>
-                
-                <ColumnDefinition/>
-                
-            </Grid.ColumnDefinitions>
-            
-            <Button Content="Back to project page" 
+                       Cursor="Hand"
+                       
+                       HorizontalAlignment="Left">
+
+                <TextBlock.InputBindings>
+                    <MouseBinding MouseAction="LeftClick"
+                                  Command="{Binding OpenProjectDirectoryCommand}"/>
+                </TextBlock.InputBindings>
+
+            </TextBlock>
+
+
+            <TextBlock Text="Edit a console process"
+                       
+                       FontWeight="Thin" 
+                       FontFamily="{StaticResource LatoThin}"
+                       
+                       Margin="0,10,0,5"/>
+
+            <!-- Title bar -->
+            <Border Background="{StaticResource LightGreyBrush}"
                     
-                    Command="{Binding BackToProjectPageCommand}"/>
+                    Padding="10,5"
+                    Margin="-10,0">
 
-            <Button Content="Back to main page" 
-             
-                    Margin="10,0,0,0"
-                    Grid.Column="1"
-                    
-                    Command="{Binding BackToMainPageCommand}"/>
+                <DockPanel LastChildFill="False"
+                            
+                            local:UniformMargin.Margin="0,0,10,0">
 
-            
-            <Button Content="Delete process"
-            
-                    HorizontalAlignment="Right"
-                    Grid.Column="2"
-                    
-                    Command="{Binding DeleteProcessCommand}"/>
-
-        </Grid>
+                    <!-- Back to process type selection view -->
+                    <Button Content="Back"
+                        
+                            Command="{Binding BackToProjectPageCommand}"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
 
 
-        <TextBlock Text="Edit a console process" />
+                    <!-- Back to project page (Projects list view) -->
+                    <Button Content="Back to project page"
+                        
+                            Command="{Binding BackToProjectPageCommand}"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
 
 
-        <!-- Select console directory button and text -->
-        <StackPanel Margin="0,10,0,0">
+                    <!-- Delete process button -->
+                    <Button Content="Delete process "
+                            
+                            Command="{Binding DeleteProcessCommand}"
+                            
+                            DockPanel.Dock="Right"
+                            
+                            Margin="0,0,-10,0"
+                            
+                            Style="{StaticResource ProjectListTitleButtonStyle}"/>
 
-            <Button Content="Select directory"
-                    
-                    HorizontalAlignment="Left"
-                    
-                    Command="{Binding SelectConsoleDirectoryCommand}"/>
 
-            
-            <TextBox Text="{Binding ConsoleDirectory, UpdateSourceTrigger=PropertyChanged}"
-                     
-                     local:PlaceHolder.Text="Console directory"
-                     
-                     Style="{StaticResource PlaceholderTextbox}"/>
+                </DockPanel>
+
+            </Border>
 
         </StackPanel>
 
-
-        <!-- Process args -->
-        <TextBox local:PlaceHolder.Text="Console script"
-                 
-                 Text="{Binding ConsoleScript}"
-                 
-                 Style="{StaticResource PlaceholderTextbox}"/>
-
-        
-        <!-- Process label -->
-        <TextBox local:PlaceHolder.Text="Process label"
-                 
-                 Text="{Binding ProcessLabel}"
-                 
-                 Style="{StaticResource PlaceholderTextbox}"/>
+        <!-- Console process settings -->
+        <StackPanel Grid.Row="1"
+                    
+                    Margin="0,10,0,0"
+                    
+                    local:UniformMargin.Margin="0,5">
 
 
-        <!-- Process visible on startup -->
-        <CheckBox Content="Process visible onstartup"
+            <!-- Console directory, Select directory, and Select current directory options -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="AUTO"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Console directory path -->
+                <TextBox local:PlaceHolder.Text="The directory where the console will run from"
+                     
+                        Text="{Binding ConsoleDirectory, UpdateSourceTrigger=PropertyChanged}"
+                     
+                         Margin="0,0,10,0"
+                          
+                         Style="{StaticResource UnderlineTextbox}"/>
+
+                <!-- Select directory button -->
+                <Button Content="Select directory"
+                        
+                        Focusable="False"
+                        
+                        Grid.Column="1"
+                        
+                        Command="{Binding SelectConsoleDirectoryCommand}"
+                        
+                        Style="{StaticResource DefaultAppButtonGrey}"/>
+
+            </Grid>
+
+
+            <!-- Cosnole script  -->
+            <TextBox local:PlaceHolder.Text="Console script" 
+                 
+                     Text="{Binding ConsoleScript}" 
+                 
+                     Style="{StaticResource UnderlineTextbox}"/>
+
+            
+            <!-- Process label -->
+            <TextBox local:PlaceHolder.Text="Process label (Optional)"
+                 
+                    Text="{Binding ProcessLabel}"
+                 
+                    Style="{StaticResource UnderlineTextbox}"/>
+
+
+            <!-- Process visible on startup -->
+            <CheckBox Content="Process visible onstartup"
                   
-                  IsChecked="{Binding ProcessVisibleOnStartup}"/>
+                      IsChecked="{Binding ProcessVisibleOnStartup}"/>
 
 
-        <!-- Add process button -->
-        <Button Content="Save"
+            <!-- Save changes button -->
+            <Button Content="Save changes"
                 
-                Padding="5,0"
                 
-                Margin="0,10,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" 
                 
-                Command="{Binding SaveProcessCommand}"/>
-        
-        
-    </StackPanel>
-    
+                    Command="{Binding SaveProcessCommand}"
+                    
+                    Style="{StaticResource DefaultAppButtonGrey}"/>
+
+        </StackPanel>
+
+    </Grid>
 
 </UserControl>
