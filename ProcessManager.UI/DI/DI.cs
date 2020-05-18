@@ -69,8 +69,12 @@
         /// </summary>
         public static ISerializer Serializer => GetService<ISerializer>();
         
-
+        /// <summary>
+        /// The app's UI manager, responsible for changing views, and such
+        /// </summary>
         public static IUIManager UI => GetService<IUIManager>();
+
+        public static ILogger Logger => GetService<ILogger>();
 
 
         /// <summary>
