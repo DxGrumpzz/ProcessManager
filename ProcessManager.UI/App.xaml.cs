@@ -118,6 +118,7 @@ namespace ProcessManager.UI
             new ProjectLoader(
                     processLoader: serviceProvider.GetService<IProcessLoader>(),
                     serializer: serviceProvider.GetService<ISerializer>(),
+                    logger: serviceProvider.GetService<ILogger>(),
                     projectsFilename: Localization.PROJECTS_FILE_NAME,
                     projectConfigFilename: Localization.PROJECT_CONFIG_FILE_NAME));
 
@@ -140,8 +141,8 @@ namespace ProcessManager.UI
             serviceCollection.AddSingleton((serviceProvider) => new MainWindowViewModel()
             {
                 CurrentView = new ProjectListView(
-                  new ProjectsListViewModel(DI.Projects)),
-                //CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(new ProjectItemViewModel(DI.Projects[0]))),
+                    new ProjectsListViewModel(DI.Projects)),
+                // CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(new ProjectItemViewModel(DI.Projects[0]))),
             });
 
             serviceCollection.AddTransient<IUIManager, UImanager>();
