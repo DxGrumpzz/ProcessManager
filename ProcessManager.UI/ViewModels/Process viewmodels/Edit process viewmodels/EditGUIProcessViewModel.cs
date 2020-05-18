@@ -1,10 +1,7 @@
 namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Windows;
     using System.Windows.Input;
 
 
@@ -14,9 +11,18 @@ namespace ProcessManager.UI
     public class EditGUIProcessViewModel : EditProcessBaseViewModel
     {
 
-        public static EditGUIProcessViewModel DesignInstance => new EditGUIProcessViewModel()
+        public static EditGUIProcessViewModel DesignInstance => new EditGUIProcessViewModel(
+            new ProjectItemViewModel(new Project()
+            {
+                ProjectPath = @"C:\Development\npm test",
+            }),
+            new ProcessItemViewModel(new ProjectItemViewModel(new Project()
+            {
+                ProjectPath = @"C:\Development\npm test",
+            }),
+            new GUIProcess(@"C:\Software\VScode.exe")))
         {
-
+            
         };
 
 
@@ -69,13 +75,12 @@ namespace ProcessManager.UI
         #endregion
 
 
-        private EditGUIProcessViewModel() { }
         public EditGUIProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
         {
             var process = ValidateProcessType<GUIProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
-            ProjectVM = projectViewModel;
+            Project = projectViewModel;
 
             SelectedPath = process.ProcessPath;
             Arguments = process.ProcessArgs;
@@ -95,7 +100,7 @@ namespace ProcessManager.UI
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var project = ProjectVM.Project;
+            var project = Project.Project;
 
             // Find process
             int index = project.ProcessList.IndexOf(ProcessVM.Process);
@@ -117,7 +122,7 @@ namespace ProcessManager.UI
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
             // Switch back to the 
-            DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
+            DI.UI.ChangeView(View.ProjectItemView, Project);
         }
     };
 };

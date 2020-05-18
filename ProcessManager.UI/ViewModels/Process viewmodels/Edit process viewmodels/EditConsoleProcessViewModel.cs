@@ -1,10 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
-    using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Text.Json;
     using System.Windows.Input;
 
 
@@ -13,10 +10,19 @@
     /// </summary>
     public class EditConsoleProcessViewModel : EditProcessBaseViewModel
     {
-
-        public static EditConsoleProcessViewModel DesignInstance => new EditConsoleProcessViewModel()
+        public static EditConsoleProcessViewModel DesignInstance => new EditConsoleProcessViewModel(
+            new ProjectItemViewModel(new Project()
+            {
+                ProjectPath = @"C:\Development\npm test",
+            }),
+            new ProcessItemViewModel(new ProjectItemViewModel(
+                new Project()
+                {
+                    ProjectPath = @"C:\Development\npm test",
+                }),
+                new ConsoleProcess("npm run start", @"C:\Development\npm test")))
         {
-
+            
         };
 
 
@@ -61,13 +67,12 @@
 
 
 
-        private EditConsoleProcessViewModel() { }
         public EditConsoleProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
         {
             var process = ValidateProcessType<ConsoleProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
-            ProjectVM = projectViewModel;
+            Project = projectViewModel;
 
             ProcessLabel = process.ProcessLabel;
             ProcessVisibleOnStartup = process.VisibleOnStartup;
@@ -90,7 +95,7 @@
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var project = ProjectVM.Project;
+            var project = Project.Project;
 
             var index = project.ProcessList.IndexOf(ProcessVM.Process);
 
@@ -107,7 +112,7 @@
 
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
-            DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
+            DI.UI.ChangeView(View.ProjectItemView, Project);
         }
     };
 };

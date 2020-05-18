@@ -22,7 +22,7 @@
         /// <summary>
         /// A project viewmodel associated with the process
         /// </summary>
-        public ProjectItemViewModel ProjectVM { get; set; }
+        public ProjectItemViewModel Project { get; set; }
 
 
         #endregion
@@ -47,11 +47,10 @@
 
 
             BackToProjectPageCommand = new RelayCommand(() =>
-            DI.UI.ChangeView(View.ProjectItemView, ProjectVM));
+            DI.UI.ChangeView(View.ProjectItemView, Project));
 
             BackToMainPageCommand = new RelayCommand(() =>
             DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects)));
-
         }
 
 
@@ -64,7 +63,7 @@
             if(result == UserDialogResult.Yes)
             {
                 var process = ProcessVM.Process;
-                var project = ProjectVM.Project;
+                var project = Project.Project;
 
                 // Remove this process from the main list
                 project.ProcessList.Remove(process);
@@ -76,7 +75,7 @@
                 File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
                 // Switch back to the project's view
-                DI.UI.ChangeView(View.ProjectItemView, ProjectVM);
+                DI.UI.ChangeView(View.ProjectItemView, Project);
             };
         }
 
