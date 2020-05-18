@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System;
     using System.Collections.Generic;
@@ -16,6 +16,7 @@
         /// </summary>
         private readonly IProcessLoader _processLoader;
         private readonly ISerializer _serializer;
+        private readonly ILogger _logger;
 
 
         /// <summary>
@@ -35,11 +36,13 @@
         private IEnumerable<Project> _projects;
 
 
-        public ProjectLoader(IProcessLoader processLoader, ISerializer serializer, string projectsFilename, string projectConfigFilename)
+
+
+        public ProjectLoader(IProcessLoader processLoader, ISerializer serializer, ILogger logger, string projectsFilename, string projectConfigFilename)
         {
             _processLoader = processLoader;
             _serializer = serializer;
-
+            _logger = logger;
             _projectsFilename = projectsFilename;
             _projectConfigFilename = projectConfigFilename;
         }
@@ -65,7 +68,7 @@
 
         public void ValidateLoadedProjects()
         {
-            foreach (var project in _projects)
+                try
             {
                 // Check if project directory exists
                 if (Directory.Exists(project.ProjectPath) == false)
@@ -78,18 +81,54 @@
                 {
                     throw new Exception($"{project.ProjectPath} doesn't contain a \"ProcessManger.Config.Json\" file");
                 };
+
+
+                }
+                catch (Exception exception)
+                {
+                    DI.Logger.Log($"Unable to validate Project.\n" +
+                        $"{exception.Message}", LogLevel.Warning);
+                };
             };
         }
 
 
         public void LoadProjectProcesses()
         {
-            foreach (var project in _projects)
+            foreach (var project in _projectsLoaded)
             {
+                try
+                {
+                    // Check if project directory exists
+                    if (Directory.Exists(project.ProjectPath) == false)
+                    {
+                        string errorString = $"{project.ProjectName} is not a valid directory or it doesn't exist";
+                        _logger.Log(errorString);
+
+                        throw new Exception(errorString);
+                    };
+
+                    // Check if project contains project config file
+                    if (File.Exists(Path.Combine(project.ProjectPath, _projectConfigFilename)) == false)
+            {
+                        string errorString = $"{project.ProjectName} doesn't contain a \"ProcessManger.Config.Json\" file";
+                        _logger.Log(errorString);
+
+                        throw new Exception(errorString);
+                    };
+
+
                 // Load the process list inside the project
                 project.ProcessList = new List<IProcessModel>(
                     // Read Project config file and deserialize
                     _processLoader.GetProcessListFromFile(project.ProjectPathWithConfig));
+
+                }
+                catch (Exception exception)
+                {
+                    DI.Logger.Log($"Unable to load Project.\n" +
+                        $"{exception.Message}", LogLevel.Warning);
+                };
             };
         }
 
