@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              
              d:DesignHeight="300" 
-             d:DesignWidth="400"
+             d:DesignWidth="500"
              
              d:DataContext="{x:Static local:ProjectsListViewModel.DesignInstance}">
 
@@ -116,6 +116,8 @@
 
                             <!-- Align 'Project name' header to project names -->
                             <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
+                            
+                            <ColumnDefinition Width="AUTO" SharedSizeGroup="Column1"/>
 
                             <!-- A very important spacer. 
                             'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
@@ -129,11 +131,11 @@
 
 
                         <!-- Project name column -->
-                        <TextBlock Grid.Column="0" 
+                        <TextBlock Grid.Column="1" 
                            
                                 Text="Project name"/>
 
-                        <TextBlock Grid.Column="2" 
+                        <TextBlock Grid.Column="3" 
                            
                                 Text="Process count"/>
 
@@ -150,6 +152,12 @@
                         <Border local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
                                 local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
                     
+                                x:Name="MainBorder"
+                                
+                                AllowDrop="True"
+                                MouseMove="MainBorder_MouseMove"
+                                DragDrop.Drop="MainBorder_Drop"
+                                
                                 Margin="-10,0"
                                 Padding="10,0"
                                 Height="35">
@@ -208,12 +216,14 @@
 
                             </Border.Style>
 
-                            <Grid>
+                            <Grid> 
 
                                 <Grid.ColumnDefinitions>
 
                                     <!-- Align project names to'Project name' header -->
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
+                                    
+                                    <ColumnDefinition Width="AUTO" SharedSizeGroup="Column1"/>
 
                                     <!-- A very important spacer. 
                                     'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
@@ -223,6 +233,14 @@
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
                                 </Grid.ColumnDefinitions>
+
+                                <Button Margin="0,0,10,0"
+                                        
+                                        IsEnabled="{Binding SettingsButtonVisible}"
+                                      
+                                        DataContext="{Binding}"
+                                        
+                                        Style="{StaticResource DarkGreyThreeDotButtonStyle}"/>
 
                                 
                                 <!-- The name of the project -->
@@ -234,13 +252,15 @@
                                         
                                            MaxWidth="160"
 
+                                           Grid.Column="1"
+                                           
                                            ToolTip="{Binding Project.ProjectName}"
                                        
                                            VerticalAlignment="Center"/>
 
 
                                 <!-- The three-dot button S-->
-                                <Button Grid.Column="1" 
+                                <Button Grid.Column="2" 
                                     
                                         IsEnabled="{Binding SettingsButtonVisible}"
                                         
@@ -259,7 +279,7 @@
                                        
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
-                                           Grid.Column="2"/>
+                                           Grid.Column="3"/>
 
                             </Grid>
 
