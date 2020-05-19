@@ -169,6 +169,166 @@
     </Style>
 
 
+    <Style x:Key="DarkGreyThreeDotButtonStyle" TargetType="{x:Type Button}">
+
+        <Setter Property="Foreground" Value="{StaticResource GreyBrush}"/>
+
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+        <Setter Property="Cursor" Value="Hand"/>
+
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+        <Setter Property="Opacity" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsEnabled}"/>
+
+
+        <Setter Property="Template">
+
+            <Setter.Value>
+
+                <ControlTemplate>
+
+                    <!-- The control's main border -->
+                    <Border Background="Transparent">
+
+                        <!-- A stack panel, jus for ease of layout so the dots will be aligned without too much hassle-->
+                        <StackPanel Orientation="Horizontal"
+                                                                    
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+
+                            <!-- The 3 dots, and 1 "main" dot that all other dots "inherit" from -->
+                            <Ellipse x:Name="MainEllipse"
+                                                                 
+                                      Width="7"
+                                      Height="{Binding Path=ActualWidth, 
+                                      RelativeSource={RelativeSource Mode=Self}}"
+                                      
+                                      Fill="{TemplateBinding Foreground}"/>
+
+                            <Ellipse Width="{Binding ElementName=MainEllipse, Path=ActualWidth}"
+                                     Height="{Binding ElementName=MainEllipse, Path=ActualHeight}"
+                                                                     
+                                     Margin="2,0"
+                                                                  
+                                     Fill="{TemplateBinding Foreground}"/>
+
+                            <Ellipse Width="{Binding ElementName=MainEllipse, Path=ActualWidth}"
+                                     Height="{Binding ElementName=MainEllipse, Path=ActualHeight}"
+                                                                      
+                                     Fill="{TemplateBinding Foreground}"/>
+
+                        </StackPanel>
+
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <!-- When mouse enters the control -->
+                        <Trigger Property="IsMouseOver" Value="True">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate to a white colour -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                                        
+                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                        
+                                                        To="{StaticResource WhiteColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+                            <!-- When mouse leave control -->
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Animate back to original colour -->
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                                                        
+                                                        Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                        
+                                                        To="{StaticResource GreyColour}"/>
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+
+                        <!-- Because visibility ironically doesn't work well with fade-in/out I use IsEnabled -->
+                        <Trigger Property="IsEnabled" Value="False">
+
+                            <Trigger.EnterActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Fade out when control is disabled -->
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                                 
+                                                                                 To="0" 
+                                                                                 
+                                                                                 Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                 />
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.EnterActions>
+
+
+                            <Trigger.ExitActions>
+
+                                <BeginStoryboard>
+
+                                    <Storyboard>
+
+                                        <!-- Fade in when control is enabled -->
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                                 
+                                                                                 To="1" 
+                                                                                 
+                                                                                 Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                                 />
+
+                                    </Storyboard>
+
+                                </BeginStoryboard>
+
+                            </Trigger.ExitActions>
+
+                        </Trigger>
+
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+
+        </Setter>
+
+    </Style>
+
+
+
     <!-- A button style used in the title bars -->
     <Style x:Key="ProjectListTitleButtonStyle" TargetType="{x:Type Button}">
 
@@ -219,7 +379,7 @@
                                         <!-- Change foreground colour to white -->
                                         <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
                                                                             
-                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                            Duration="0:0:1"
                                                                             
                                                                             To="{StaticResource WhiteColour}"/>
 
@@ -239,7 +399,7 @@
                                         <!-- Change foreground colour back to black -->
                                         <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
                                                                             
-                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
+                                                                            Duration="0:0:1"
                                                                             
                                                                             To="{StaticResource BlackColour}"/>
 
