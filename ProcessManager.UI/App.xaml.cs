@@ -109,7 +109,7 @@ namespace ProcessManager.UI
 
             serviceCollection.AddTransient<ILogger, ConsoleLogger>();
 #else
-            serviceCollection.AddTransient<ILogger, FileLogger>();
+            serviceCollection.AddTransient<ILogger, FileLogger>((provider) => new FileLogger(_logFilepath));
 #endif
 
 
