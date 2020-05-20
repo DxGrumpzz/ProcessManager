@@ -148,7 +148,7 @@ namespace ProcessManager.UI
         private void ExecuteBackToMainPageCommand()
         {
             // Go back to to the projects list view
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM);
         }
 
 

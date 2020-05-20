@@ -69,12 +69,20 @@
         /// </summary>
         public static ISerializer Serializer => GetService<ISerializer>();
         
+
         /// <summary>
         /// The app's UI manager, responsible for changing views, and such
         /// </summary>
         public static IUIManager UI => GetService<IUIManager>();
 
+
+        /// <summary>
+        /// A logger. Used to display build info, errors, and warnings
+        /// </summary>
         public static ILogger Logger => GetService<ILogger>();
+
+
+        public static ProjectsListViewModel ProjectsListVM => GetService<ProjectsListViewModel>();
 
 
         /// <summary>

@@ -159,7 +159,7 @@
 
         private void ExecuteBackToMainPageCommand()
         {
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM);
         }
 
         private void ExecuteSwitchToProcessSelectionViewCommand()

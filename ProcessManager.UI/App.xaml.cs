@@ -33,7 +33,6 @@ namespace ProcessManager.UI
         private string _logFilepath = $"{Environment.CurrentDirectory}\\{LOG_FILE_NAME}";
 
 
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -95,6 +94,7 @@ namespace ProcessManager.UI
             });
         }
 
+
         private IServiceCollection SetupDI()
         {
             var serviceCollection = new ServiceCollection();
@@ -150,13 +150,16 @@ namespace ProcessManager.UI
             });
 
 
+            // Setup Projects list viewmodel
+            serviceCollection.AddSingleton((provider) => new ProjectsListViewModel(provider.GetService<IList<Project>>()));
+
             // Setup main viewmodel
-            serviceCollection.AddSingleton((serviceProvider) => new MainWindowViewModel()
+            serviceCollection.AddSingleton((provider) => new MainWindowViewModel()
             {
-                CurrentView = new ProjectListView(
-                    new ProjectsListViewModel(DI.Projects)),
-                // CurrentView = new AddConsoleProcessView(new AddConsoleProcessViewModel(new ProjectItemViewModel(DI.Projects[0]))),
+                CurrentView = new ProjectListView(provider.GetService<ProjectsListViewModel>()),
             });
+
+
 
             serviceCollection.AddTransient<IUIManager, UImanager>();
 

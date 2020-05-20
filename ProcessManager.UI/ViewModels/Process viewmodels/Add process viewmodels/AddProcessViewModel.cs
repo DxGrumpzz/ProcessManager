@@ -39,7 +39,7 @@
             DI.UI.ChangeView(View.ProjectItemView, Project));
 
             SwitchToMainPageCommand = new RelayCommand(() =>
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects)));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM));
 
             OpenProjectDirectoryCommand = new RelayCommand(() =>
             DI.FolderDialog.OpenFolder(Project.Project.ProjectPath));

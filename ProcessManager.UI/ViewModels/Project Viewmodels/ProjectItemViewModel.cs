@@ -106,12 +106,12 @@
 
         private void ExecuteGotoMainPageommnad()
         {
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM);
         }
 
         private void SwitchToProjectListView()
         {
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM);
         }
 
     };

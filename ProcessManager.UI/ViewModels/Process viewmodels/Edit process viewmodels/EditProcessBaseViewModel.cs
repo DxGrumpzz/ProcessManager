@@ -50,7 +50,7 @@
             DI.UI.ChangeView(View.ProjectItemView, Project));
 
             BackToMainPageCommand = new RelayCommand(() =>
-            DI.UI.ChangeView(View.ProjectsListView, new ProjectsListViewModel(DI.Projects)));
+            DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM));
         }
 
 

@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -51,12 +51,6 @@ namespace ProcessManager.UI
                 return;
 
             currentData.Drop(droppedData);
-
-
-            _viewModel.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
-            {
-                return new ProjectListItemViewModel(project);
-            }));
         }
 
 

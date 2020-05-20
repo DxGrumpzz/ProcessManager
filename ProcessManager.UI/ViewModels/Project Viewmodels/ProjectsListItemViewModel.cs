@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -88,6 +89,12 @@
 
             var bytes = DI.Serializer.SerializerProjects(DI.Projects);
             File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+
+
+            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
+            {
+                return new ProjectListItemViewModel(project);
+            }));
         }
 
 
