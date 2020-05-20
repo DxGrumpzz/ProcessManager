@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
@@ -71,6 +72,24 @@
                 SettingsButtonVisible = false;
             });
         }
+
+
+
+
+        public void Drop(ProjectListItemViewModel droppedData)
+        {
+            var currentIndex = DI.Projects.IndexOf(Project);
+            var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
+
+            var temp = DI.Projects[currentIndex];
+
+            DI.Projects[currentIndex] = droppedData.Project;
+            DI.Projects[droppedIndex] = temp;
+
+            var bytes = DI.Serializer.SerializerProjects(DI.Projects);
+            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+        }
+
 
 
         private void ExecuteRunProjectCommand()

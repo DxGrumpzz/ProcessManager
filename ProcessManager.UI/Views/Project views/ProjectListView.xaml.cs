@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -50,17 +50,7 @@
             if (currentData == data)
                 return;
 
-
-            var currentIndex = DI.Projects.IndexOf(currentData.Project);
-            var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
-
-            var temp = DI.Projects[currentIndex];
-
-            DI.Projects[currentIndex] = droppedData.Project;
-            DI.Projects[droppedIndex] = temp;
-
-            var bytes = DI.Serializer.SerializerProjects(DI.Projects);
-            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+            currentData.Drop(droppedData);
 
 
             _viewModel.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
