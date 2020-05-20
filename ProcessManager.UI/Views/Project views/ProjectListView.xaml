@@ -155,8 +155,9 @@
                                 x:Name="MainBorder"
                                 
                                 AllowDrop="True"
-                                MouseMove="MainBorder_MouseMove"
                                 DragDrop.Drop="MainBorder_Drop"
+                                DragDrop.DragEnter="MainBorder_DragEnter"
+                                DragDrop.DragLeave="MainBorder_DragLeave"
                                 
                                 Margin="-10,0"
                                 Padding="10,0"
@@ -216,7 +217,7 @@
 
                             </Border.Style>
 
-                            <Grid> 
+                            <Grid >
 
                                 <Grid.ColumnDefinitions>
 
@@ -227,20 +228,24 @@
 
                                     <!-- A very important spacer. 
                                     'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
-                                        so I have to use a column that takes the "remaning" space -->
+                                    so I have to use a column that takes the "remaning" space -->
                                     <ColumnDefinition Width="*"/>
 
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
                                 </Grid.ColumnDefinitions>
 
-                                <Button Margin="0,0,10,0"
-                                        
+
+                                <Button Margin="-10,0,0,0"
+                                  
                                         IsEnabled="{Binding SettingsButtonVisible}"
-                                      
+                                        
+                                        PreviewMouseMove="Button_PreviewMouseMove"
+                                        Width="20"
+                                 
                                         DataContext="{Binding}"
                                         
-                                        Style="{StaticResource DarkGreyThreeDotButtonStyle}"/>
+                                        Style="{StaticResource DarkGreyThreeDotVerticalButtonStyle}"/>
 
                                 
                                 <!-- The name of the project -->

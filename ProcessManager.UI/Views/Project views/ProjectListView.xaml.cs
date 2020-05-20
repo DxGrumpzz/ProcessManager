@@ -7,6 +7,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using System.Windows.Media;
 
     /// <summary>
     /// Interaction logic for MainView.xaml
@@ -14,6 +15,8 @@
     public partial class ProjectListView : UserControl
     {
         private ProjectsListViewModel _viewModel;
+
+        private const string DRAG_DROP_DATA_NAME = "ViewModelData";
 
         public ProjectListView()
         {
@@ -28,24 +31,15 @@
         }
 
 
-        private void Button_DragEnter(object sender, DragEventArgs e)
-        {
-            var button = (Button)sender;
-
-            DI.Logger.Log("Drag enter");
-
-
-            Debugger.Break();
-        }
-
         private void MainBorder_Drop(object sender, DragEventArgs e)
         {
-            DI.Logger.Log("Drag, dropped");
-
             Border border = (Border)sender;
             var currentData = (ProjectListItemViewModel)border.DataContext;
 
-            var data = e.Data.GetData("Data1");
+            var data = e.Data.GetData(DRAG_DROP_DATA_NAME);
+
+            if (data is null)
+                return;
 
             if (!(data is ProjectListItemViewModel droppedData))
             {
@@ -53,17 +47,21 @@
                 return;
             };
 
+            if (currentData == data)
+                return;
+
 
             var currentIndex = DI.Projects.IndexOf(currentData.Project);
             var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
 
-            var temp3 = DI.Projects[currentIndex];
+            var temp = DI.Projects[currentIndex];
 
             DI.Projects[currentIndex] = droppedData.Project;
-            DI.Projects[droppedIndex] = temp3;
+            DI.Projects[droppedIndex] = temp;
 
             var bytes = DI.Serializer.SerializerProjects(DI.Projects);
             File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+
 
             _viewModel.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
             {
@@ -72,20 +70,30 @@
         }
 
 
-        private void MainBorder_MouseMove(object sender, MouseEventArgs e)
+        private void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                DI.Logger.Log("Drag started");
-
-                Border border = (Border)sender;
+                Button border = (Button)sender;
 
                 DataObject dragDropData = new DataObject();
 
-                dragDropData.SetData("Data1", border.DataContext);
+                dragDropData.SetData(DRAG_DROP_DATA_NAME, border.DataContext);
 
                 DragDrop.DoDragDrop(border, dragDropData, DragDropEffects.Move);
             };
+        }
+
+        private void MainBorder_DragEnter(object sender, DragEventArgs e)
+        {
+            Border border = (Border)sender;
+            border.Background = (SolidColorBrush)App.Current.Resources["LightGreyBrush"];
+        }
+
+        private void MainBorder_DragLeave(object sender, DragEventArgs e)
+        {
+            Border border = (Border)sender;
+            border.Background = Brushes.Transparent;
         }
     }
 }
