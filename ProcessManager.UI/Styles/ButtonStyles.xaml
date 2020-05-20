@@ -378,7 +378,7 @@
                                         <!-- Change foreground colour to white -->
                                         <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
                                                                             
-                                                                            Duration="0:0:1"
+                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                             
                                                                             To="{StaticResource WhiteColour}"/>
 
@@ -398,7 +398,7 @@
                                         <!-- Change foreground colour back to black -->
                                         <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
                                                                             
-                                                                            Duration="0:0:1"
+                                                                            Duration="{StaticResource MouseHoverAnimationTiming}"
                                                                             
                                                                             To="{StaticResource BlackColour}"/>
 
