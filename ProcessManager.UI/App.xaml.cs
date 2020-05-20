@@ -27,6 +27,13 @@ namespace ProcessManager.UI
         private static extern void AllocConsole();
 #endif
 
+
+        private const string LOG_FILE_NAME = "Log.txt";
+
+        private string _logFilepath = $"{Environment.CurrentDirectory}\\{LOG_FILE_NAME}";
+
+
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -51,6 +58,10 @@ namespace ProcessManager.UI
                 return;
             };
 
+            // Create new file for logging
+            File.Create(_logFilepath)
+                // Dispose file stream after creation
+                .Dispose();
 
             DI.Logger.Log("Creating MainWindow...");
 
@@ -91,6 +102,7 @@ namespace ProcessManager.UI
 
             serviceCollection.AddTransient<IUserDialog, WindowsUserDialog>();
 
+
 #if DEBUG
             AllocConsole();
             Console.Title = "ProcessManager.UI console logger";
@@ -99,6 +111,7 @@ namespace ProcessManager.UI
 #else
             serviceCollection.AddTransient<ILogger, FileLogger>();
 #endif
+
 
             // Setup serializer
             serviceCollection.AddTransient<ISerializer, JsonSerializer>();

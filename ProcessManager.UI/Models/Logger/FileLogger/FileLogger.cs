@@ -11,7 +11,7 @@
     {
         private object _synchronizingObject = new object();
 
-        private string _logFilePath;
+        private string _logFilepath;
 
         /// <summary>
         /// The logger's verboseness level 
@@ -28,18 +28,9 @@
         /// <summary>
         /// Default constructor, takes a file path and writes the log there
         /// </summary>
-        /// <param name="logFilePath"></param>
-        public FileLogger(string logFilePath = "\\Log\\Log.txt")
+        public FileLogger(string logFilepath)
         {
-            if (string.IsNullOrWhiteSpace(logFilePath))
-                throw new ArgumentNullException("Log path can't be empty");
-
-            _logFilePath = logFilePath;
-
-            // Create new file for logging
-            File.Create(Path.Combine(logFilePath, logFilePath))
-                // Dispose file stream after creation
-                .Dispose();
+            _logFilepath = logFilepath;
         }
 
 
@@ -59,10 +50,11 @@
                 string message =
                     $"[{logLevel}]{Environment.NewLine}" +
                     $"[{Path.GetFileName(filePath)} > {callerOrigin}() > Line: {lineNumber}]" +
-                    $"{Environment.NewLine}{logMessage}{Environment.NewLine}";
+                    $"{Environment.NewLine}{logMessage}{Environment.NewLine}" +
+                    Environment.NewLine;
 
                 // Write log message to log file
-                File.AppendAllText(_logFilePath, message);
+                File.AppendAllText(_logFilepath, message);
 
                 // Invoke log event
                 NewLog?.Invoke(logMessage, logLevel);
