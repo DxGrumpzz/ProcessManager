@@ -92,4 +92,54 @@
         }
     };
 
+
+    public class MouseMoved
+    {
+
+        public static ICommand GetCommand(DependencyObject obj)
+        {
+            return (ICommand)obj.GetValue(CommandProperty);
+        }
+
+        public static void SetCommand(DependencyObject obj, ICommand value)
+        {
+            obj.SetValue(CommandProperty, value);
+        }
+
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.RegisterAttached("Command",
+                typeof(ICommand),
+                typeof(MouseMoved),
+                new PropertyMetadata(default(ICommand), CommandPropertyChanged));
+
+        private static void CommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // Don't do anything if the control doesn't derive from UIElement
+            if (!(d is FrameworkElement frameworkElement))
+                return;
+
+            // If the value isn't an ICommand derivative 
+            if (!(e.NewValue is ICommand))
+            {
+                Debugger.Break();
+                return;
+            }
+
+            frameworkElement.Initialized += (sender, initializedEvent) =>
+            {
+                var mouseInfo = new MouseMovedInfo();
+
+                // Bind MouseLeave event and execute the command
+                frameworkElement.PreviewMouseMove += (object sender, MouseEventArgs mouseEvent) =>
+                {
+                    mouseInfo.LeftButtonPressed = mouseEvent.LeftButton == MouseButtonState.Pressed;
+                    mouseInfo.RightButtonPressed = mouseEvent.RightButton == MouseButtonState.Pressed;
+
+                    ((ICommand)e.NewValue).Execute(mouseInfo);
+                };
+            };
+        }
+    };
+
+
 };
