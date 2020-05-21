@@ -130,23 +130,12 @@
         /// </summary>
         private readonly Action<T> _method;
 
-        /// <summary>
-        /// A "generic" asynchronous method that takes a single argument
-        /// </summary>
-        private readonly Func<T, Task> _aasyncMethod;
-
         #endregion
 
 
         public RelayCommand(Action<T> method, Func<bool> predicate = null)
         {
             _method = method;
-            _predicate = predicate;
-        }
-
-        public RelayCommand(Func<T, Task> method, Func<bool> predicate = null)
-        {
-            _aasyncMethod = method;
             _predicate = predicate;
         }
 
@@ -161,20 +150,10 @@
         /// Executes the action
         /// </summary>
         /// <param name="parameter"></param>
-        public async void Execute(object parameter = null)
+        public void Execute(object parameter = null)
         {
             // Invoke if not null
             _method?.Invoke((T)parameter);
-
-            try
-            {
-                if (!(_aasyncMethod is null))
-                    await _aasyncMethod?.Invoke((T)parameter);
-            }
-            catch
-            {
-                throw;
-            }
         }
     }
 
