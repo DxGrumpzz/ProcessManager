@@ -24,6 +24,9 @@
             SettingsButtonVisible = true,
         };
 
+         /// <summary>
+        /// A common key for the data passed between drag and drop operations
+        /// </summary>
         private const string DRAG_DROP_DATA_NAME = "ViewModelData";
 
 
@@ -33,6 +36,8 @@
         private bool _isSelected;
 
         private bool _settingsButtonVisible;
+       
+        private bool _dragAndDropEnabled;
 
         #endregion
 
@@ -40,6 +45,9 @@
 
         #region Public properties
 
+        /// <summary>
+        /// A boolean flag that indicates if the project settings button should be visible
+        /// </summary>
         public bool SettingsButtonVisible
         {
             get => _settingsButtonVisible;
@@ -63,12 +71,22 @@
             }
         }
 
+
+        /// <summary>
+        /// A <see cref="Project"/> associated with this viewmodel
+        /// </summary>
         public Project Project { get; }
 
+
+        /// <summary>
+        /// "Shared" drag and drop data that will be passed between "dragiee" and "dropiee" controls
+        /// </summary>
         public Dictionary<string, object> DragDropData { get; }
 
-        private bool _dragAndDropEnabled;
 
+        /// <summary>
+        /// A boolean flag that indicates if the drag and drop operations are enabled
+        /// </summary>
         public bool DragAndDropEnabled
         {
             get => _dragAndDropEnabled;
@@ -136,6 +154,7 @@
 
             DropCommand = new RelayCommand<Dictionary<string, object>>((dragDropData) =>
             {
+                // Validate that data actually exists
                 if (dragDropData is null)
                 {
                     DI.Logger.Log("Drag and drop error. Dropped data is null", LogLevel.Warning);
@@ -143,6 +162,7 @@
                     return;
                 };
 
+                // Check if dropped data actually contains valid info
                 if (dragDropData.TryGetValue(DRAG_DROP_DATA_NAME, out object dropData) == false)
                 {
                     DI.Logger.Log("Drag and drop error. Unable to find valid data", LogLevel.Error);
@@ -150,6 +170,7 @@
                     return;
                 };
 
+                // Check if dropped data is actually of the correct type
                 if (!(dropData is ProjectListItemViewModel dropDataAsVM))
                 {
                     DI.Logger.Log("Drag and drop error. Dropped data contains invald value(s)", LogLevel.Warning);
@@ -157,6 +178,7 @@
                     return;
                 };
 
+                // Do drop stuff
                 Drop(dropDataAsVM);
             });
 
@@ -195,28 +217,7 @@
 
 
 
-        public void Drop(ProjectListItemViewModel droppedData)
-        {
-            var currentIndex = DI.Projects.IndexOf(Project);
-            var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
-
-            var temp = DI.Projects[currentIndex];
-
-            DI.Projects[currentIndex] = droppedData.Project;
-            DI.Projects[droppedIndex] = temp;
-
-            var bytes = DI.Serializer.SerializerProjects(DI.Projects);
-            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
-
-
-            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
-            {
-                return new ProjectListItemViewModel(project);
-            }));
-        }
-
-
-
+       
         private void ExecuteRunProjectCommand()
         {
             foreach (var process in Project.ProcessList)
@@ -240,6 +241,43 @@
         {
             DI.UI.ChangeView(View.ProjectItemView, new ProjectItemViewModel(Project));
         }
+
+
+        private void Drop(ProjectListItemViewModel droppedData)
+        {
+            // Swap between the dragged project and dropped project
+            SwapProjects(droppedData);
+
+            // Write the changes to file
+            var bytes = DI.Serializer.SerializerProjects(DI.Projects);
+            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+
+            // Update the projects list 
+            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
+            {
+                return new ProjectListItemViewModel(project);
+            }));
+        }
+
+
+        /// <summary>
+        /// Swaps places between 2 projects
+        /// </summary>
+        /// <param name="droppedData"></param>
+        private void SwapProjects(ProjectListItemViewModel droppedData)
+        {
+            // Find indices of the 2 projects (this, and the dropped)
+            var currentIndex = DI.Projects.IndexOf(Project);
+            var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
+
+            // Using a sophisticated swap algorithm with a constant runtime of O(1), swap the 2 elements between in the list
+            var temp = DI.Projects[currentIndex];
+
+            DI.Projects[currentIndex] = droppedData.Project;
+            DI.Projects[droppedIndex] = temp;
+        }
+
+
 
     };
 };
