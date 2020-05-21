@@ -93,6 +93,9 @@
     };
 
 
+    /// <summary>
+    /// A class that contains attached properties for a mouse moved event
+    /// </summary>
     public class MouseMoved
     {
 
@@ -106,11 +109,16 @@
             obj.SetValue(CommandProperty, value);
         }
 
+
+        /// <summary>
+        /// An attached property that invokes an <see cref="ICommand"/> when the mouse moves over the control
+        /// </summary>
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached("Command",
                 typeof(ICommand),
                 typeof(MouseMoved),
                 new PropertyMetadata(default(ICommand), CommandPropertyChanged));
+
 
         private static void CommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -125,6 +133,7 @@
                 return;
             }
 
+            // Wait for control to initialize
             frameworkElement.Initialized += (sender, initializedEvent) =>
             {
                 var mouseInfo = new MouseMovedInfo();
