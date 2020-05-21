@@ -143,6 +143,7 @@
 
                 </HeaderedItemsControl.Header>
 
+                <!---->
 
                 <!-- Items/rows inside -->
                 <HeaderedItemsControl.ItemTemplate>
@@ -155,9 +156,12 @@
                                 x:Name="MainBorder"
                                 
                                 AllowDrop="True"
-                                DragDrop.Drop="MainBorder_Drop"
-                                DragDrop.DragEnter="MainBorder_DragEnter"
-                                DragDrop.DragLeave="MainBorder_DragLeave"
+                                
+                                Background="Transparent"
+                                
+                                local:DragAndDrop.DragEnterCommand="{Binding DragEnterCommand}"
+                                local:DragAndDrop.DragLeaveCommand="{Binding DragLeaveCommand}"
+                                local:DragAndDrop.DropCommand="{Binding DropCommand}"
                                 
                                 Margin="-10,0"
                                 Padding="10,0"
@@ -171,9 +175,9 @@
 
                                     <Style.Triggers>
 
-                                        <Trigger Property="IsMouseOver" Value="True">
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
 
-                                            <Trigger.EnterActions>
+                                            <DataTrigger.EnterActions>
 
                                                 <BeginStoryboard>
 
@@ -189,9 +193,9 @@
 
                                                 </BeginStoryboard>
 
-                                            </Trigger.EnterActions>
+                                            </DataTrigger.EnterActions>
 
-                                            <Trigger.ExitActions>
+                                            <DataTrigger.ExitActions>
 
                                                 <BeginStoryboard>
 
@@ -207,9 +211,9 @@
 
                                                 </BeginStoryboard>
 
-                                            </Trigger.ExitActions>
+                                            </DataTrigger.ExitActions>
 
-                                        </Trigger>
+                                        </DataTrigger>
 
                                     </Style.Triggers>
 
@@ -217,7 +221,8 @@
 
                             </Border.Style>
 
-                            <Grid >
+
+                            <Grid>
 
                                 <Grid.ColumnDefinitions>
 
@@ -241,16 +246,20 @@
                                   
                                         IsEnabled="{Binding SettingsButtonVisible}"
                                         
-                                        PreviewMouseMove="Button_PreviewMouseMove"
+                                        ToolTip="Drag and drop"
+                                        
                                         Width="20"
                                  
                                         Cursor="SizeAll"   
                                         
-                                        DataContext="{Binding}"
+                                        local:MouseMoved.Command="{Binding MouseMovedCommand}"
+                                        
+                                        local:DragAndDrop.StartDragDropCommand="{Binding DragAndDropEnabled}"
+                                        local:DragAndDrop.DragDropData="{Binding DragDropData}"
                                         
                                         Style="{StaticResource DarkGreyThreeDotVerticalButtonStyle}"/>
 
-                                
+
                                 <!-- The name of the project -->
                                 <TextBlock Text="{Binding Project.ProjectName}"
                                            FontFamily="{StaticResource LatoThin}"
