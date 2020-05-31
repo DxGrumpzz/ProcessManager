@@ -1,6 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Windows.Input;
@@ -81,6 +82,12 @@
 
             // Remove this project from from list in DI
             DI.Projects.Remove(Project);
+
+            // Update projects list after project deletion
+            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects
+                // Convert ProjectModel to ProjectListItemViewModel
+                .Select(project => new ProjectListItemViewModel(project)));
+
 
             // Convert the json object to json string
             var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);
