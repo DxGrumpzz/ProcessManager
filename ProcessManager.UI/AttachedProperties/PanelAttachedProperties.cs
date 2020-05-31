@@ -110,7 +110,7 @@
                     // Get the panel's children as an enumerable of FrameworkElement
                     var children = panel.Children.Cast<FrameworkElement>();
 
-                    // Find child widest child
+                    // Find widest child
                     double biggestWidth = children.Max(child => child.ActualWidth);
 
                     // Set uniform width to all panel children

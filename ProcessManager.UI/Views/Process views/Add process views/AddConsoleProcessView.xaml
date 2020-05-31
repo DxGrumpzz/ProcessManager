@@ -46,7 +46,7 @@
             </TextBlock>
 
 
-            <TextBlock Text="Add a process that will run directly from the cmd such as; a batch script, npm, etc.. directly from the console"
+            <TextBlock Text="A console process that will run directly from the cmd such as; a batch script, npm, etc.."
                        
                        FontWeight="Thin"
                        FontFamily="{StaticResource LatoThin}"
