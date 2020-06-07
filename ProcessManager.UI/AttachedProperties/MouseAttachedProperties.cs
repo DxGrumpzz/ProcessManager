@@ -134,7 +134,7 @@
             }
 
             // Wait for control to initialize
-            frameworkElement.Initialized += (sender, initializedEvent) =>
+            frameworkElement.Loaded += (sender, initializedEvent) =>
             {
                 var mouseInfo = new MouseMovedInfo();
 
