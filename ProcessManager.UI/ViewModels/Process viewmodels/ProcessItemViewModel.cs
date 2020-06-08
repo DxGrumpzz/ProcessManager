@@ -31,7 +31,7 @@ namespace ProcessManager.UI
 
         #region Public properties
 
-        public ProjectItemViewModel Project { get; set; }
+        public ProjectItemViewModel ProjectItemVM { get; set; }
 
 
         /// <summary>
