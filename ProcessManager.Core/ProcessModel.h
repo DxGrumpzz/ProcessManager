@@ -28,7 +28,7 @@ private:
     bool _isClosing = false;
 
     // A mutex that is shared between the close and run calls
-    std::mutex _processInitializationCloseMutex;
+    std::mutex _processOpenCloseMutex;
 
 public:
 
@@ -102,7 +102,7 @@ public:
     // Run the process and return boolean result
     bool RunProcess()
     {
-        std::lock_guard< std::mutex>lock(_processInitializationCloseMutex);
+        std::lock_guard< std::mutex>lock(_processOpenCloseMutex);
 
         if (_isInitializing == true || _isClosing == true)
             return false;
@@ -137,7 +137,7 @@ public:
     // Closes the process
     bool CloseProcess()
     {
-        std::lock_guard< std::mutex>lock(_processInitializationCloseMutex);
+        std::lock_guard< std::mutex>lock(_processOpenCloseMutex);
 
         if (_isInitializing == true || _isClosing == true)
             return false;
@@ -221,6 +221,7 @@ private:
         std::wstring normalizedArgs;
         NormalizedArgs(normalizedArgs);
 
+
         // Run the process
         if (!CreateProcessW(ProcessPath.c_str(),
             const_cast<wchar_t*>(normalizedArgs.c_str()),
@@ -243,9 +244,10 @@ private:
         // Allow process to initialize
         ResumeProcess();
 
+
         // Find the process main WindowHandle
         MainWindowHandle = GetProcessHWND(ProcessInfo.dwProcessId, 10000);
-
+        
         return true;
     };
 

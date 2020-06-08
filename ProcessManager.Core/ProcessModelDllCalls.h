@@ -46,12 +46,12 @@ DLL_CALL void DestroyProcessObject(ProcessModel*& process)
 
 
 
-DLL_CALL bool RunProcess(ProcessModel*& process)
+DLL_CALL bool RunProcess(ProcessModel* process)
 {
     return process->RunProcess();
 };
 
-DLL_CALL bool CloseProcess(ProcessModel*& process)
+DLL_CALL bool CloseProcess(ProcessModel* process)
 {
     bool result = process->CloseProcess();
 

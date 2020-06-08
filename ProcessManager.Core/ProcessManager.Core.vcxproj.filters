@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ProcessManagerDllCalls.h">
-      <Filter>ProcessManager</Filter>
-    </ClCompile>
     <ClCompile Include="SystemTrayIconDllCalls.h">
       <Filter>SystemTrayIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessModelDllCalls.h">
+      <Filter>ProcessModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -16,7 +16,7 @@
       <Filter>SystemTrayIcon</Filter>
     </ClInclude>
     <ClInclude Include="ProcessModel.h">
-      <Filter>ProcessManager</Filter>
+      <Filter>ProcessModel</Filter>
     </ClInclude>
     <ClInclude Include="WindowsHelpers.h">
       <Filter>WindowsHelpers</Filter>
@@ -29,7 +29,7 @@
     <Filter Include="WindowsHelpers">
       <UniqueIdentifier>{dde3a1cf-64ae-4481-a4ca-e2821738e06d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ProcessManager">
+    <Filter Include="ProcessModel">
       <UniqueIdentifier>{7e8e7a43-d2b3-4bd0-9218-8e795d7c56d5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
