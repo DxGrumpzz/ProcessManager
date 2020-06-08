@@ -82,6 +82,8 @@ namespace ProcessManager.UI
 
         public ICommand AddProcessCommand { get; }
 
+        public ICommand OpenProjectDirectoryCommand { get; }
+
         #endregion
 
 
@@ -113,6 +115,9 @@ namespace ProcessManager.UI
                 () => ConsoleDirectory?.Length >= 3 &&
                 // And isn't a valid directory
                 Directory.Exists(ConsoleDirectory));
+
+            OpenProjectDirectoryCommand = new RelayCommand(() =>
+            DI.FolderDialog.OpenFolder(ProjectItemVM.Project.ProjectPath));
         }
 
 

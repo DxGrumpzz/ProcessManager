@@ -26,12 +26,12 @@
         <StackPanel>
 
             <!-- The name of the project -->
-            <TextBlock Text="{Binding Project.Project.ProjectName}"
+            <TextBlock Text="{Binding ProjectItemVM.Project.ProjectName}"
                    
                        FontSize="20"/>
 
             <!-- Project path -->
-            <TextBlock Text="{Binding Project.Project.ProjectPath}"
+            <TextBlock Text="{Binding ProjectItemVM.Project.ProjectPath}"
                    
                        FontFamily="{StaticResource LatoThin}"
                        FontWeight="Thin"

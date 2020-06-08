@@ -36,6 +36,7 @@
         public ICommand BackToProjectPageCommand { get; }
         public ICommand BackToMainPageCommand { get; }
 
+        public ICommand OpenProjectDirectoryCommand { get; }
 
         #endregion
 
@@ -51,6 +52,11 @@
 
             BackToMainPageCommand = new RelayCommand(() =>
             DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM));
+
+
+            OpenProjectDirectoryCommand = new RelayCommand(() =>
+            DI.FolderDialog.OpenFolder(ProjectItemVM.Project.ProjectPath));
+
         }
 
 

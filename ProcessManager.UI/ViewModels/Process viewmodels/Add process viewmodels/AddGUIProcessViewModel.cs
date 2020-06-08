@@ -89,6 +89,8 @@
 
         public ICommand AddProcessCommand { get; }
 
+        public ICommand OpenProjectDirectoryCommand { get; }
+
         #endregion
 
 
@@ -113,6 +115,9 @@
                 () => SelectedProcessPath?.Length >= 6 && 
                 // And make sure the file actually exists
                 File.Exists(SelectedProcessPath));
+
+            OpenProjectDirectoryCommand = new RelayCommand(() =>
+            DI.FolderDialog.OpenFolder(ProjectItemVM.Project.ProjectPath));
         }
 
 
@@ -142,6 +147,8 @@
 
             // Return back to the Project's view
             ExecuteSwitchToProcessSelectionViewCommand();
+
+
         }
 
         private void ExecuteSelectProcessCommand()

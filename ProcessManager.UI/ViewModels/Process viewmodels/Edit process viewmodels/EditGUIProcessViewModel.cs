@@ -26,7 +26,6 @@ namespace ProcessManager.UI
         };
 
 
-
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -18,7 +18,7 @@
             }));
 
 
-        public ProjectItemViewModel Project { get; }
+        public ProjectItemViewModel ProjectItemVM { get; }
 
         public List<ProcessType> ProcessTypes { get; private set; }
 
@@ -29,22 +29,28 @@
 
         public ICommand SwitchToAddProcessViewCommand { get; }
 
+        public ICommand OpenProjectDirectory { get; }
+
         public AddProcessViewModel(ProjectItemViewModel project)
         {
-            Project = project;
+            ProjectItemVM = project;
 
             SetupProcessTypes();
 
             SwitchToProjectPageCommand = new RelayCommand(() =>
-            DI.UI.ChangeView(View.ProjectItemView, Project));
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM));
 
             SwitchToMainPageCommand = new RelayCommand(() =>
             DI.UI.ChangeView(View.ProjectsListView, DI.ProjectsListVM));
 
             OpenProjectDirectoryCommand = new RelayCommand(() =>
-            DI.FolderDialog.OpenFolder(Project.Project.ProjectPath));
+            DI.FolderDialog.OpenFolder(ProjectItemVM.Project.ProjectPath));
 
             SwitchToAddProcessViewCommand = new RelayCommand<ProcessType>(ExecuteSwitchToAddProcessViewCommand);
+
+            OpenProjectDirectory = new RelayCommand(() =>
+            DI.FolderDialog.OpenFolder(ProjectItemVM.Project.ProjectPath));
+
         }
 
 
@@ -55,13 +61,13 @@
             {
                 case ProcessType.Console:
                 {
-                    DI.UI.ChangeView(View.AddConsoleProcessView, new AddConsoleProcessViewModel(Project));
+                    DI.UI.ChangeView(View.AddConsoleProcessView, new AddConsoleProcessViewModel(ProjectItemVM));
                     break;
                 };
 
                 case ProcessType.GUI:
                 {
-                    DI.UI.ChangeView(View.AddGUIProcessView, new AddGUIProcessViewModel(Project));
+                    DI.UI.ChangeView(View.AddGUIProcessView, new AddGUIProcessViewModel(ProjectItemVM));
                     break;
                 };
             };
