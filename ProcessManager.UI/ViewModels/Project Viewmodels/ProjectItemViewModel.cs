@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -11,6 +11,7 @@
     /// </summary>
     public class ProjectItemViewModel : BaseViewModel
     {
+
         public static ProjectItemViewModel DesignInstance => new ProjectItemViewModel(new Project()
         {
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
@@ -25,6 +26,12 @@
             },
         });
 
+        #region Private fields
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ObservableCollection<ProcessItemViewModel> _processList;
+
+        #endregion
 
         /// <summary>
         /// The project associated with this viewmodel
@@ -34,8 +41,16 @@
         /// <summary>
         /// The project's processes as a "list" of ProcessItemViewModel
         /// </summary>
-        public IEnumerable<ProcessItemViewModel> ProcessList => Project.ProcessList
-            .Select(process => new ProcessItemViewModel(this, process)).ToArray();
+        public ObservableCollection<ProcessItemViewModel> ProcessList
+        {
+            get => _processList;
+            private set
+            {
+                _processList = value;
+                OnPropertyChanged();
+            }
+        }
+
 
 
         #region Public commands
