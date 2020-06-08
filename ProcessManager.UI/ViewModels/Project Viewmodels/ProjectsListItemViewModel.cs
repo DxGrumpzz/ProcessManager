@@ -117,8 +117,6 @@
         public ICommand DragLeaveCommand { get; }
         public ICommand DropCommand { get; }
 
-        public ICommand DragCommand  { get; }
-        
         public ICommand MouseMovedCommand { get; }
 
         #endregion

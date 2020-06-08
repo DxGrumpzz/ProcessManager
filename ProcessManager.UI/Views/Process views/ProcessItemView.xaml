@@ -10,8 +10,16 @@
              
              d:DataContext="{x:Static local:ProcessItemViewModel.DesignInstance}">
 
+
     <Border Background="Transparent"
-            x:Name="MainBorder">
+            x:Name="MainBorder"
+            
+            AllowDrop="True"
+            
+            local:DragAndDrop.DragEnterCommand="{Binding DragEnterCommand}"
+            local:DragAndDrop.DragLeaveCommand="{Binding DragLeaveCommand}"
+            local:DragAndDrop.DropCommand="{Binding DropCommand}">
+        
 
         <Border.Style>
 
@@ -68,21 +76,36 @@
 
         <Grid Height="35"
               
-              Margin="10,0">
+              Margin="0,0,10,0">
 
 
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="AUTO"/>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="AUTO" SharedSizeGroup="Col1"/>
                 <ColumnDefinition Width="AUTO" SharedSizeGroup="Col2"/>
             </Grid.ColumnDefinitions>
 
 
+            <Button Width="15"
+    
+                    Cursor="SizeAll"
+                    
+                    local:MouseMoved.Command="{Binding MouseMovedCommand}"
+                    
+                    local:DragAndDrop.StartDragDropCommand="{Binding DragAndDropEnabled}"
+                    local:DragAndDrop.DragDropData="{Binding DragDropData}"
+                    
+                    Style="{StaticResource DarkGreyThreeDotVerticalButtonStyle}"/>
+            
+
             <!-- Process name and label -->
             <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
                   TextBlock.FontWeight="Thin"
              
                   TextBlock.FontSize="17"
+            
+                  Grid.Column="1"
                   
                   Background="Transparent"
                   
@@ -117,7 +140,7 @@
             </Grid>
 
             <!-- Eidt process button -->
-            <Button Grid.Column="1" 
+            <Button Grid.Column="2" 
                                     
                     IsEnabled="{Binding ElementName=MainBorder, Path=IsMouseOver}"
                                         
@@ -130,7 +153,7 @@
             <!-- Run and close buttons container -->
             <StackPanel Orientation="Horizontal"
                         
-                        Grid.Column="2" 
+                        Grid.Column="3" 
                         
                         Margin="0,1"
                         local:UniformMargin.Margin="5,0,0,0">

@@ -1,5 +1,6 @@
 namespace ProcessManager.UI
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace ProcessManager.UI
             new GUIProcess(Path.GetRandomFileName()));
 
 
+        private const string DRAG_DROP_DATA_NAME = "ViewModelData";
+
+
         #region Private fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -25,11 +29,20 @@ namespace ProcessManager.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _processLabelVisible;
+        private bool _isSelected;
+        private bool _dragAndDropEnabled;
 
         #endregion
 
 
         #region Public properties
+
+
+        /// <summary>
+        /// "Shared" drag and drop data that will be passed between "dragiee" and "dropiee" controls
+        /// </summary>
+        public Dictionary<string, object> DragDropData { get; }
+
 
         public ProjectItemViewModel ProjectItemVM { get; set; }
 
@@ -127,6 +140,29 @@ namespace ProcessManager.UI
         /// </summary>
         public bool ProcessHasLabel => !string.IsNullOrWhiteSpace(Process.ProcessLabel);
 
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public bool DragAndDropEnabled
+        {
+            get => _dragAndDropEnabled;
+            set
+            {
+                _dragAndDropEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         #endregion
 
 
@@ -145,13 +181,30 @@ namespace ProcessManager.UI
 
         public ICommand EditProcessCommand { get; }
 
+
+
+        public ICommand DragEnterCommand { get; }
+        public ICommand DragLeaveCommand { get; }
+        public ICommand DropCommand { get; }
+
+        public ICommand DragCommand { get; }
+
+        public ICommand MouseMovedCommand { get; set; }
+
         #endregion
 
 
         public ProcessItemViewModel(ProjectItemViewModel project, IProcessModel process)
         {
-            Project = project;
+            ProjectItemVM = project;
             Process = process;
+
+
+            DragDropData = new Dictionary<string, object>()
+            {
+                { DRAG_DROP_DATA_NAME, this },
+            };
+
 
             ProcessRunning = process.IsRunning;
 
@@ -196,27 +249,113 @@ namespace ProcessManager.UI
 
             EditProcessCommand = new RelayCommand(ExecuteEditProcessCommand);
 
+
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
             if (ProcessHasLabel == true)
             {
                 MouseEnterCommand = new RelayCommand(() => ProcessLabelVisible = true);
                 MouseLeaveCommand = new RelayCommand(() => ProcessLabelVisible = false);
             };
+
+
+
+
+
+            // Bind drag and drop events
+            DragEnterCommand = new RelayCommand<ProjectListItemViewModel>((project) =>
+            {
+                IsSelected = true;
+            });
+
+            DragLeaveCommand = new RelayCommand<ProjectListItemViewModel>((project) =>
+            {
+                IsSelected = false;
+            });
+
+            DropCommand = new RelayCommand<Dictionary<string, object>>((dragDropData) =>
+            {
+                // Validate that data actually exists
+                if (dragDropData is null)
+                {
+                    DI.Logger.Log("Drag and drop error. Dropped data is null", LogLevel.Warning);
+                    Debugger.Break();
+                    return;
+                };
+
+                // Check if dropped data actually contains valid info
+                if (dragDropData.TryGetValue(DRAG_DROP_DATA_NAME, out object dropData) == false)
+                {
+                    DI.Logger.Log("Drag and drop error. Unable to find valid data", LogLevel.Error);
+                    Debugger.Break();
+                    return;
+                };
+
+                // Check if dropped data is actually of the correct type
+                if (!(dropData is ProcessItemViewModel dropDataAsVM))
+                {
+                    DI.Logger.Log("Drag and drop error. Dropped data contains invald value(s)", LogLevel.Warning);
+                    Debugger.Break();
+                    return;
+                };
+
+                if (dropDataAsVM == this)
+                    return;
+
+                // Do drop stuff
+                Drop(dropDataAsVM);
+            });
+
+            // When the mouse moves over the drag drop button
+            MouseMovedCommand = new RelayCommand<MouseMovedInfo>((mouseInfo) =>
+            {
+                // Check if user held his left mouse button
+                if (mouseInfo.LeftButtonPressed == true)
+                {
+                    // Enable drag drop
+                    DragAndDropEnabled = true;
+                }
+                else
+                {
+                    DragAndDropEnabled = false;
+                };
+            });
+
         }
+
 
         private void ExecuteEditProcessCommand()
         {
             switch (Process.ProcessType)
             {
                 case ProcessType.Console:
-                    DI.UI.ChangeView(View.EditConsoleProcessView, new EditConsoleProcessViewModel(Project, this));
+                    DI.UI.ChangeView(View.EditConsoleProcessView, new EditConsoleProcessViewModel(ProjectItemVM, this));
                     break;
 
                 case ProcessType.GUI:
-                    DI.UI.ChangeView(View.EditGUIProcessView, new EditGUIProcessViewModel(Project, this));
+                    DI.UI.ChangeView(View.EditGUIProcessView, new EditGUIProcessViewModel(ProjectItemVM, this));
                     break;
 
             };
         }
+
+
+        private void Drop(ProcessItemViewModel droppedData)
+        {
+            var draggedIndex = ProjectItemVM.Project.ProcessList.IndexOf(droppedData.Process);
+            var droppedIndex = ProjectItemVM.Project.ProcessList.IndexOf(Process);
+
+            var temp = ProjectItemVM.Project.ProcessList[draggedIndex];
+
+            ProjectItemVM.Project.ProcessList[draggedIndex] = Process;
+            ProjectItemVM.Project.ProcessList[droppedIndex] = temp;
+
+            ProjectItemVM.UpdateProcessList();
+
+
+            var serializedProcessList = DI.Serializer.SerializeProcessList(ProjectItemVM.Project.ProcessList);
+
+            File.WriteAllBytes(ProjectItemVM.Project.ProjectPathWithConfig, serializedProcessList);
+        }
+
     };
 };
