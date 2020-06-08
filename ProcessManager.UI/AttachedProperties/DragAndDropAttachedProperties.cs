@@ -44,7 +44,7 @@
             };
 
             // Wait for control to initialize
-            frameworkElement.Initialized += (sender, evnt) =>
+            frameworkElement.Loaded += (sender, evnt) =>
             {
                 // When something is dragged over this control
                 frameworkElement.DragEnter += (sender2, evnt2) =>
@@ -91,7 +91,7 @@
             };
 
             // Wait for control to initialize 
-            frameworkElement.Initialized += (sender, evnt) =>
+            frameworkElement.Loaded += (sender, evnt) =>
             {
                 // Bind drag leave event
                 frameworkElement.DragLeave += (sender2, evnt2) =>
