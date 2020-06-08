@@ -11,12 +11,11 @@ namespace ProcessManager.UI
     /// </summary>
     public class ProcessItemViewModel : BaseViewModel
     {
+        private const string DRAG_DROP_DATA_NAME = "ViewModelData";
 
         public static ProcessItemViewModel DesignInstance => new ProcessItemViewModel(null,
             new GUIProcess(Path.GetRandomFileName()));
 
-
-        private const string DRAG_DROP_DATA_NAME = "ViewModelData";
 
 
         #region Private fields
@@ -44,7 +43,12 @@ namespace ProcessManager.UI
         public Dictionary<string, object> DragDropData { get; }
 
 
+
+        /// <summary>
+        /// A <see cref="ProjectItemViewModel "/> that is associated with this viewmodel
+        /// </summary>
         public ProjectItemViewModel ProjectItemVM { get; set; }
+
 
 
         /// <summary>
@@ -141,6 +145,9 @@ namespace ProcessManager.UI
         public bool ProcessHasLabel => !string.IsNullOrWhiteSpace(Process.ProcessLabel);
 
 
+        /// <summary>
+        /// A boolean flag that indicates if this viewmodel is currently selected
+        /// </summary>
         public bool IsSelected
         {
             get => _isSelected;
@@ -151,7 +158,9 @@ namespace ProcessManager.UI
             }
         }
 
-
+        /// <summary>
+        /// A boolean flag that indicates if this viewmodel is being dragged
+        /// </summary>
         public bool DragAndDropEnabled
         {
             get => _dragAndDropEnabled;
@@ -175,8 +184,13 @@ namespace ProcessManager.UI
         public ICommand ShowProcessCommand { get; }
         public ICommand HideProcessCommand { get; }
 
+
         public ICommand MouseEnterCommand { get; }
         public ICommand MouseLeaveCommand { get; }
+
+
+        public ICommand MouseEnterProcessNameCommand { get; }
+        public ICommand MouseLeaveProcessNameCommand { get; }
 
 
         public ICommand EditProcessCommand { get; }
@@ -211,6 +225,8 @@ namespace ProcessManager.UI
             ProcessVisible = process.VisibleOnStartup;
 
 
+            #region Process commands
+
             // Bind the process closed event
             Process.ProcessClosedCallback += (IProcessModel process) => ProcessRunning = false;
 
@@ -238,14 +254,19 @@ namespace ProcessManager.UI
             };
 
 
+            // Bind process commands
             RunProcessCommand = new AsyncRelayCommand(
                 async () => await Task.Run(Process.RunProcess));
 
             CloseProcessCommand = new AsyncRelayCommand(
                 async () => await Task.Run(Process.CloseProcess));
 
+
             ShowProcessCommand = new RelayCommand(() => Process.ShowProcessWindow());
             HideProcessCommand = new RelayCommand(() => Process.HideProcessWindow());
+
+            #endregion
+
 
             EditProcessCommand = new RelayCommand(ExecuteEditProcessCommand);
 
@@ -253,21 +274,20 @@ namespace ProcessManager.UI
             // Bind mouse enter/leave command if a process label has been specified in ProcessList.json file
             if (ProcessHasLabel == true)
             {
-                MouseEnterCommand = new RelayCommand(() => ProcessLabelVisible = true);
-                MouseLeaveCommand = new RelayCommand(() => ProcessLabelVisible = false);
+                MouseEnterProcessNameCommand = new RelayCommand(() => ProcessLabelVisible = true);
+                MouseLeaveProcessNameCommand = new RelayCommand(() => ProcessLabelVisible = false);
             };
 
 
-
-
+            #region Drag & drop commands
 
             // Bind drag and drop events
-            DragEnterCommand = new RelayCommand<ProjectListItemViewModel>((project) =>
+            DragEnterCommand = new RelayCommand<ProcessItemViewModel>((project) =>
             {
                 IsSelected = true;
             });
 
-            DragLeaveCommand = new RelayCommand<ProjectListItemViewModel>((project) =>
+            DragLeaveCommand = new RelayCommand<ProcessItemViewModel>((project) =>
             {
                 IsSelected = false;
             });
@@ -305,6 +325,11 @@ namespace ProcessManager.UI
                 Drop(dropDataAsVM);
             });
 
+            #endregion
+
+
+            #region Mouse commands
+
             // When the mouse moves over the drag drop button
             MouseMovedCommand = new RelayCommand<MouseMovedInfo>((mouseInfo) =>
             {
@@ -320,11 +345,16 @@ namespace ProcessManager.UI
                 };
             });
 
+            MouseEnterCommand = new RelayCommand(() => IsSelected = true);
+            MouseLeaveCommand = new RelayCommand(() => IsSelected = false);
+
+            #endregion
         }
 
 
         private void ExecuteEditProcessCommand()
         {
+            // Change to the correct EditProcess view, depending on the process type
             switch (Process.ProcessType)
             {
                 case ProcessType.Console:
@@ -334,26 +364,34 @@ namespace ProcessManager.UI
                 case ProcessType.GUI:
                     DI.UI.ChangeView(View.EditGUIProcessView, new EditGUIProcessViewModel(ProjectItemVM, this));
                     break;
-
             };
         }
 
 
+        /// <summary>
+        /// Do drag *Drop stuff
+        /// </summary>
+        /// <param name="droppedData"> The data dropped on this viewmodel </param>
         private void Drop(ProcessItemViewModel droppedData)
         {
+            // Indices of the dragged, and dropped viewmodels
             var draggedIndex = ProjectItemVM.Project.ProcessList.IndexOf(droppedData.Process);
             var droppedIndex = ProjectItemVM.Project.ProcessList.IndexOf(Process);
 
+            // Simple swap of elements
             var temp = ProjectItemVM.Project.ProcessList[draggedIndex];
 
             ProjectItemVM.Project.ProcessList[draggedIndex] = Process;
             ProjectItemVM.Project.ProcessList[droppedIndex] = temp;
 
+            // Update the view
             ProjectItemVM.UpdateProcessList();
 
 
+            // Serialize the new process list
             var serializedProcessList = DI.Serializer.SerializeProcessList(ProjectItemVM.Project.ProcessList);
 
+            // Save the changes to file
             File.WriteAllBytes(ProjectItemVM.Project.ProjectPathWithConfig, serializedProcessList);
         }
 

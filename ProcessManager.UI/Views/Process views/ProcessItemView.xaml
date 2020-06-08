@@ -18,8 +18,12 @@
             
             local:DragAndDrop.DragEnterCommand="{Binding DragEnterCommand}"
             local:DragAndDrop.DragLeaveCommand="{Binding DragLeaveCommand}"
+            
+            local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
+            local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}"
+            
             local:DragAndDrop.DropCommand="{Binding DropCommand}">
-        
+
 
         <Border.Style>
 
@@ -27,9 +31,9 @@
 
                 <Style.Triggers>
 
-                    <Trigger Property="IsMouseOver" Value="True">
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
 
-                        <Trigger.EnterActions>
+                        <DataTrigger.EnterActions>
 
                             <BeginStoryboard>
 
@@ -45,10 +49,10 @@
 
                             </BeginStoryboard>
 
-                        </Trigger.EnterActions>
+                        </DataTrigger.EnterActions>
 
 
-                        <Trigger.ExitActions>
+                        <DataTrigger.ExitActions>
 
                             <BeginStoryboard>
 
@@ -64,9 +68,9 @@
 
                             </BeginStoryboard>
 
-                        </Trigger.ExitActions>
+                        </DataTrigger.ExitActions>
 
-                    </Trigger>
+                    </DataTrigger>
 
                 </Style.Triggers>
 
@@ -97,7 +101,7 @@
                     local:DragAndDrop.DragDropData="{Binding DragDropData}"
                     
                     Style="{StaticResource DarkGreyThreeDotVerticalButtonStyle}"/>
-            
+
 
             <!-- Process name and label -->
             <Grid TextBlock.FontFamily="{StaticResource LatoThin}"
@@ -109,8 +113,8 @@
                   
                   Background="Transparent"
                   
-                  local:MouseEnterAttachedProperty.Command="{Binding MouseEnterCommand}"
-                  local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveCommand}">
+                  local:MouseEnterAttachedProperty.Command="{Binding MouseEnterProcessNameCommand}"
+                  local:MouseLeaveAttachedProperty.Command="{Binding MouseLeaveProcessNameCommand}">
 
                 <Grid.InputBindings>
 
@@ -127,6 +131,7 @@
 
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Center"/>
+
 
                 <!-- The process label -->
                 <TextBlock Text="{Binding Process.ProcessLabel}"
