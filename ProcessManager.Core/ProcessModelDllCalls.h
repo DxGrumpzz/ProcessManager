@@ -8,33 +8,39 @@
 // Creates an instance of ProcessModels and 'Outs' it's pointer
 DLL_CALL void CreateProcessObject(const wchar_t* processPath, const wchar_t* processArgs,
                                   const wchar_t* consoleScript, const wchar_t* startupDirectory,
-                                  bool runAsConsole,
+                                  ProcessModel::ProcessTypeEnum processType,
                                   bool visibleOnStartup,
-                                  ProcessClosedCallBack processClosedCallback, 
+                                  ProcessClosedCallBack processClosedCallback,
                                   ProcessClosedCallBack processInitialziedCallback,
                                   ProcessModel*& process)
 {
     process = new ProcessModel();
 
-    process->RunAsConsole = runAsConsole;
+    process->ProcessType = processType;
     process->VisibleOnStartup = visibleOnStartup;
 
 
-    if (runAsConsole == true)
+    switch (process->ProcessType)
     {
-        process->ConsoleScript = consoleScript;
-        process->StartupDirectory = startupDirectory;
-    }
-    else
-    {
-        process->ProcessPath = processPath;
-        process->ProcessArgs = processArgs;
-    };
+        case ProcessModel::ProcessTypeEnum::ConsoleProcess:
+        {
+            process->ConsoleScript = consoleScript;
+            process->StartupDirectory = startupDirectory;
+            break;
+        };
 
+        case ProcessModel::ProcessTypeEnum::GUIProcess:
+        {
+            process->ProcessPath = processPath;
+            process->ProcessArgs = processArgs;
+        };
+    };
 
     process->ProcessInitializedCallback = processInitialziedCallback;
     process->ProcessClosedCallback = processClosedCallback;
 };
+
+
 
 
 // Frees memory used by a created ProcessModel

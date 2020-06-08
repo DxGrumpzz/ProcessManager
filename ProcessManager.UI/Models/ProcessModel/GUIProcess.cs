@@ -43,7 +43,7 @@
                 ProcessInitializedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(processPath, processArgs, null, null, false, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
+            CreateProcessObject(processPath, processArgs, null, null, ProcessType, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
 

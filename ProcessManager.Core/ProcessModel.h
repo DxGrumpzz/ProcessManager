@@ -30,6 +30,16 @@ private:
     // A mutex that is shared between the close and run calls
     std::mutex _processOpenCloseMutex;
 
+    /// <summary>
+    /// Supported process types
+    /// </summary>
+    enum class ProcessTypeEnum
+    {
+        GUIProcess = 0,
+        ConsoleProcess = 1,
+    };
+
+
 public:
 
     // A struct that contains information about this process
@@ -48,8 +58,7 @@ public:
     std::wstring ProcessArgs;
 
 
-    // A boolean flag that indicates if this process is to run as a console script
-    bool RunAsConsole;
+    ProcessTypeEnum ProcessType;
 
     // A boolean flag that indicates if this process will be visible when it's initialized
     bool VisibleOnStartup;
@@ -82,7 +91,7 @@ public:
         ProcessPath(L""),
         ProcessArgs(L""),
 
-        RunAsConsole(false),
+        ProcessType(ProcessTypeEnum::GUIProcess),
 
         VisibleOnStartup(true),
 
@@ -114,11 +123,24 @@ public:
 
         bool result = false;
 
+
         // Try to run the process
-        if (RunAsConsole == true)
+        switch (ProcessType)
+        {
+
+            case ProcessTypeEnum::GUIProcess:
+            {
+                result = RunProcessAsGUI();
+                break;
+            };
+
+            case ProcessTypeEnum::ConsoleProcess:
+            {
             result = RunProcessAsConsole();
-        else
-            result = RunProcessAsGUI();
+                break;
+            };
+
+        };
 
         // If process initialized succesfully invoke the initialzied event
         if (result == true)

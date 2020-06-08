@@ -42,7 +42,7 @@
                 ProcessInitializedCallback?.Invoke(this);
             };
 
-            CreateProcessObject(null, null, consoleScript, startupDirectory, true, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
+            CreateProcessObject(null, null, consoleScript, startupDirectory, ProcessType, visibleOnStartup, _processClosedCallback, _processInitialziedCallback, ref _processPointer);
         }
 
         ~ConsoleProcess()

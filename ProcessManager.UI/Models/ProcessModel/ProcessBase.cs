@@ -25,6 +25,7 @@
 
         private object _process_run_close_monitor = new object();
 
+
         #region DLL calls
 
         /// <summary>
@@ -42,7 +43,7 @@
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode)]
         protected extern static void CreateProcessObject(string processPath, string processArgs,
                                                          string consoleScript, string startupDirectory,
-                                                         bool runAsConsole,
+                                                         ProcessType processType,
                                                          bool visibleOnStartup,
                                                          _ProcessClosedCallBack processClosedCallback,
                                                          _ProcessClosedCallBack processInitialziedCallback,
