@@ -64,7 +64,7 @@
         /// <param name="process"> Pointer to the process </param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
-        protected extern static bool RunProcess(ref IntPtr process);
+        protected extern static bool RunProcess(IntPtr process);
 
         /// <summary>
         /// Gracefully closes the process
@@ -72,7 +72,7 @@
         /// <param name="process"> Pointer to the process </param>
         /// <returns></returns>
         [DllImport(DLL_NAME)]
-        protected extern static bool CloseProcess(ref IntPtr process);
+        protected extern static bool CloseProcess(IntPtr process);
 
 
 
@@ -156,7 +156,7 @@
                     IsInitialzing = true;
 
                     // Run this process
-                    return RunProcess(ref _processPointer);
+                    return RunProcess(_processPointer);
                 }
                 finally
                 {
@@ -173,7 +173,7 @@
                 if (IsRunning == false)
                     return false;
 
-                return CloseProcess(ref _processPointer);
+                return CloseProcess(_processPointer);
             };
         }
 
