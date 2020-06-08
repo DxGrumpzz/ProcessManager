@@ -1,9 +1,11 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Net.Http.Headers;
     using System.Windows.Input;
 
     /// <summary>
@@ -17,13 +19,13 @@ namespace ProcessManager.UI
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
 
             ProcessList = new IProcessModel[]
-            {
+{
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.exe"),
 
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat"),
 
                 new ConsoleProcess("npm run start" ,$@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat"),
-            },
+},
         });
 
         #region Private fields
@@ -71,6 +73,8 @@ namespace ProcessManager.UI
         {
             Project = project;
 
+            UpdateProcessList();
+
             GotoMainPageCommnad = new RelayCommand(ExecuteGotoMainPageommnad);
 
             AddNewProcessCommand = new RelayCommand(ExecuteAddNewProcessCommand);
@@ -82,7 +86,11 @@ namespace ProcessManager.UI
             DI.FolderDialog.OpenFolder(Project.ProjectPath));
         }
 
-
+        public void UpdateProcessList()
+        {
+            ProcessList = new ObservableCollection<ProcessItemViewModel>(Project.ProcessList
+            .Select(process => new ProcessItemViewModel(this, process)));
+        }
 
         private void ExecuteDeleteProjectCommand()
         {

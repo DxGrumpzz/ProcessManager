@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
@@ -106,6 +106,9 @@ namespace ProcessManager.UI
             {
                 ProcessLabel = ProcessLabel,
             };
+
+            ProjectItemVM.UpdateProcessList();
+
 
             var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
               
