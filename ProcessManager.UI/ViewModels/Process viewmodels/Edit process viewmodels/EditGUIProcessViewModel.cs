@@ -80,7 +80,7 @@ namespace ProcessManager.UI
             var process = ValidateProcessType<GUIProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
-            Project = projectViewModel;
+            ProjectItemVM = projectViewModel;
 
             SelectedPath = process.ProcessPath;
             Arguments = process.ProcessArgs;
@@ -100,7 +100,7 @@ namespace ProcessManager.UI
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var project = Project.Project;
+            var project = ProjectItemVM.Project;
 
             // Find process
             int index = project.ProcessList.IndexOf(ProcessVM.Process);
@@ -122,7 +122,7 @@ namespace ProcessManager.UI
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
             // Switch back to the 
-            DI.UI.ChangeView(View.ProjectItemView, Project);
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }
     };
 };

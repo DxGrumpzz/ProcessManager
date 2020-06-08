@@ -116,7 +116,7 @@
 
                             <!-- Align 'Project name' header to project names -->
                             <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
-                            
+
                             <ColumnDefinition Width="AUTO" SharedSizeGroup="Column1"/>
 
                             <!-- A very important spacer. 
@@ -143,7 +143,6 @@
 
                 </HeaderedItemsControl.Header>
 
-                <!---->
 
                 <!-- Items/rows inside -->
                 <HeaderedItemsControl.ItemTemplate>
@@ -228,7 +227,7 @@
 
                                     <!-- Align project names to'Project name' header -->
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column0"/>
-                                    
+
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column1"/>
 
                                     <!-- A very important spacer. 

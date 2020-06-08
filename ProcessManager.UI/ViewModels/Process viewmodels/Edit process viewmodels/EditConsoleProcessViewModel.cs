@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Diagnostics;
     using System.IO;
@@ -72,7 +72,7 @@
             var process = ValidateProcessType<ConsoleProcess>(processItemViewModel.Process);
 
             ProcessVM = processItemViewModel;
-            Project = projectViewModel;
+            ProjectItemVM = projectViewModel;
 
             ProcessLabel = process.ProcessLabel;
             ProcessVisibleOnStartup = process.VisibleOnStartup;
@@ -95,7 +95,7 @@
 
         protected override void ExecuteSaveProcessCommand()
         {
-            var project = Project.Project;
+            var project = ProjectItemVM.Project;
 
             var index = project.ProcessList.IndexOf(ProcessVM.Process);
 
@@ -112,7 +112,7 @@
 
             File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
 
-            DI.UI.ChangeView(View.ProjectItemView, Project);
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }
     };
 };

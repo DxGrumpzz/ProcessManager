@@ -99,7 +99,7 @@
 
         </StackPanel>
 
-        <!-- Console process settings -->
+        <!-- GUI process settings -->
         <StackPanel Grid.Row="1"
                     
                     Margin="0,10,0,0"
@@ -141,7 +141,7 @@
             <!-- Process args  -->
             <TextBox local:PlaceHolder.Text="Process args (Optional, Space seperated)" 
                  
-                     Text="{Binding ConsoleScript}" 
+                     Text="{Binding Arguments}" 
                  
                      Style="{StaticResource UnderlineTextbox}"/>
 
