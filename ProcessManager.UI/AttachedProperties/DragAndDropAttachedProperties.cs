@@ -23,7 +23,7 @@
             obj.SetValue(DragEnterCommandProperty, value);
         }
 
-        
+
         /// <summary>
         /// An attached property that invokes an <see cref="ICommand"/> when an element is dragged over the control
         /// </summary>
@@ -222,7 +222,7 @@
             };
 
             // Wait for control to initalize
-            frameworkElement.Initialized += (sender, evnt) =>
+            frameworkElement.Loaded += (sender, evnt) =>
             {
                 // Bind drop command
                 frameworkElement.Drop += (sender2, dragEvent) =>
