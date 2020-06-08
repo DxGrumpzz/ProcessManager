@@ -34,7 +34,7 @@ namespace ProcessManager.UI
         /// <summary>
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
-        public ProjectItemViewModel Project { get; }
+        public ProjectItemViewModel ProjectItemVM { get; }
 
 
         /// <summary>
@@ -88,23 +88,23 @@ namespace ProcessManager.UI
         private AddConsoleProcessViewModel() { }
         public AddConsoleProcessViewModel(ProjectItemViewModel projectVM)
         {
-            Project = projectVM;
+            ProjectItemVM = projectVM;
 
             SelectDirectoryCommand = new RelayCommand(ExecuteSelectDirectoryCommand);
             SelectCurrentDirectoryCommand = new RelayCommand(() =>
-                ConsoleDirectory = Project.Project.ProjectPath);
+                ConsoleDirectory = ProjectItemVM.Project.ProjectPath);
 
             BackToMainPageCommand = new RelayCommand(ExecuteBackToMainPageCommand);
 
             
             SwitchToProcessSelectionViewCommand = new RelayCommand(() =>
             // Go back to process type selection view
-            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(Project)));
+            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(ProjectItemVM)));
 
 
             BackToProjectPageCommand = new RelayCommand(() =>
             // Go back to the project item view
-            DI.UI.ChangeView(View.ProjectItemView, Project));
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM));
 
 
             AddProcessCommand = new RelayCommand(
@@ -169,7 +169,7 @@ namespace ProcessManager.UI
                 return;
             };
 
-            var project = Project.Project;
+            var project = ProjectItemVM.Project;
 
             // Add the new process to the project's process list
             project.ProcessList.Add(new ConsoleProcess(ConsoleScript, ConsoleDirectory, ProcessVisibleOnStartup)
@@ -177,13 +177,15 @@ namespace ProcessManager.UI
                 ProcessLabel = ProcessLabel,
             });
 
+            ProjectItemVM.UpdateProcessList();
+
             // Serialize the process list after adding the project
             byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
 
             // Write the json to the project's config file
             File.WriteAllBytes(project.ProjectPathWithConfig, json);
 
-            DI.UI.ChangeView(View.ProjectItemView, Project);
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }
 
     };

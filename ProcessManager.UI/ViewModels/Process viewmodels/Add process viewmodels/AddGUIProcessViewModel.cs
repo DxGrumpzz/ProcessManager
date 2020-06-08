@@ -35,7 +35,7 @@
         /// <summary>
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
-        public ProjectItemViewModel Project { get; }
+        public ProjectItemViewModel ProjectItemVM { get; }
 
         /// <summary>
         /// A path to the process
@@ -94,7 +94,7 @@
 
         public AddGUIProcessViewModel(ProjectItemViewModel projectVM)
         {
-            Project = projectVM;
+            ProjectItemVM = projectVM;
 
             SelectProcessCommand = new RelayCommand(ExecuteSelectProcessCommand);
 
@@ -104,7 +104,7 @@
             SwitchToProcessSelectionViewCommand = new RelayCommand(ExecuteSwitchToProcessSelectionViewCommand);
 
             SwitchToProjectViewCommand = new RelayCommand(() =>
-            DI.UI.ChangeView(View.ProjectItemView, Project));
+            DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM));
 
 
             AddProcessCommand = new RelayCommand(
@@ -125,13 +125,15 @@
                 return;
             };
 
-            var project = Project.Project;
+            var project = ProjectItemVM.Project;
 
             // Add the process  to the projets' process list
             project.ProcessList.Add(new GUIProcess(SelectedProcessPath, ProcessAgs, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
             });
+
+            ProjectItemVM.UpdateProcessList();
 
             byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
 
@@ -164,7 +166,7 @@
 
         private void ExecuteSwitchToProcessSelectionViewCommand()
         {
-            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(Project));
+            DI.UI.ChangeView(View.AddProcessView, new AddProcessViewModel(ProjectItemVM));
         }
 
     };
