@@ -107,10 +107,7 @@
             DI.Projects.Remove(Project);
 
             // Update projects list after project deletion
-            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects
-                // Convert ProjectModel to ProjectListItemViewModel
-                .Select(project => new ProjectListItemViewModel(project)));
-
+            DI.ProjectsListVM.UpdateProjectsList();
 
             // Convert the json object to json string
             var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);

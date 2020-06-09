@@ -1,4 +1,4 @@
-namespace ProcessManager.UI
+﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -251,31 +251,8 @@ namespace ProcessManager.UI
             File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
 
             // Update the projects list 
-            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects.Select(project =>
-            {
-                return new ProjectListItemViewModel(project);
-            }));
+            DI.ProjectsListVM.UpdateProjectsList();
         }
-
-
-        /// <summary>
-        /// Swaps places between 2 projects
-        /// </summary>
-        /// <param name="droppedData"></param>
-        private void SwapProjects(ProjectListItemViewModel droppedData)
-        {
-            // Find indices of the 2 projects (this, and the dropped)
-            var currentIndex = DI.Projects.IndexOf(Project);
-            var droppedIndex = DI.Projects.IndexOf(droppedData.Project);
-
-            // Using a sophisticated swap algorithm with a constant runtime of O(1), swap the 2 elements between in the list
-            var temp = DI.Projects[currentIndex];
-
-            DI.Projects[currentIndex] = droppedData.Project;
-            DI.Projects[droppedIndex] = temp;
-        }
-
-
 
     };
 };

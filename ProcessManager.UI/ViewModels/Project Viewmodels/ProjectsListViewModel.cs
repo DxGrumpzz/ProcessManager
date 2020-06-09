@@ -56,7 +56,7 @@
         public ObservableCollection<ProjectListItemViewModel> Projects
         {
             get => _projects;
-            set
+            private set
             {
                 _projects = value;
                 OnPropertyChanged();
@@ -86,7 +86,18 @@
             AddNewProjectCommnad = new RelayCommand(ExecuteAddNewProjectCommnad);
         }
 
-        
+
+        /// <summary>
+        /// Refreshes the Projects list using the Projects provided in <see cref="DI.Projects"/>
+        /// </summary>
+        public void UpdateProjectsList()
+        {
+            // Update projects list
+            DI.ProjectsListVM.Projects = new ObservableCollection<ProjectListItemViewModel>(DI.Projects
+                // Convert ProjectModel to ProjectListItemViewModel
+                .Select(project => new ProjectListItemViewModel(project)));
+        }
+
         private void ExecuteAddNewProjectCommnad()
         {
             var folderDialog = DI.FolderDialog;
@@ -174,6 +185,7 @@
             // Write empty json brackets to file
             File.WriteAllText(configPath, "[\n\n]");
         }
+
 
 
     };
