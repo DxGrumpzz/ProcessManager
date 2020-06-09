@@ -30,6 +30,9 @@ private:
     // A mutex that is shared between the close and run calls
     std::mutex _processOpenCloseMutex;
 
+
+public:
+
     /// <summary>
     /// Supported process types
     /// </summary>
