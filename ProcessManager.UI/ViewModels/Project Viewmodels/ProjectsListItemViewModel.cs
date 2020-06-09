@@ -1,4 +1,4 @@
-﻿namespace ProcessManager.UI
+namespace ProcessManager.UI
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -244,7 +244,7 @@
         private void Drop(ProjectListItemViewModel droppedData)
         {
             // Swap between the dragged project and dropped project
-            SwapProjects(droppedData);
+            DI.Projects.Swap(droppedData.Project, Project);
 
             // Write the changes to file
             var bytes = DI.Serializer.SerializerProjects(DI.Projects);

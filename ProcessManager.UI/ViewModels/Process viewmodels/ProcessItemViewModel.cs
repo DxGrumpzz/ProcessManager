@@ -374,15 +374,8 @@ namespace ProcessManager.UI
         /// <param name="droppedData"> The data dropped on this viewmodel </param>
         private void Drop(ProcessItemViewModel droppedData)
         {
-            // Indices of the dragged, and dropped viewmodels
-            var draggedIndex = ProjectItemVM.Project.ProcessList.IndexOf(droppedData.Process);
-            var droppedIndex = ProjectItemVM.Project.ProcessList.IndexOf(Process);
-
             // Simple swap of elements
-            var temp = ProjectItemVM.Project.ProcessList[draggedIndex];
-
-            ProjectItemVM.Project.ProcessList[draggedIndex] = Process;
-            ProjectItemVM.Project.ProcessList[droppedIndex] = temp;
+            ProjectItemVM.Project.ProcessList.Swap(droppedData.Process, Process);
 
             // Update the view
             ProjectItemVM.UpdateProcessList();
