@@ -158,12 +158,8 @@
             // Add the new project to the projects list
             DI.Projects.Add(newProject);
 
-
-            // Convert the new projects list to a json string
-            var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);
-
-            // Write the json to file
-            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, jsonBytes);
+            // Update projects list
+            DI.FileManager.UpdateProjectsList(DI.Projects);
 
             // Update tray icon
             DI.SystemTrayIcon.RebuildIcon(showAfterBuild: true);
@@ -185,7 +181,6 @@
             // Write empty json brackets to file
             File.WriteAllText(configPath, "[\n\n]");
         }
-
 
 
     };

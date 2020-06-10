@@ -244,9 +244,8 @@
             // Swap between the dragged project and dropped project
             DI.Projects.Swap(droppedData.Project, Project);
 
-            // Write the changes to file
-            var bytes = DI.Serializer.SerializerProjects(DI.Projects);
-            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, bytes);
+            // Update projects list
+            DI.FileManager.UpdateProjectsList(DI.Projects);
 
             // Update the projects list 
             DI.ProjectsListVM.UpdateProjectsList();

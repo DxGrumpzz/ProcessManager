@@ -109,11 +109,8 @@
             // Update projects list after project deletion
             DI.ProjectsListVM.UpdateProjectsList();
 
-            // Convert the json object to json string
-            var jsonBytes = DI.Serializer.SerializerProjects(DI.Projects);
-
-            // Write the json string to Projects file
-            File.WriteAllBytes(Localization.PROJECTS_FILE_NAME, jsonBytes);
+            // Update projects list
+            DI.FileManager.UpdateProjectsList(DI.Projects);
 
             // Switch back to main page
             SwitchToProjectListView();
