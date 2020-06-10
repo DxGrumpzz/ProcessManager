@@ -11,18 +11,18 @@
     public class EditConsoleProcessViewModel : EditProcessBaseViewModel
     {
         public static EditConsoleProcessViewModel DesignInstance => new EditConsoleProcessViewModel(
-            new ProjectItemViewModel(new Project()
-            {
-                ProjectPath = @"C:\Development\npm test",
-            }),
-            new ProcessItemViewModel(new ProjectItemViewModel(
-                new Project()
-                {
-                    ProjectPath = @"C:\Development\npm test",
-                }),
-                new ConsoleProcess("npm run start", @"C:\Development\npm test")))
+             new ProjectItemViewModel(new Project()
+             {
+                 ProjectPath = @"C:\Development\npm test",
+             }),
+             new ProcessItemViewModel(new ProjectItemViewModel(
+                 new Project()
+                 {
+                     ProjectPath = @"C:\Development\npm test",
+                 }),
+                 new ConsoleProcess("npm run start", @"C:\Development\npm test")))
         {
-            
+
         };
 
 
@@ -97,11 +97,13 @@
         {
             var project = ProjectItemVM.Project;
 
+            // Find the process' index in the project's processes list
             var index = project.ProcessList.IndexOf(ProcessVM.Process);
 
             if (index == -1)
                 return;
 
+            // Update the project
             project.ProcessList[index] = new ConsoleProcess(ConsoleScript, ConsoleDirectory, ProcessVisibleOnStartup)
             {
                 ProcessLabel = ProcessLabel,
@@ -109,13 +111,12 @@
 
             ProjectItemVM.UpdateProcessList();
 
+            // Save changes to Project config file
+            DI.FileManager.UpdateProjectConfig(project);
 
-            var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
-              
-
-            File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
-
+            // Switch back to the ProjectPage
             DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }
+
     };
 };

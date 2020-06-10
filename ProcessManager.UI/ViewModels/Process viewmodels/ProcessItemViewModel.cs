@@ -380,12 +380,9 @@ namespace ProcessManager.UI
             // Update the view
             ProjectItemVM.UpdateProcessList();
 
+            // Save changes
+            DI.FileManager.UpdateProjectConfig(ProjectItemVM.Project);
 
-            // Serialize the new process list
-            var serializedProcessList = DI.Serializer.SerializeProcessList(ProjectItemVM.Project.ProcessList);
-
-            // Save the changes to file
-            File.WriteAllBytes(ProjectItemVM.Project.ProjectPathWithConfig, serializedProcessList);
         }
 
     };

@@ -116,6 +116,10 @@ namespace ProcessManager.UI
             // Setup serializer
             serviceCollection.AddTransient<ISerializer, JsonSerializer>();
 
+            // Add file manager
+            serviceCollection.AddTransient<IFileManager, FileManager>((provider) => new FileManager(provider.GetService<ISerializer>()));
+
+
             // Add folder dialog 
             serviceCollection.AddScoped<IFolderDialog, WindowsFolderDialog>();
 

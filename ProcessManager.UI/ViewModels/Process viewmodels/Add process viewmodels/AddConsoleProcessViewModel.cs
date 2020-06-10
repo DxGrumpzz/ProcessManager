@@ -184,11 +184,8 @@ namespace ProcessManager.UI
 
             ProjectItemVM.UpdateProcessList();
 
-            // Serialize the process list after adding the project
-            byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
-
-            // Write the json to the project's config file
-            File.WriteAllBytes(project.ProjectPathWithConfig, json);
+            // Save new process to config
+            DI.FileManager.UpdateProjectConfig(project);
 
             DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }

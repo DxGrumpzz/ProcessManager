@@ -74,11 +74,11 @@
                 // Remove this process from the main list
                 project.ProcessList.Remove(process);
 
-                // Serialize the list after removing the process
-                var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
-               
-                // Update the project's config file
-                File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
+                // Update projects list view
+                DI.ProjectsListVM.UpdateProjectsList();
+
+                // Save changes in project config
+                DI.FileManager.UpdateProjectConfig(project);
 
                 // Switch back to the project's view
                 DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);

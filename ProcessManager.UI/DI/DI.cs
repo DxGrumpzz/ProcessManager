@@ -81,6 +81,10 @@
         /// </summary>
         public static ILogger Logger => GetService<ILogger>();
 
+        /// <summary>
+        /// A file manager. Responsible for the managing project configs
+        /// </summary>
+        public static IFileManager FileManager => GetService<IFileManager>();
 
         public static ProjectsListViewModel ProjectsListVM => GetService<ProjectsListViewModel>();
 

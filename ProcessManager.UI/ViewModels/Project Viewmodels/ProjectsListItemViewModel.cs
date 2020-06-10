@@ -1,7 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Data;
     using System.Diagnostics;
     using System.IO;
@@ -215,7 +214,6 @@
 
 
 
-       
         private void ExecuteRunProjectCommand()
         {
             foreach (var process in Project.ProcessList)

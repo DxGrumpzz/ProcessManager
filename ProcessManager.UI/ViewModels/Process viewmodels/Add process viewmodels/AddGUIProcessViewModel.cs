@@ -140,15 +140,11 @@
 
             ProjectItemVM.UpdateProcessList();
 
-            byte[] json = DI.Serializer.SerializeProcessList(project.ProcessList);
-
-            // Write the json to the project's config file
-            File.WriteAllBytes(project.ProjectPathWithConfig, json);
+            // Save new process to config
+            DI.FileManager.UpdateProjectConfig(project);
 
             // Return back to the Project's view
             ExecuteSwitchToProcessSelectionViewCommand();
-
-
         }
 
         private void ExecuteSelectProcessCommand()

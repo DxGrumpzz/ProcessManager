@@ -114,13 +114,10 @@ namespace ProcessManager.UI
                 ProcessLabel = ProcessLabel,
             };
 
-            // Serialize project list 
-            var projectBytes = DI.Serializer.SerializeProcessList(project.ProcessList);
+            // Save changes to Project config file
+            DI.FileManager.UpdateProjectConfig(project);
 
-            // Update project config file
-            File.WriteAllBytes(project.ProjectPathWithConfig, projectBytes);
-
-            // Switch back to the 
+            // Switch back to the ProjectPage
             DI.UI.ChangeView(View.ProjectItemView, ProjectItemVM);
         }
     };
