@@ -43,6 +43,7 @@
     <Resource Include="Resources\Fonts\IndieFlower-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Regular.ttf" />
     <Resource Include="Resources\Fonts\Lato-Thin.ttf" />
+    <Resource Include="Resources\Images\Copy To Clipboard Icon.png" />
     <Resource Include="Resources\Images\Process Type\Console_Process.png" />
     <Resource Include="Resources\Images\Process Type\GUI_Process.png" />
   </ItemGroup>

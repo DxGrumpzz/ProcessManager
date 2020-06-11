@@ -1,8 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:ProcessManager.UI">
+    
 
     <BitmapImage x:Key="GUIProcessImage" UriSource="/Resources/Images/Process Type/GUI_Process.png" local:BuildResourceExtentions.LoadIntoFile="True"/>
     <BitmapImage x:Key="ConsoleProcessImage" UriSource="/Resources/Images/Process Type/Console_Process.png" local:BuildResourceExtentions.LoadIntoFile="True"/>
+
+    <BitmapImage x:Key="CopyToClipboardIcon" UriSource="/Resources/Images/Copy To Clipboard Icon.png" local:BuildResourceExtentions.LoadIntoFile="True"/>
 
 </ResourceDictionary>
