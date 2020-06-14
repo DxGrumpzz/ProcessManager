@@ -1,5 +1,6 @@
 ﻿namespace ProcessManager.UI
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Windows.Input;
@@ -13,6 +14,8 @@
             new ProjectItemViewModel(new Project()
             {
                 ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetRandomFileName()}",
+                
+                ProcessList = new List<IProcessModel>(),
             }))
         {
             SelectedProcessPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetRandomFileName()}",
@@ -36,6 +39,8 @@
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
         public ProjectItemViewModel ProjectItemVM { get; }
+
+        public ProjectHeaderViewModel ProjectHeaderVM { get; set; }
 
         /// <summary>
         /// A path to the process
@@ -97,6 +102,8 @@
         public AddGUIProcessViewModel(ProjectItemViewModel projectVM)
         {
             ProjectItemVM = projectVM;
+
+            ProjectHeaderVM = new ProjectHeaderViewModel(ProjectItemVM.Project);
 
             SelectProcessCommand = new RelayCommand(ExecuteSelectProcessCommand);
 

@@ -5,7 +5,6 @@
     using System.Windows.Input;
 
 
-
     /// <summary>
     /// 
     /// </summary>
@@ -15,13 +14,29 @@
             new ProjectItemViewModel(new Project()
             {
                 ProjectPath = "C:\\Software\\Super secret project",
-            }));
+                ProcessList = new List<IProcessModel>(),
+            }))
+        {
+            ProcessTypes = new List<ProcessType>()
+            {
+                ProcessType.Console,
+                ProcessType.GUI,
+            },
+        };
 
+
+        #region Public properties
 
         public ProjectItemViewModel ProjectItemVM { get; }
 
+        public ProjectHeaderViewModel ProjectHeaderVM { get; }
+
         public List<ProcessType> ProcessTypes { get; private set; }
 
+        #endregion
+
+
+        #region Commands
 
         public ICommand SwitchToProjectPageCommand { get; }
         public ICommand SwitchToMainPageCommand { get; }
@@ -31,9 +46,13 @@
 
         public ICommand OpenProjectDirectory { get; }
 
+        #endregion
+
+
         public AddProcessViewModel(ProjectItemViewModel project)
         {
             ProjectItemVM = project;
+            ProjectHeaderVM = new ProjectHeaderViewModel(project.Project);
 
             SetupProcessTypes();
 

@@ -22,32 +22,11 @@
         </Grid.RowDefinitions>
 
 
-        <!-- Project name title, and titlebar-->
+        <!-- Project header, and titlebar-->
         <StackPanel>
 
-            <!-- The name of the project -->
-            <TextBlock Text="{Binding ProjectItemVM.Project.ProjectName}"
-                   
-                       FontSize="20"/>
-
-            <!-- Project path -->
-            <TextBlock Text="{Binding ProjectItemVM.Project.ProjectPath}"
-                   
-                       FontFamily="{StaticResource LatoThin}"
-                       FontWeight="Thin"
-                       FontSize="15"
-                
-                       Cursor="Hand"
-                       
-                       HorizontalAlignment="Left"
-                       Margin="0,0,0,10">
-
-                <TextBlock.InputBindings>
-                    <MouseBinding MouseAction="LeftClick"
-                                  Command="{Binding OpenProjectDirectoryCommand}"/>
-                </TextBlock.InputBindings>
-
-            </TextBlock>
+            <!-- Project header -->
+            <local:ProjectHeaderView DataContext="{Binding ProjectHeaderVM}"/>
 
             <!-- Title bar -->
             <Border Background="{StaticResource LightGreyBrush}"

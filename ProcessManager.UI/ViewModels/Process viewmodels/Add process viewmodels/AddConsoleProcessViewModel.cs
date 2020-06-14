@@ -1,5 +1,6 @@
 namespace ProcessManager.UI
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Windows.Input;
@@ -14,6 +15,7 @@ namespace ProcessManager.UI
         new ProjectItemViewModel(new Project()
         {
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
+            ProcessList = new List<IProcessModel>(),
         }))
         {
             ConsoleDirectory = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
@@ -35,7 +37,8 @@ namespace ProcessManager.UI
         /// A ProjectViewModel which is used when the user wants to go back to the Project view and not lose any saved data
         /// </summary>
         public ProjectItemViewModel ProjectItemVM { get; }
-
+        
+        public ProjectHeaderViewModel ProjectHeaderVM { get; }
 
         /// <summary>
         /// A path to a directory, which the console process will start on
@@ -92,7 +95,12 @@ namespace ProcessManager.UI
         {
             ProjectItemVM = projectVM;
 
+            ProjectHeaderVM = new ProjectHeaderViewModel(ProjectItemVM.Project);
+
+
+
             SelectDirectoryCommand = new RelayCommand(ExecuteSelectDirectoryCommand);
+         
             SelectCurrentDirectoryCommand = new RelayCommand(() =>
                 ConsoleDirectory = ProjectItemVM.Project.ProjectPath);
 
@@ -111,7 +119,8 @@ namespace ProcessManager.UI
 
             AddProcessCommand = new RelayCommand(
                 ExecuteAddProcessCommand,
-                // Don't execute command if the directory's length is  less than three charactes
+                // Don't execute command if the directory's length is less than three charactes 
+                // (Why 3 ? because "C:\" is technically a valid directory)
                 () => ConsoleDirectory?.Length >= 3 &&
                 // And isn't a valid directory
                 Directory.Exists(ConsoleDirectory));

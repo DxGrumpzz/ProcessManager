@@ -1,7 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Windows.Input;
 
 
@@ -10,19 +10,22 @@
     /// </summary>
     public class EditConsoleProcessViewModel : EditProcessBaseViewModel
     {
+
         public static EditConsoleProcessViewModel DesignInstance => new EditConsoleProcessViewModel(
              new ProjectItemViewModel(new Project()
              {
                  ProjectPath = @"C:\Development\npm test",
+                 ProcessList = new List<IProcessModel>(),
              }),
              new ProcessItemViewModel(new ProjectItemViewModel(
                  new Project()
                  {
                      ProjectPath = @"C:\Development\npm test",
+                    ProcessList = new List<IProcessModel>(),
                  }),
                  new ConsoleProcess("npm run start", @"C:\Development\npm test")))
         {
-
+            
         };
 
 
@@ -36,6 +39,8 @@
 
 
         #region Public properties
+
+        
 
         /// <summary>
         /// The new path to where the console will run from
@@ -67,12 +72,10 @@
 
 
 
-        public EditConsoleProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
+        public EditConsoleProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel) :
+            base(projectViewModel, processItemViewModel)
         {
             var process = ValidateProcessType<ConsoleProcess>(processItemViewModel.Process);
-
-            ProcessVM = processItemViewModel;
-            ProjectItemVM = projectViewModel;
 
             ProcessLabel = process.ProcessLabel;
             ProcessVisibleOnStartup = process.VisibleOnStartup;

@@ -1,11 +1,9 @@
 ﻿namespace ProcessManager.UI
 {
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Net.Http.Headers;
     using System.Windows.Input;
 
     /// <summary>
@@ -19,14 +17,15 @@
             ProjectPath = $@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}",
 
             ProcessList = new IProcessModel[]
-{
+            {
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.exe"),
 
                 new GUIProcess($@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat"),
 
                 new ConsoleProcess("npm run start" ,$@"C:\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}\{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}.bat"),
-},
+            },
         });
+
 
         #region Private fields
 
@@ -35,10 +34,13 @@
 
         #endregion
 
+
         /// <summary>
         /// The project associated with this viewmodel
         /// </summary>
         public Project Project { get; }
+
+        public ProjectHeaderViewModel ProjectHeaderViewModel { get; }
 
         /// <summary>
         /// The project's processes as a "list" of ProcessItemViewModel
@@ -64,14 +66,14 @@
 
         public ICommand DeleteProjectCommand { get; }
 
-        public ICommand OpenProjectDirectoryCommand { get; }
-
         #endregion
+
 
 
         public ProjectItemViewModel(Project project)
         {
             Project = project;
+            ProjectHeaderViewModel = new ProjectHeaderViewModel(Project);
 
             UpdateProcessList();
 
@@ -82,9 +84,8 @@
 
             DeleteProjectCommand = new RelayCommand(ExecuteDeleteProjectCommand);
 
-            OpenProjectDirectoryCommand = new RelayCommand(() =>
-            DI.FolderDialog.OpenFolder(Project.ProjectPath));
         }
+
 
         public void UpdateProcessList()
         {

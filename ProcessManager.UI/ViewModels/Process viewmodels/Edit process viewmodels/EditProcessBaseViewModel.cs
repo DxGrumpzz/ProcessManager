@@ -17,13 +17,14 @@
         /// <summary>
         /// A process VM associated with this viewmodel
         /// </summary>
-        public ProcessItemViewModel ProcessVM { get; set; }
+        public ProcessItemViewModel ProcessVM { get; private set; }
 
         /// <summary>
         /// A project viewmodel associated with the process
         /// </summary>
-        public ProjectItemViewModel ProjectItemVM { get; set; }
+        public ProjectItemViewModel ProjectItemVM { get; private set; }
 
+        public ProjectHeaderViewModel ProjectHeaderVM { get; private set; }
 
         #endregion
 
@@ -41,8 +42,15 @@
         #endregion
 
 
-        protected EditProcessBaseViewModel()
+        protected EditProcessBaseViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
         {
+            ProjectItemVM = projectViewModel;
+
+            ProcessVM = processItemViewModel;
+
+            ProjectHeaderVM = new ProjectHeaderViewModel(projectViewModel.Project);
+
+
             SaveProcessCommand = new RelayCommand(ExecuteSaveProcessCommand);
             DeleteProcessCommand = new RelayCommand(ExecuteDeleteProcessCommand);
 

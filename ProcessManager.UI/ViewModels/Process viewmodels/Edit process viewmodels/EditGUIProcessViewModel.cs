@@ -74,12 +74,10 @@ namespace ProcessManager.UI
         #endregion
 
 
-        public EditGUIProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel)
+        public EditGUIProcessViewModel(ProjectItemViewModel projectViewModel, ProcessItemViewModel processItemViewModel) : 
+            base(projectViewModel, processItemViewModel)
         {
             var process = ValidateProcessType<GUIProcess>(processItemViewModel.Process);
-
-            ProcessVM = processItemViewModel;
-            ProjectItemVM = projectViewModel;
 
             SelectedPath = process.ProcessPath;
             Arguments = process.ProcessArgs;
