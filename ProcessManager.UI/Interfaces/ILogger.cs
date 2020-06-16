@@ -1,9 +1,7 @@
 ﻿namespace ProcessManager.UI
 {
     using System;
-    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using System.Text;
 
     /// <summary>
     /// 
@@ -17,16 +15,6 @@
 		/// An action that will be invoked when a new log is logged 
 		/// </summary>
 		public event Action<string, LogLevel> NewLog;
-
-		#endregion
-
-
-		#region Properties
-
-		/// <summary>
-		/// The logger's verboseness level 
-		/// </summary>
-		public LogLevel LogOutputLevel { get; set; }
 
 		#endregion
 

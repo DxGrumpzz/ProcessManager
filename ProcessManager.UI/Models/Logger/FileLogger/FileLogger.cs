@@ -9,14 +9,17 @@
     /// </summary>
     public class FileLogger : ILogger
     {
+        /// <summary>
+        /// A boolean flag that indicates if this is the first time this logger was initialized
+        /// </summary>
+        private static bool _isFirstLoad = true;
+
+        /// <summary>
+        /// The <see cref="Log(string, LogLevel, string, string, int)"/> mutex locking object
+        /// </summary>
         private object _synchronizingObject = new object();
 
         private string _logFilepath;
-
-        /// <summary>
-        /// The logger's verboseness level 
-        /// </summary>
-        public LogLevel LogOutputLevel { get; set; }
 
 
         /// <summary>
@@ -31,6 +34,18 @@
         public FileLogger(string logFilepath)
         {
             _logFilepath = logFilepath;
+
+
+            // If this is the first time this logger is initialized
+            if (_isFirstLoad == true)
+            {
+                // Create new/empty file for logging
+                File.Create(logFilepath)
+                    // Dispose file stream after creation
+                    .Dispose();
+
+                _isFirstLoad = false;
+            };
         }
 
 

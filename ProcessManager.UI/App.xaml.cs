@@ -19,20 +19,6 @@ namespace ProcessManager.UI
     public partial class App : Application
     {
 
-#if DEBUG
-        /// <summary>
-        /// A console that will be displayed 
-        /// </summary>
-        [DllImport("Kernel32.dll")]
-        private static extern void AllocConsole();
-#endif
-
-
-        private const string LOG_FILE_NAME = "Log.txt";
-
-        private string _logFilepath = $"{Environment.CurrentDirectory}\\{LOG_FILE_NAME}";
-
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -57,10 +43,6 @@ namespace ProcessManager.UI
                 return;
             };
 
-            // Create new file for logging
-            File.Create(_logFilepath)
-                // Dispose file stream after creation
-                .Dispose();
 
             DI.Logger.Log("Creating MainWindow...");
 
@@ -104,12 +86,9 @@ namespace ProcessManager.UI
 
 
 #if DEBUG
-            AllocConsole();
-            Console.Title = "ProcessManager.UI console logger";
-
-            serviceCollection.AddTransient<ILogger, ConsoleLogger>();
+            serviceCollection.AddTransient<ILogger, ConsoleLogger>((provider) => new ConsoleLogger("ProcessManager.UI console logger"));
 #else
-            serviceCollection.AddTransient<ILogger, FileLogger>((provider) => new FileLogger(_logFilepath));
+            serviceCollection.AddTransient<ILogger, FileLogger>((provider) => new FileLogger($@"{Environment.CurrentDirectory}\Log.txt"));
 #endif
 
 

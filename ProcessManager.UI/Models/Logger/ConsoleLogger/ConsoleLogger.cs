@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
 
 
     /// <summary>
@@ -10,20 +11,28 @@
     /// </summary>
     public class ConsoleLogger : ILogger
     {
+        /// <summary>
+        /// A console that will be displayed 
+        /// </summary>
+        [DllImport("Kernel32.dll")]
+        private static extern void AllocConsole();
+
 
         private object _synchronizatingObject = new object();
-
-
-        /// <summary>
-        /// The logger's verboseness level 
-        /// </summary>
-        public LogLevel LogOutputLevel { get; set; }
 
 
         /// <summary>
         /// An action that will be invoked when a new log is logged 
         /// </summary>
         public event Action<string, LogLevel> NewLog = (message, outputLever) => { };
+
+
+        public ConsoleLogger(string consoleTitle = "")
+        {
+            AllocConsole();
+            Console.Title = consoleTitle;
+        }
+
 
 
         /// <summary>
@@ -39,19 +48,19 @@
             lock (_synchronizatingObject)
             {
                 // Writes the LogLevel in a format I like
-                var  writeLogLevel = new Action<LogLevel, ConsoleColor>((logLevel, colour) =>
-                {
+                var writeLogLevel = new Action<LogLevel, ConsoleColor>((logLevel, colour) =>
+               {
                     // Write first character
                     Console.Write('[');
 
                     // Set colour and write the log level
                     Console.ForegroundColor = colour;
-                    Console.Write($"{logLevel}");
+                   Console.Write($"{logLevel}");
 
                     // Reset console colours and add the last bracket
                     Console.ResetColor();
-                    Console.WriteLine(']');
-                });
+                   Console.WriteLine(']');
+               });
 
 
                 // Setup message format
