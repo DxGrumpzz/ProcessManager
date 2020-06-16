@@ -220,7 +220,6 @@
 
                             </Border.Style>
 
-
                             <Grid>
 
                                 <Grid.ColumnDefinitions>
@@ -234,6 +233,8 @@
                                     'SharedSizeGroup' and 'Grid.IsSharedSizeScope' don't "honour" star(*) sizing
                                     so I have to use a column that takes the "remaning" space -->
                                     <ColumnDefinition Width="*"/>
+
+                                    <ColumnDefinition Width="AUTO" />
 
                                     <ColumnDefinition Width="AUTO" SharedSizeGroup="Column2"/>
 
@@ -288,6 +289,35 @@
                                         Style="{StaticResource ThreeDotButtonStyle}"/>
 
 
+                                <!-- Run and close project buttons -->
+                                <StackPanel Orientation="Horizontal"
+                                            
+                                            Margin="0,3"
+                                            
+                                            Grid.Column="3">
+
+
+                                    <!-- Run project button -->
+                                    <Button Content="Run" 
+                                   
+                                            IsEnabled="{Binding ProjectInitializing}"
+                                    
+                                            Command="{Binding RunProjectCommand}"
+                                            
+                                            Margin="5,0"
+                                            
+                                            Style="{StaticResource AppButtonDarkGrey}"/>
+
+
+                                    <!-- Close project button --> 
+                                    <Button Content="Close"
+                                            
+                                            Command="{Binding CloseProjectCommand}"
+                                            Style="{StaticResource AppButtonDarkGrey}"/>
+
+                                </StackPanel>
+
+
                                 <!-- A text block containing the number of processes in this project -->
                                 <TextBlock Text="{Binding Project.ProcessList.Count}" 
                                            FontFamily="{StaticResource LatoThin}"
@@ -295,7 +325,7 @@
                                        
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
-                                           Grid.Column="3"/>
+                                           Grid.Column="4"/>
 
                             </Grid>
 
